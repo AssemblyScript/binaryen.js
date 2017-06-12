@@ -1,0 +1,22 @@
+{
+  "name": "binaryen",
+  "description": "JavaScript version of Binaryen, a compiler infrastructure and toolchain library for WebAssembly.",
+  "version": "1.37.13",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dcodeIO/binaryen.js.git"
+  },
+  "keywords": [
+    "webassembly",
+    "wasm"
+  ],
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "files":[
+    "index.js",
+    "index.d.ts",
+    "package.json",
+    "README.md"
+  ]
+}

@@ -1,0 +1,4 @@
+emsdk-portable/
+cmake*
+node_modules/
+npm-debug.*
