@@ -1,12 +1,13 @@
-binaryen
-========
+[![Build Status](https://travis-ci.org/dcodeIO/binaryen.js.svg?branch=master)](https://travis-ci.org/dcodeIO/binaryen.js)
 
-Compiler infrastructure and toolchain library for WebAssembly.
+binaryen.js
+===========
 
-Overview
---------
+**binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate WebAssembly using a JavaScript API.
 
-binaryen.js is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate WebAssembly using a JavaScript API.
+```
+$> npm install binaryen
+```
 
 The API is documented in the rest of this document.
 

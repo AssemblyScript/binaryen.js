@@ -1,11 +1,76 @@
-dist: trusty
-language: node_js
-install:
-- wget -qO- https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz | tar xvz
-- wget -qO- https://cmake.org/files/v3.9/cmake-3.9.0-rc2-Linux-x86_64.tar.gz | tar xvz && ln -s cmake-3.9.0-rc2-Linux-x86_64 cmake
-- export PATH=$(pwd)/cmake/bin:$PATH
-- ./emsdk-portable/emsdk install sdk-incoming-64bit
-script:
-- ./emsdk-portable/emsdk activate sdk-incoming-64bit
-- ./binaryen/build-js.sh && cp ./binaryen/bin/binaryen.js ./index.js
-# TODO: update version and publish to npm
+language: cpp
+dist: trusty # Note that a trusty instance is limited to 2 cores, max. 4 gb of memory and 20 gb of hard disk space.
+compiler: clang-5.0
+addons:
+  apt:
+    sources:
+    - llvm-toolchain-trusty
+    packages:
+    - clang-5.0
+    - lld-5.0
+git:
+  submodules: false
+cache:
+  ccache: true
+  directories:
+  - $HOME/.emscripten_cache
+notifications:
+  email:
+    on_failure: change
+env:
+  global:
+  - MAKEFLAGS="-j2"
+  - CFLAGS="-Qunused-arguments -fcolor-diagnostics -fuse-ld=lld-5.0 -O0"
+  - CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -fuse-ld=lld-5.0 -O0"
+  - CCACHE_SLOPPINESS="pch_defines,time_macros"
+  - CCACHE_COMPRESS=1
+  - CCACHE_HARDLINK=1
+  - CCACHE_MAXSIZE="256m"
+  - EMSDK="$HOME/emsdk-portable"
+  - EMSCRIPTEN="$EMSDK/emscripten/incoming"
+  - PATH="$HOME/cmake-3.8.2-Linux-x86_64/bin:$EMSDK:$PATH"
+  - GIT_NAME="Travis CI"
+  - GIT_EMAIL="travis@travis-ci.org"
+
+install: # install a recent cmake and emsdk-portable
+- wget --no-check-certificate -qO- https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz | tar -xzC $HOME &&
+  wget --no-check-certificate -qO- https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz | tar -xzC $HOME
+
+before_script: # setup emscripten
+- ccache -z -M ${CCACHE_MAXSIZE} &&
+  ccache -s
+- export CC="ccache clang-5.0" &&
+  export CXX="ccache clang++-5.0" &&
+  export LD="ld.lld-5.0" &&
+  export RC=1 &&
+  timeout 40m emsdk install -j2 --build=Release --disable-assertions clang-incoming-64bit &&
+  emsdk install -j2 emscripten-incoming-64bit &&
+  emsdk install node-4.1.1-64bit > /dev/null &&
+  emsdk activate --build=Release clang-incoming-64bit &&
+  emsdk activate emscripten-incoming-64bit &&
+  emsdk activate node-4.1.1-64bit &&
+  git submodule update --init --remote --merge;
+  export RC=$?;
+  $(exit 0)
+
+script: # build binaryen.js
+- if [ $RC -eq 0 ]; then
+    source $EMSDK/emsdk_env.sh &&
+    cd ./binaryen &&
+    ./build-js.sh &&
+    cp ./bin/binaryen.js ../index.js &&
+    cd ..;
+  else
+    $(exit $RC);
+  fi
+
+before_cache:
+- ccache -s
+
+after_success: # push back to github
+- git checkout master &&
+  git config credential.helper "store --file=.git/credentials" &&
+  echo "https://${GH_TOKEN}:@github.com" > .git/credentials &&
+  git add ./index.js &&
+  git commit -m "Travis CI build ${TRAVIS_BUILD_NUMBER} [travis skip]" &&
+  git push -u origin master

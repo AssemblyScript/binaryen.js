@@ -240,6 +240,14 @@ declare module binaryen {
 
   }
 
+  class Relooper {
+    addBlock(expression: Expression): RelooperBlock;
+    addBranch(from: RelooperBlock, to: RelooperBlock, condition: Expression, code: Expression): void;
+    addBlockWithSwitch(code: Expression, condition: Expression): RelooperBlock;
+    addBranchForSwitch(from: RelooperBlock, to: RelooperBlock, indexes: number[], code: Expression): void;
+    renderAndDispose(entry: RelooperBlock, labelHelper: number, module: Module): Expression;
+  }
+
   function readBinary(data: Uint8Array): Module;
 
   // These are actually pointers internally
@@ -252,6 +260,7 @@ declare module binaryen {
   abstract class I64Expression extends Expression {}
   abstract class F32Expression extends Expression {}
   abstract class F64Expression extends Expression {}
+  abstract class RelooperBlock {}
 }
 
 export = binaryen;
