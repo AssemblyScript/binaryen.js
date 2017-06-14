@@ -207,7 +207,7 @@ declare module binaryen {
 
     emitBinary(): Uint8Array;
     emitText(): string;
-    validate(): void;
+    validate(): number;
     optimize(): void;
     autoDrop(): void;
     interpret(): void;

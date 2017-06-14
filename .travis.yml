@@ -61,6 +61,7 @@ script: # build binaryen.js
     ./build-js.sh &&
     cp ./bin/binaryen.js ../index.js &&
     cd .. &&
+    npm install &&
     npm test
   else
     $(exit $RC);
@@ -71,6 +72,7 @@ before_cache:
 - ccache -s
 
 after_success: # push to github
+# export BINARYEN_LATEST=`tail -n 1 $EMSDK/binaryen-tags.txt`
 - git config --global user.email "travis@travis-ci.org" &&
   git config --global user.name "Travis CI" &&
   git config credential.helper "store --file=.git/credentials" &&
