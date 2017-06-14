@@ -13,6 +13,9 @@
   ],
   "main": "index.js",
   "typings": "index.d.ts",
+  "scripts":{
+    "test": "node tests"
+  },
   "files":[
     "index.js",
     "index.d.ts",
