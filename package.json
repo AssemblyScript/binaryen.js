@@ -13,10 +13,10 @@
   ],
   "main": "index.js",
   "typings": "index.d.ts",
-  "scripts":{
+  "scripts": {
     "test": "node tests"
   },
-  "files":[
+  "files": [
     "index.js",
     "index.d.ts",
     "package.json",

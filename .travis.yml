@@ -42,7 +42,8 @@ before_script: # setup emscripten
   export CXX="ccache clang++-5.0" &&
   export LD="ld.lld-5.0" &&
   export RC=1
-- timeout 40m emsdk install -j2 --build=Release --disable-assertions clang-incoming-64bit &&
+- emsdk update-tags &&
+  timeout 40m emsdk install -j2 --build=Release --disable-assertions clang-incoming-64bit &&
   emsdk install -j2 emscripten-incoming-64bit &&
   emsdk activate --build=Release clang-incoming-64bit &&
   emsdk activate emscripten-incoming-64bit &&
@@ -71,13 +72,30 @@ before_cache:
 - cp $HOME/.emscripten $HOME/.emscripten_cache/config
 - ccache -s
 
-after_success: # push to github
-# export BINARYEN_LATEST=`tail -n 1 $EMSDK/binaryen-tags.txt`
-- git config --global user.email "travis@travis-ci.org" &&
+after_success: # push to github and npm
+- RELEASE_VERSION=`tail -n 1 $EMSDK/binaryen-tags.txt` &&
+  PRERELEASE_VERSION=${RELEASE_VERSION}"-nightly."`date -u +"%Y%m%d"` &&
+  git config --global user.email "travis@travis-ci.org" &&
   git config --global user.name "Travis CI" &&
   git config credential.helper "store --file=.git/credentials" &&
   echo "https://${GH_TOKEN}:@github.com" > .git/credentials &&
   git add ./binaryen &&
-  git add ./index.js &&
-  git commit -m "Build ""#""${TRAVIS_BUILD_NUMBER} [ci skip]" &&
-  git push -u origin master
+  git add ./index.js && (
+    (
+      npm version "${RELEASE_VERSION}" &&
+      git add ./package.json &&
+      PUBLISH_VERSION=${RELEASE_VERSION} &&
+      IS_PRERELEASE=0
+    ) || (
+      npm version "${PRERELEASE_VERSION}" &&
+      PUBLISH_VERSION=${PRERELEASE_VERSION} &&
+      IS_PRERELEASE=1
+    )
+  ) &&
+  git commit -m "Build ""#""${TRAVIS_BUILD_NUMBER} (v${PUBLISH_VERSION}) [ci skip]" &&
+  git push -u origin master --tags
+#  && if [ $IS_PRERELEASE -eq 1 ]; then
+#    npm publish --tag nightly;
+#  else
+#    npm publish --tag latest;
+#  fi
