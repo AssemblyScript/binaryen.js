@@ -49,6 +49,7 @@ before_script: # setup emscripten
   emsdk activate --build=Release clang-incoming-64bit &&
   emsdk activate emscripten-incoming-64bit &&
   emsdk activate node-4.1.1-64bit &&
+  git checkout master &&
   git submodule update --init --remote --merge;
   export RC=$?;
   $(exit 0)
@@ -68,9 +69,8 @@ before_cache:
 - ccache -s
 
 after_success: # push back to github
-- git checkout master &&
-  git config credential.helper "store --file=.git/credentials" &&
+- git config credential.helper "store --file=.git/credentials" &&
   echo "https://${GH_TOKEN}:@github.com" > .git/credentials &&
   git add ./index.js &&
-  git commit -m "Travis CI build ${TRAVIS_BUILD_NUMBER} [travis skip]" &&
+  git commit -m "Travis CI build ${TRAVIS_BUILD_NUMBER} [ci skip]" &&
   git push -u origin master
