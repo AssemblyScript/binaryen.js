@@ -1,18 +1,43 @@
-[![Build Status](https://travis-ci.org/dcodeIO/binaryen.js.svg?branch=master)](https://travis-ci.org/dcodeIO/binaryen.js)
-
 binaryen.js
 ===========
 
 **binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate WebAssembly using a JavaScript API.
 
+[![Build Status](https://travis-ci.org/dcodeIO/binaryen.js.svg?branch=master)](https://travis-ci.org/dcodeIO/binaryen.js)
+
+Usage
+-----
+
 ```
 $> npm install binaryen
 ```
 
+```js
+var binaryen = require("binaryen");
+
+var myModule = new binaryen.Module();
+myModule.addFunction("main", mod.addFunctionType("i", binaryen.i32, []), [], mod.return(mod.i32.const(0)));
+myModule.addExport("main", "main");
+
+var textData = myModule.emitText();
+var wasmData = myModule.emitBinary();
+...
+```
+
+The buildbot also publishes nightly versions once a day. The latest nightly can be installed through
+
+```
+$> npm install binaryen@nightly
+```
+
+or you can use one of the [previous versions](https://github.com/dcodeIO/binaryen.js/tags) instead if necessary.
+
+API
+---
+
 The API is documented in the rest of this document.
 
-Types
------
+### Types
 
  * `binaryen.none`: The none type.
  * `binaryen.i32`: The i32 type.
@@ -20,8 +45,7 @@ Types
  * `binaryen.f32`: The f32 type.
  * `binaryen.f64`: The f64 type.
 
-Modules
--------
+### Modules
 
  * `binaryen.Module()`: Constructor for a Binaryen WebAssembly module. You need to create one of these first.
 
