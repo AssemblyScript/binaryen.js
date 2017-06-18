@@ -240,6 +240,11 @@ declare module binaryen {
 
   }
 
+  function readBinary(data: Uint8Array): Module;
+  function parseText(text: string): Module;
+  function emitText(expression: Expression): string;
+  function setAPITracing(on: boolean): void;
+
   class Relooper {
     addBlock(expression: Expression): RelooperBlock;
     addBranch(from: RelooperBlock, to: RelooperBlock, condition: Expression, code: Expression): void;
@@ -247,8 +252,6 @@ declare module binaryen {
     addBranchForSwitch(from: RelooperBlock, to: RelooperBlock, indexes: number[], code: Expression): void;
     renderAndDispose(entry: RelooperBlock, labelHelper: number, module: Module): Expression;
   }
-
-  function readBinary(data: Uint8Array): Module;
 
   // These are actually pointers internally
   abstract class Type {}

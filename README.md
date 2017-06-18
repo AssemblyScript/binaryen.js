@@ -257,6 +257,7 @@ Unprefixed expressions:
 (now done with `Module`s, returning to the `Binaryen` object)
 
   * `Binaryen.readBinary(data)`: Reads a binary wasm module and returns a Binaryen `Module` object created from it.
+  * `Binaryen.parseText(text)`: Parses a module in text representation and returns a Binaryen `Module` object created from it.
   * `Binaryen.emitText(expression)`: Returns a text representation of an individual expression, in s-expression format. Because Binaryen expression do not depend on their function or module, you can do this at any time.
   * `setAPITracing(on)`: Sets whether API tracing is on. When on, this emits C API commands for everything you do. This can be very useful for filing bug reports.
   * `Binaryen.Relooper()`: Constructor for a Binaryen Relooper instance. This lets you provide an arbitrary CFG, and the Relooper will structure it for WebAssembly.
