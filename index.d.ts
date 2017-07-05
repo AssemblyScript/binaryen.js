@@ -224,6 +224,7 @@ declare module binaryen {
     break(label: string, condition?: I32Expression, value?: I32Expression): Statement;
     switch(labels: string[], defaultLabel: string, condition: I32Expression, value?: I32Expression): Statement;
     call(name: string, operands: Expression[], type: Type): Expression;
+    callImport(name: string, operands: Expression[], type: Type): Expression;
     callIndirect(target: I32Expression, operands: Expression[], type: Type): Expression;
     getLocal(index: number, type: Type): Expression;
     setLocal(index: number, value: Expression): Statement;
