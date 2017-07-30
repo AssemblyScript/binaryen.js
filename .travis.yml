@@ -45,20 +45,21 @@ before_script: # setup ccache, git and emscripten
   emsdk activate emscripten-incoming-64bit &&
   git checkout master &&
   git submodule update --init --remote --merge;
-  export RC=$?
-- $(exit 0)
+  export RC=$?;
+  $(exit 0)
 
 script: # build binaryen.js
-- if [ $RC -ne 0 ]; then
-    exit $RC;
+- if [ $RC -eq 0 ]; then
+    source $EMSDK/emsdk_env.sh &&
+    cd ./binaryen &&
+    ./build-js.sh &&
+    cp ./bin/binaryen.js ../index.js &&
+    cd .. &&
+    npm install &&
+    npm test;
+    export RC=$?;
   fi;
-  source $EMSDK/emsdk_env.sh &&
-  cd ./binaryen &&
-  ./build-js.sh &&
-  cp ./bin/binaryen.js ../index.js &&
-  cd .. &&
-  npm install &&
-  npm test;
+  $(exit $RC)
 
 before_cache: # print ccache statistics
 - ccache -s
@@ -71,7 +72,6 @@ after_failure: # trigger continuation if (and only if) the build timed out
     git commit --allow-empty -m "Build continuation notification" &&
     git push -u origin master;
   fi
-- exit $RC
 
 after_success: # push to github and publish on npm (intentionally fails for duplicates)
 - RELEASE_VERSION=`tail -n 1 $EMSDK/binaryen-tags.txt` &&
