@@ -22,5 +22,8 @@
     "package.json",
     "package-lock.json",
     "README.md"
-  ]
+  ],
+  "devDependencies": {
+    "tape": "^4.8.0"
+  }
 }
