@@ -67,6 +67,7 @@ Module property operations:
 Module operations:
 
   * `emitBinary()`: Returns a binary for the module, which you can then compile and run in the browser.
+  * `emitAsmjs()`: Returns the module converted to asm.js, which can be run in older browsers as well.
   * `emitText()`: Returns a text representation of the module, in s-expression format.
   * `validate()`: Validates the module, checking it for correctness. Returns `1` if the module is valid, otherwise `0`.
   * `optimize()`: Optimize the module.

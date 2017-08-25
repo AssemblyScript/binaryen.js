@@ -207,6 +207,7 @@ declare module binaryen {
 
     emitBinary(): Uint8Array;
     emitText(): string;
+    emitAsmjs(): string;
     validate(): number;
     optimize(): void;
     autoDrop(): void;
