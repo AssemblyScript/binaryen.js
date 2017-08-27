@@ -5,7 +5,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dcodeIO/binaryen.js.git"
+    "url": "https://github.com/AssemblyScript/binaryen.js.git"
   },
   "keywords": [
     "webassembly",

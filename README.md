@@ -3,7 +3,7 @@ binaryen.js
 
 **binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate WebAssembly using a JavaScript API.
 
-[![npm](https://img.shields.io/npm/v/binaryen.svg)](https://www.npmjs.com/package/binaryen) [![npm (tag)](https://img.shields.io/npm/v/binaryen/nightly.svg)](https://www.npmjs.com/package/binaryen) [![Build Status](https://travis-ci.org/dcodeIO/binaryen.js.svg?branch=master)](https://travis-ci.org/dcodeIO/binaryen.js)
+[![npm](https://img.shields.io/npm/v/binaryen.svg)](https://www.npmjs.com/package/binaryen) [![npm (tag)](https://img.shields.io/npm/v/binaryen/nightly.svg)](https://www.npmjs.com/package/binaryen) [![Build Status](https://travis-ci.org/AssemblyScript/binaryen.js.svg?branch=master)](https://travis-ci.org/AssemblyScript/binaryen.js)
 
 Usage
 -----
@@ -30,7 +30,7 @@ The buildbot also publishes nightly versions once a day. The latest nightly can 
 $> npm install binaryen@nightly
 ```
 
-or you can use one of the [previous versions](https://github.com/dcodeIO/binaryen.js/tags) instead if necessary.
+or you can use one of the [previous versions](https://github.com/AssemblyScript/binaryen.js/tags) instead if necessary.
 
 API
 ---
