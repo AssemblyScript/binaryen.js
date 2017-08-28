@@ -17,8 +17,8 @@ env:
   - CCACHE_HARDLINK=1
   - CCACHE_MAXSIZE="256m"
   - EMSDK="$HOME/emsdk-portable"
-  - EMSCRIPTEN_VERSION="tag-1.37.17" # see https://github.com/WebAssembly/binaryen/issues/1135
-  - CLANG_VERSION="tag-e1.37.17"
+  - EMSCRIPTEN_VERSION="incoming"
+  - CLANG_VERSION="incoming"
   - PATH="$HOME/cmake-3.8.2-Linux-x86_64/bin:$EMSDK:$PATH"
 
 install: # install cmake, emsdk-portable and node.js
