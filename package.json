@@ -1,7 +1,7 @@
 {
   "name": "binaryen",
   "description": "JavaScript version of Binaryen, a compiler infrastructure and toolchain library for WebAssembly.",
-  "version": "1.37.20",
+  "version": "1.37.20-nightly20170830",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -24,6 +24,9 @@
     "README.md"
   ],
   "devDependencies": {
+    "dateformat": "^2.0.0",
+    "semver": "^5.4.1",
+    "simple-git": "^1.76.0",
     "tape": "^4.8.0"
   }
 }

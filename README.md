@@ -24,7 +24,7 @@ var wasmData = myModule.emitBinary();
 ...
 ```
 
-The buildbot also publishes nightly versions once a day. The latest nightly can be installed through
+The buildbot also publishes nightly versions once a day if there have been changes. The latest nightly can be installed through
 
 ```
 $> npm install binaryen@nightly
