@@ -107,11 +107,8 @@ after_success: # push to github and publish on npm (intentionally fails for dupl
   git push -u origin "v"$VERSION &&
   if [ $RELEASE ]; then
     echo "Publishing release ..." &&
-    echo "publish skipped";
+    npm publish;
   else
     echo "Publishing nightly ..." &&
-    echo "publish skipped";
+    npm publish --tag nightly;
   fi
-
-# npm publish;
-# npm publish --tag nightly;
