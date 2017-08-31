@@ -52,20 +52,27 @@ before_script: # setup ccache, git and emscripten
 
 script: # build binaryen.js
 - if [ $RC -eq 0 ]; then
-    export VERSION=`node scripts/version` &&
-    if [[ $VERSION == *nightly* ]]; then
-      export NIGHTLY=1 &&
-      echo "Building nightly v$VERSION";
-    else
+    npm install &&
+    VERSION=`node scripts/version` &&
+    export VERSION &&
+    if [[ $VERSION != *nightly* ]]; then
       export RELEASE=1 &&
-      echo "Building release v$VERSION";
+      echo "Building release v$VERSION (@$TAG) ...";
+    else
+      unset RELEASE &&
+      echo "Building nightly v$VERSION ...";
     fi &&
     source $EMSDK/emsdk_env.sh &&
     cd ./binaryen &&
+    if [ $RELEASE ]; then
+      TAG=`node ../scripts/version tag` &&
+      echo "Resetting to $TAG ..." &&
+      git reset --hard "$TAG" &&
+      git clean -f;
+    fi &&
     ./build-js.sh &&
     cp ./bin/binaryen.js ../index.js &&
     cd .. &&
-    npm install &&
     npm test;
     export RC=$?;
   fi;
@@ -78,12 +85,11 @@ before_cache: # print ccache statistics
 
 after_failure: # trigger continuation if (and only if) the build timed out
 - if [ $RC -eq 124 ]; then
-    git checkout master &&
     git commit --allow-empty -m "Build continuation notification" &&
     git push -u origin master;
   fi
 
-after_success: # push to github and publish on npm (intentionally fails for duplicates)
+after_success: # push to github and publish on npm (intentionally fails for duplicates, triggers a nightly build when publishing release)
 - git add ./binaryen &&
   git add ./index.js &&
   npm version $VERSION --no-git-tag-version --force &&
@@ -93,29 +99,19 @@ after_success: # push to github and publish on npm (intentionally fails for dupl
     echo "Committing release ("$VERSION") ...";
   else
     echo "Committing nightly ("$VERSION") ...";
-  fi
+  fi &&
   git commit -m "Build ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION") [ci skip]" &&
-  echo "push skipped" &&
+  git push -u origin master &&
   echo "Creating tag v$VERSION ..." &&
   git tag "v"$VERSION &&
-  echo "push skipped" &&
-  if [ $NIGHTLY ]; then
-    echo "Publishing nightly ..." &&
-    echo "publish skipped"
-  else
+  git push -u origin "v"$VERSION &&
+  if [ $RELEASE ]; then
     echo "Publishing release ..." &&
+    echo "publish skipped";
+  else
+    echo "Publishing nightly ..." &&
     echo "publish skipped";
   fi
 
-#   git commit -m "Build ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION") [ci skip]" &&
-#   git push -u origin master &&
-#   echo "Creating tag v$VERSION ..." &&
-#   git tag "v"$VERSION &&
-#   git push -u origin "v"$VERSION &&
-#   if [ $NIGHTLY ]; then
-#     echo "Publishing nightly ..." &&
-#     npm publish --tag nightly;
-#   else
-#     echo "Publishing release ..." &&
-#     npm publish;
-#   fi
+# npm publish;
+# npm publish --tag nightly;

@@ -92,6 +92,15 @@ test("optimizing the module", function(test) {
   test.end();
 });
 
+var asmjs;
+test("emitting asmjs", function(test) {
+  test.doesNotThrow(function() {
+    asmjs = mod.emitAsmjs();
+  });
+  test.ok(typeof asmjs === "string" && asmjs.length, "should return a non-empty string");
+  test.end();
+});
+
 test("fixtures", function(test) {
 
   var textComp = fs.readFileSync(__dirname + "/fixtures/index.text").toString().replace(/\r?\n/g, "\n");

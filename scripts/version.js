@@ -46,12 +46,10 @@ Promise.all([
   latest(src),
   latest(dst)
 ]).then(() => {
-  if (semver.gt(src.version, dst.version))
-    src.git.reset([ "--hard" ], src.tag, err => {
-      if (err)
-        throw err;
-      console.log(src.version);
-    });
+  if (process.argv[2] === "tag")
+    console.log(src.tag);
+  else if (semver.gt(src.version, dst.version))
+    console.log(src.version);
   else
     console.log(src.version + "-nightly." + dateFormat(Date.UTC(), "yyyymmdd"));
 }).catch(err => {
