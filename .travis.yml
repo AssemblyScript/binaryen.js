@@ -16,15 +16,13 @@ env:
   - CCACHE_COMPRESS=1
   - CCACHE_HARDLINK=1
   - CCACHE_MAXSIZE="256m"
-  - EMSDK="$HOME/emsdk-portable"
-  - EMSCRIPTEN_VERSION="incoming"
-  - CLANG_VERSION="incoming"
-  - PATH="$HOME/cmake-3.8.2-Linux-x86_64/bin:$EMSDK:$PATH"
+  - LLVM="$HOME/emscripten-fastcomp/build/bin"
+  - EMSCRIPTEN="$HOME/emscripten"
+  - PATH="$HOME/emscripten:$HOME/cmake/bin:$PATH"
 
-install: # install cmake, emsdk-portable and node.js
-- wget --no-check-certificate -qO- https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.tar.gz | tar -xzC $HOME &&
-  wget --no-check-certificate -qO- https://s3.amazonaws.com/mozilla-games/emscripten/releases/emsdk-portable.tar.gz | tar -xzC $HOME &&
-  nvm install 8
+install: # install cmake and node.js
+- mkdir $HOME/cmake && wget -qO- https://cmake.org/files/v3.9/cmake-3.9.4-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
+- nvm install 8
 
 before_script: # setup ccache, git and emscripten
 - ccache -z -M $CCACHE_MAXSIZE &&
@@ -34,17 +32,18 @@ before_script: # setup ccache, git and emscripten
   git config credential.helper "store --file=.git/credentials" &&
   echo "https://${GH_TOKEN}:@github.com" > .git/credentials &&
   echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > $HOME/.npmrc
-- export CC="ccache clang" &&
+- export RC=1
+- git clone -b incoming --depth 1 https://github.com/kripken/emscripten-fastcomp $HOME/emscripten-fastcomp &&
+  git clone -b incoming --depth 1 https://github.com/kripken/emscripten-fastcomp-clang $HOME/emscripten-fastcomp/tools/clang &&
+  git clone -b incoming --depth 1 https://github.com/kripken/emscripten $HOME/emscripten &&
+  mkdir $HOME/emscripten-fastcomp/build &&
+  export CC="ccache clang" &&
   export CXX="ccache clang++" &&
   export LD="ld.gold" &&
-  export RC=1
-- emsdk update-tags &&
-  timeout 30m
-  emsdk install -j2 --build=Release --disable-assertions clang-${CLANG_VERSION}-64bit &&
-  emsdk install -j2 emscripten-${EMSCRIPTEN_VERSION}-64bit &&
-  emsdk activate --build=Release clang-${CLANG_VERSION}-64bit &&
-  emsdk activate emscripten-${EMSCRIPTEN_VERSION}-64bit &&
-  export EMSCRIPTEN=${EMSCRIPTEN_ROOT} &&
+  cmake -B$HOME/emscripten-fastcomp/build -H$HOME/emscripten-fastcomp -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="X86;JSBackend" -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF -DCLANG_INCLUDE_EXAMPLES=OFF -DCLANG_INCLUDE_TESTS=OFF &&
+  timeout 30m make -C $HOME/emscripten-fastcomp/build $MAKEFLAGS &&
+  emcc -v &&
+  emcc -v &&
   git checkout master &&
   git submodule update --init --remote --merge;
   export RC=$?;
@@ -62,17 +61,15 @@ script: # build binaryen.js
       unset RELEASE &&
       echo "Building nightly v$VERSION ...";
     fi &&
-    source $EMSDK/emsdk_env.sh &&
-    cd ./binaryen &&
     if [ $RELEASE ]; then
-      TAG=`node ../scripts/version tag` &&
+      TAG=`node scripts/version tag` &&
       echo "Resetting to $TAG ..." &&
+      cd ./binaryen &&
       git reset --hard "$TAG" &&
-      git clean -f;
+      git clean -f &&
+      cd ..;
     fi &&
-    ./build-js.sh &&
-    cp ./bin/binaryen.js ../index.js &&
-    cd .. &&
+    npm run build &&
     npm test;
     export RC=$?;
   fi;
@@ -85,6 +82,8 @@ before_cache: # print ccache statistics
 
 after_failure: # trigger continuation if (and only if) the build timed out
 - if [ $RC -eq 124 ]; then
+    git checkout master &&
+    git pull &&
     git commit --allow-empty -m "Build continuation notification" &&
     git push -u origin master;
   fi
@@ -96,19 +95,20 @@ after_success: # push to github and publish on npm (intentionally fails for dupl
   if [ $RELEASE ]; then
     git add ./package.json &&
     git add ./package-lock.json &&
-    echo "Committing release ("$VERSION") ...";
+    echo "Committing release ("$VERSION") ..." &&
+    git commit -m "Release ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION")";
   else
-    echo "Committing nightly ("$VERSION") ...";
-  fi &&
-  git commit -m "Build ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION") [ci skip]" &&
-  git push -u origin master &&
-  echo "Creating tag v$VERSION ..." &&
-  git tag "v"$VERSION &&
-  git push -u origin "v"$VERSION &&
-  if [ $RELEASE ]; then
-    echo "Publishing release ..." &&
-    npm publish;
-  else
-    echo "Publishing nightly ..." &&
-    npm publish --tag nightly;
+    echo "Committing nightly ("$VERSION") ..." &&
+    git commit -m "Nightly ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION") [ci skip]";
   fi
+#  && git push -u origin master &&
+#  echo "Creating tag v$VERSION ..." &&
+#  git tag "v"$VERSION &&
+#  git push -u origin "v"$VERSION &&
+#  if [ $RELEASE ]; then
+#    echo "Publishing release ..." &&
+#    npm publish;
+#  else
+#    echo "Publishing nightly ..." &&
+#    npm publish --tag nightly;
+#  fi

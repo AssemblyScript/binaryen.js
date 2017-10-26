@@ -101,10 +101,14 @@ test("emitting asmjs", function(test) {
   test.end();
 });
 
+function stripComments(text) {
+  return text.replace(/ \(; [\w$_]+ ;\)/g, "");
+}
+
 test("fixtures", function(test) {
 
-  var textComp = fs.readFileSync(__dirname + "/fixtures/index.text").toString().replace(/\r?\n/g, "\n");
-  test.strictEqual(text, textComp.toString().replace(/\r?\n/g, "\n"), "should match text output");
+  var textComp = fs.readFileSync(__dirname + "/fixtures/index.text", "utf8").replace(/\r?\n/g, "\n");
+  test.strictEqual(stripComments(text), stripComments(textComp), "should match text output");
 
   var binaryComp = fs.readFileSync(__dirname + "/fixtures/index.wasm");
   test.ok(Buffer.compare(binary, binaryComp) === 0, "should match binary output");

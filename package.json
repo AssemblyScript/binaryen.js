@@ -14,6 +14,7 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
+    "build": "node scripts/build",
     "test": "node tests"
   },
   "files": [
@@ -25,6 +26,7 @@
   ],
   "devDependencies": {
     "dateformat": "^2.0.0",
+    "glob": "^7.1.2",
     "semver": "^5.4.1",
     "simple-git": "^1.76.0",
     "tape": "^4.8.0"
