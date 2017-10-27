@@ -7,6 +7,9 @@ cache:
   ccache: true
   directories:
   - $HOME/.emscripten_cache
+branches:
+  only:
+  - master
 env:
   global:
   - MAKEFLAGS="-j2"
