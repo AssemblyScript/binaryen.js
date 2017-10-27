@@ -1,5 +1,5 @@
 language: cpp
-dist: trusty # Note that trusty instances are limited to 2 cores, max. 4 gb of memory and 20 gb of hard disk space.
+dist: trusty # limited to 2 cores, max. 4 gb of memory and 20 gb of hard disk space.
 compiler: clang
 git:
   submodules: false
@@ -100,15 +100,15 @@ after_success: # push to github and publish on npm (intentionally fails for dupl
   else
     echo "Committing nightly ("$VERSION") ..." &&
     git commit -m "Nightly ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION") [ci skip]";
+  fi &&
+  git push -u origin master &&
+  echo "Creating tag v$VERSION ..." &&
+  git tag "v"$VERSION &&
+  git push -u origin "v"$VERSION &&
+  if [ $RELEASE ]; then
+    echo "Publishing release ..." &&
+    npm publish;
+  else
+    echo "Publishing nightly ..." &&
+    npm publish --tag nightly;
   fi
-#  && git push -u origin master &&
-#  echo "Creating tag v$VERSION ..." &&
-#  git tag "v"$VERSION &&
-#  git push -u origin "v"$VERSION &&
-#  if [ $RELEASE ]; then
-#    echo "Publishing release ..." &&
-#    npm publish;
-#  else
-#    echo "Publishing nightly ..." &&
-#    npm publish --tag nightly;
-#  fi
