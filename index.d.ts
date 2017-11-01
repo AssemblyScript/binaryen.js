@@ -210,6 +210,7 @@ declare module binaryen {
     emitAsmjs(): string;
     validate(): number;
     optimize(): void;
+    runPasses(passes: string[]): void;
     autoDrop(): void;
     interpret(): void;
     dispose(): void;

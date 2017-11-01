@@ -16,7 +16,7 @@ $> npm install binaryen
 var binaryen = require("binaryen");
 
 var myModule = new binaryen.Module();
-myModule.addFunction("main", mod.addFunctionType("i", binaryen.i32, []), [], mod.return(mod.i32.const(0)));
+myModule.addFunction("main", myModule.addFunctionType("i", binaryen.i32, []), [], myModule.return(myModule.i32.const(0)));
 myModule.addExport("main", "main");
 
 var textData = myModule.emitText();
@@ -70,7 +70,8 @@ Module operations:
   * `emitAsmjs()`: Returns the module converted to asm.js, which can be run in older browsers as well.
   * `emitText()`: Returns a text representation of the module, in s-expression format.
   * `validate()`: Validates the module, checking it for correctness. Returns `1` if the module is valid, otherwise `0`.
-  * `optimize()`: Optimize the module.
+  * `optimize()`: Runs the standard optimization passes on the module.
+  * `runPasses(passes)`: Runs the specified passes on the module.
   * `autoDrop()`: Automatically inserts `drop` operations. This lets you not worry about dropping when creating your code.
   * `interpret()`: Run the module in the Binaryen interpreter (creates the module, and calls the start method). Useful for debugging.
   * `dispose()`: Cleans up the module. If the Binaryen object can be garbage-collected anyhow, you don't need to do this, but if it stays around - e.g. if you create multiple `Module`s over time - then you should call this once a `Module` is no longer needed. (As binaryen.js uses compiled C++ code, we can't just rely on normal garbage collection to clean things up internally.)

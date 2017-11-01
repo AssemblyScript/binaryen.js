@@ -99,10 +99,10 @@ after_success: # push to github and publish on npm (intentionally fails for dupl
     git add ./package.json &&
     git add ./package-lock.json &&
     echo "Committing release ("$VERSION") ..." &&
-    git commit -m "Release ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION")";
+    git commit -m "Build ""#"$TRAVIS_BUILD_NUMBER":"" Release v"$VERSION;
   else
     echo "Committing nightly ("$VERSION") ..." &&
-    git commit -m "Nightly ""#"$TRAVIS_BUILD_NUMBER" (v"$VERSION") [ci skip]";
+    git commit -m "Build ""#"$TRAVIS_BUILD_NUMBER":"" Nightly v"$VERSION" [ci skip]";
   fi &&
   git push -u origin master &&
   echo "Creating tag v$VERSION ..." &&
