@@ -13,7 +13,7 @@ var sourceFiles = [];
   "asmjs/*.cpp",
   "cfg/*.cpp",
   "emscripten-optimizer/*.cpp",
-  "+(ast|ir)/*.cpp",
+  "ir/*.cpp",
   "passes/*.cpp",
   "support/!(archive|file|command-line).cpp",
   "wasm/!(wasm-io).cpp",
