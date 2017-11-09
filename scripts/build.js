@@ -39,10 +39,8 @@ while (match = expression.exec(headerSource))
 console.log("Found " + exportedFunctions.length + " exported functions:\n\n  " + exportedFunctions.join("\n  ") + "\n");
 
 var commonOptions = [
-  "-s", "ALLOW_MEMORY_GROWTH=1",
   "-s", "DEMANGLE_SUPPORT=1",
   "-s", "DISABLE_EXCEPTION_CATCHING=0",
-  "-s", "ELIMINATE_DUPLICATE_FUNCTIONS=1",
   "-s", /^win/.test(process.platform)
     ? "EXPORTED_FUNCTIONS=\"[" + exportedFunctions.map(name => "\\\"_" + name + "\\\"").join(",") + "]\""
     : "EXPORTED_FUNCTIONS='[" + exportedFunctions.map(name => "\"_" + name + "\"").join(",") + "]'",
@@ -68,14 +66,23 @@ function precompile() {
 function compile(options) {
   var cmd = '"' + path.join(emscriptenDirectory, "em++") + '"';
   var arg = commonOptions.concat([
-    "--closure", "1",
-    "--pre-js", options.pre,
-    "--post-js", options.post,
     "-Oz",
     "-o", options.out,
-    "-Wno-almost-asm",
     "shared.bc"
   ]);
+  arg = arg.concat(/.js$/.test(options.out)
+    ? [
+      "-s", "ALLOW_MEMORY_GROWTH=1",
+      "-s", "ELIMINATE_DUPLICATE_FUNCTIONS=1",
+      "-Wno-almost-asm",
+      "--closure", "1",
+      "--pre-js", options.pre,
+      "--post-js", options.post
+    ] : [
+      "-s", "WASM=1",
+      "-s", "SIDE_MODULE=1",
+      "-s", "BINARYEN_METHOD='native-wasm'"
+    ]);
   console.log(cmd + " " + arg.join(" ") + "\n");
   var proc = child_process.spawnSync(cmd, arg, { stdio: "inherit", shell: true });
   if (proc.error)
@@ -99,4 +106,11 @@ compile({
 //   pre: path.join(projectDirectory, "js", "minimal-pre.js"),
 //   post: path.join(projectDirectory, "js", "minimal-post.js"),
 //   out: "minimal.js"
+// });
+
+// console.log("\nCompiling minimal.wasm ...\n");
+// compile({
+//   pre: path.join(projectDirectory, "js", "minimal-pre.js"),
+//   post: path.join(projectDirectory, "js", "minimal-post.js"),
+//   out: "minimal.wasm"
 // });
