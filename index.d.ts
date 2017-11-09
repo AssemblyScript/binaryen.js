@@ -195,11 +195,11 @@ declare module binaryen {
 
     addFunctionType(name: string, resultType: Type, paramTypes: Type[]): Signature;
     getFunctionTypeBySignature(resultType: Type, paramTypes: Type[]): Signature;
-    addFunction(name: string, functionType: Signature, varTypes: Type[], body: Statement): binaryen.Function;
-    addGlobal(name: string, type: Type, mutable: boolean, init: Expression): Expression;
-    addImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType?: Signature): void;
+    addFunction(name: string, functionType: Signature, varTypes: Type[], body: Statement): Function;
+    addGlobal(name: string, type: Type, mutable: boolean, init: Expression): Global;
+    addImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType?: Signature): Import;
     removeImport(internalName: string): void;
-    addExport(internalName: string, externalName: string): void;
+    addExport(internalName: string, externalName: string): Export;
     removeExport(externalName: string): void;
     setFunctionTable(funcs: number[]): void;
     setMemory(initial: number, maximum: number, exportName?: string, segments?: MemorySegment[]): void;
@@ -262,6 +262,9 @@ declare module binaryen {
   abstract class Signature {}
   abstract class Function {}
   abstract class Expression {}
+  abstract class Global {}
+  abstract class Import {}
+  abstract class Export {}
   abstract class I32Expression extends Expression {}
   abstract class I64Expression extends Expression {}
   abstract class F32Expression extends Expression {}
