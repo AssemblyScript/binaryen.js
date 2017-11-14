@@ -123,6 +123,8 @@ Type-prefixed expressions:
     * `i32.gt_u(left, right)`: Create an unsigned greater-than on two `i32`s.
     * `i32.ge_s(left, right)`: Create a signed greater-or-equal on two `i32`s.
     * `i32.ge_u(left, right)`: Create an unsigned greater-or-equal on two `i32`s.
+    * `i32.atomic`: See type-prefixed atomic expressions below.
+    * `i32.wait(ptr, expected, timeout)`: Load `i32` value, compare to expected (as `i32`), and wait for wake at same address.
   * `i64`:
     * `i64.load(offset, align, ptr)`: Create a 32-bit load, with an offset, alignment, and pointer.
     * `i64.load8_s(offset, align, ptr)`: Create an 8-bit signed load, with an offset, alignment, and pointer.
@@ -172,6 +174,8 @@ Type-prefixed expressions:
     * `i64.gt_u(left, right)`: Create an unsigned greater-than on two `i64`s.
     * `i64.ge_s(left, right)`: Create a signed greater-or-equal on two `i64`s.
     * `i64.ge_u(left, right)`: Create an unsigned greater-or-equal on two `i64`s.
+    * `i64.atomic`: See type-prefixed atomic expressions below.
+    * `i64.wait(ptr, expected, timeout)`: Load `i64` value, compare to expected (as `i64`), and wait for wake at same address.
   * `f32`:
     * `f32.load(offset, align, ptr)`: Create an `f32` load, with an offset, alignment, and pointer.
     * `f32.store(offset, align, ptr, value)`: Create an `f32` store, with an offset, alignment, pointer, and value.
@@ -235,6 +239,20 @@ Type-prefixed expressions:
     * `f64.gt(left, right)`: Create a greater-than on two `f64`s.
     * `f64.ge(left, right)`: Create a greater-or-equals on two `f64`s.
 
+Type-prefixed atomic expressions:
+
+* `i32/i64.atomic.rmw`
+  * `i32/i64.atomic.rmw.add(offset, ptr, value)` Create a sign-agnostic atomic addition.
+  * `i32/i64.atomic.rmw.sub(offset, ptr, value)` Create a sign-agnostic atomic subtraction.
+  * `i32/i64.atomic.rmw.and(offset, ptr, value)` Create a sign-agnostic atomic bitwise and.
+  * `i32/i64.atomic.rmw.or(offset, ptr, value)` Create a sign-agnostic atomic bitwise inclusive or.
+  * `i32/i64.atomic.rmw.xor(offset, ptr, value)` Create a sign-agnostic atomic bitwise exclusive or.
+  * `i32/i64.atomic.rmw.xchg(offset, ptr, value)` Create a sign-agnostic atomic exchange.
+  * `i32/i64.atomic.rmw.cmpxchg(offset, ptr, expected, replacement)` Create a sign-agnostic atomic compare exchange.
+* `i32/i64.atomic.rmw8_u` Same as above, but with a zero-extended 1 byte value.
+* `i32/i64.atomic.rmw16_u` Same as above, but with a zero-extended 2 bytes value.
+* `i64.atomic.rmw32_u` Same as above, but with a zero-extended 4 bytes value.
+
 Unprefixed expressions:
 
   * `block(label, children[, type])`: Create a block (a list of instructions), with an optional label, list of children and an optional result type.
@@ -255,6 +273,7 @@ Unprefixed expressions:
   * `return(value)`: Create a return with an optional value.
   * `nop()`: Create a nop (no-operation).
   * `unreachable()`: Create an unreachable (trap).
+  * `wake(ptr, wakeCount)`: Create a wake, waking up up to `wakeCount` waiters.
 
 (now done with `Module`s, returning to the `Binaryen` object)
 

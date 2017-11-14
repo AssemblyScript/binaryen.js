@@ -55,6 +55,36 @@ declare module binaryen {
     gt_u(left: I32Expression, right: I32Expression): I32Expression;
     ge_s(left: I32Expression, right: I32Expression): I32Expression;
     ge_u(left: I32Expression, right: I32Expression): I32Expression;
+    atomic: {
+      rmw: {
+        add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        and(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        or(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        xor(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        xchg(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I32Expression, replacement: I32Expression): I32Expression;
+      },
+      rmw_8u: {
+        add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        and(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        or(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        xor(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        xchg(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I32Expression, replacement: I32Expression): I32Expression;
+      },
+      rmw_16u: {
+        add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        and(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        or(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        xor(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        xchg(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I32Expression, replacement: I32Expression): I32Expression;
+      }
+    },
+    wait(ptr: Expression, expected: I32Expression, timeout: I64Expression): I32Expression;
   }
 
   interface I64Operations {
@@ -110,6 +140,45 @@ declare module binaryen {
     gt_u(left: I64Expression, right: I64Expression): I64Expression;
     ge_s(left: I64Expression, right: I64Expression): I64Expression;
     ge_u(left: I64Expression, right: I64Expression): I64Expression;
+    atomic: {
+      rmw: {
+        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+      },
+      rmw_8u: {
+        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+      },
+      rmw_16u: {
+        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+      },
+      rmw_32u: {
+        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+      }
+    },
+    wait(ptr: Expression, expected: I64Expression, timeout: I64Expression): I32Expression;
   }
 
   interface F32Operations {
@@ -240,7 +309,7 @@ declare module binaryen {
     growMemory(value: Expression): Expression;
     currentMemory(): Expression;
     unreachable(): Statement;
-
+    wake(ptr: Expression, wakeCount: I64Expression): I64Expression;
   }
 
   function readBinary(data: Uint8Array): Module;
@@ -257,19 +326,19 @@ declare module binaryen {
   }
 
   // These are actually pointers internally
-  abstract class Type {}
-  abstract class Statement {}
-  abstract class Signature {}
-  abstract class Function {}
-  abstract class Expression {}
-  abstract class Global {}
-  abstract class Import {}
-  abstract class Export {}
-  abstract class I32Expression extends Expression {}
-  abstract class I64Expression extends Expression {}
-  abstract class F32Expression extends Expression {}
-  abstract class F64Expression extends Expression {}
-  abstract class RelooperBlock {}
+  abstract class Type { protected __Type__: number; }
+  abstract class Statement { protected __Statement__: number; }
+  abstract class Signature { protected __Signature__: number; }
+  abstract class Function { protected __Function__: number; }
+  abstract class Expression { protected __Expression__: number; }
+  abstract class Global { protected __Global__: number; }
+  abstract class Import { protected __Import__: number; }
+  abstract class Export { protected __Export__: number; }
+  abstract class I32Expression extends Expression { protected __I32Expression__: number; }
+  abstract class I64Expression extends Expression { protected __I64Expression__: number; }
+  abstract class F32Expression extends Expression { protected __F32Expression__: number; }
+  abstract class F64Expression extends Expression { protected __F64Expression__: number; }
+  abstract class RelooperBlock { protected __RelooperBlock__: number; }
 }
 
 export = binaryen;
