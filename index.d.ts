@@ -5,6 +5,36 @@ declare module binaryen {
   const i64: Type;
   const f32: Type;
   const f64: Type;
+  const undefined: Type;
+
+  const InvalidId: number;
+  const BlockId: number;
+  const IfId: number;
+  const LoopId: number;
+  const BreakId: number;
+  const SwitchId: number;
+  const CallId: number;
+  const CallImportId: number;
+  const CallIndirectId: number;
+  const GetLocalid: number;
+  const SetLocalId: number;
+  const GetGlobalId: number;
+  const SetGlobalId: number;
+  const LoadId: number;
+  const StoreId: number;
+  const ConstId: number;
+  const UnaryId: number;
+  const BinaryId: number;
+  const SelectId: number;
+  const DropId: number;
+  const ReturnId: number;
+  const HostId: number;
+  const NopId: number;
+  const UnreachableId: number;
+  const AtomicCmpxchgId: number;
+  const AtomicRMWId: number;
+  const AtomicWaitId: number;
+  const AtomicWakeId: number;
 
   interface I32Operations {
     load(offset: number, align: number, ptr: Expression): I32Expression;
@@ -312,9 +342,15 @@ declare module binaryen {
     wake(ptr: Expression, wakeCount: I64Expression): I64Expression;
   }
 
+  function getExpressionId(expression: Expression): number;
+  function getExpressionType(expression: Expression): Type;
+  function getConstValueI32(expression: Expression): number;
+  function getConstValueI64(expression: Expression): { low: number, high: number };
+  function getConstValueF32(expression: Expression): number;
+  function getConstValueF64(expression: Expression): number;
+  function emitText(expression: Expression): string;
   function readBinary(data: Uint8Array): Module;
   function parseText(text: string): Module;
-  function emitText(expression: Expression): string;
   function setAPITracing(on: boolean): void;
 
   class Relooper {
