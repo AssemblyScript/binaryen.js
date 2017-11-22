@@ -13,6 +13,11 @@
   ],
   "main": "index.js",
   "typings": "index.d.ts",
+  "bin": {
+    "binaryen-as": "bin/as",
+    "binaryen-dis": "bin/dis",
+    "binaryen-opt": "bin/opt"
+  },
   "scripts": {
     "build": "node scripts/build",
     "test": "node tests"
@@ -22,7 +27,10 @@
     "index.d.ts",
     "package.json",
     "package-lock.json",
-    "README.md"
+    "README.md",
+    "bin/as.js",
+    "bin/dis.js",
+    "bin/opt.js"
   ],
   "devDependencies": {
     "dateformat": "^2.0.0",

@@ -86,6 +86,12 @@ declare module binaryen {
     ge_s(left: I32Expression, right: I32Expression): I32Expression;
     ge_u(left: I32Expression, right: I32Expression): I32Expression;
     atomic: {
+      load(offset: number, ptr: Expression): I32Expression;
+      load8_u(offset: number, ptr: Expression): I32Expression;
+      load16_u(offset: number, ptr: Expression): I32Expression;
+      store(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+      store8(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+      store16(offset: number, ptr: Expression, value: I32Expression): I32Expression;
       rmw: {
         add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
         sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
@@ -171,6 +177,14 @@ declare module binaryen {
     ge_s(left: I64Expression, right: I64Expression): I64Expression;
     ge_u(left: I64Expression, right: I64Expression): I64Expression;
     atomic: {
+      load(offset: number, ptr: Expression): I64Expression;
+      load8_u(offset: number, ptr: Expression): I64Expression;
+      load16_u(offset: number, ptr: Expression): I64Expression;
+      load32_u(offset: number, ptr: Expression): I64Expression;
+      store(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+      store8(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+      store16(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+      store32(offset: number, ptr: Expression, value: I64Expression): I64Expression;
       rmw: {
         add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
         sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
@@ -295,10 +309,20 @@ declare module binaryen {
     addFunctionType(name: string, resultType: Type, paramTypes: Type[]): Signature;
     getFunctionTypeBySignature(resultType: Type, paramTypes: Type[]): Signature;
     addFunction(name: string, functionType: Signature, varTypes: Type[], body: Statement): Function;
+    getFunction(name: string): Function;
+    removeFunction(name: string): void;
     addGlobal(name: string, type: Type, mutable: boolean, init: Expression): Global;
-    addImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType?: Signature): Import;
+    /* deprecated */ addImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType?: Signature): Import;
+    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType: Signature): Import;
+    addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): Import;
+    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): Import;
+    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): Import;
     removeImport(internalName: string): void;
-    addExport(internalName: string, externalName: string): Export;
+    /* deprecated */ addExport(internalName: string, externalName: string): Export;
+    addFunctionExport(internalName: string, externalName: string): Export;
+    addTableExport(internalName: string, externalName: string): Export;
+    addMemoryExport(internalName: string, externalName: string): Export;
+    addGlobalExport(internalName: string, externalName: string): Export;
     removeExport(externalName: string): void;
     setFunctionTable(funcs: number[]): void;
     setMemory(initial: number, maximum: number, exportName?: string, segments?: MemorySegment[]): void;
@@ -309,7 +333,9 @@ declare module binaryen {
     emitAsmjs(): string;
     validate(): number;
     optimize(): void;
+    optimizeFunction(func: string|Function): void;
     runPasses(passes: string[]): void;
+    runPassesOnFunction(func: string|Function, passes: string[]): void;
     autoDrop(): void;
     interpret(): void;
     dispose(): void;
@@ -348,6 +374,7 @@ declare module binaryen {
   function getConstValueI64(expression: Expression): { low: number, high: number };
   function getConstValueF32(expression: Expression): number;
   function getConstValueF64(expression: Expression): number;
+  function getFunctionBody(func: Function): Expression;
   function emitText(expression: Expression): string;
   function readBinary(data: Uint8Array): Module;
   function parseText(text: string): Module;
