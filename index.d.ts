@@ -7,34 +7,34 @@ declare module binaryen {
   const f64: Type;
   const undefined: Type;
 
-  const InvalidId: number;
-  const BlockId: number;
-  const IfId: number;
-  const LoopId: number;
-  const BreakId: number;
-  const SwitchId: number;
-  const CallId: number;
-  const CallImportId: number;
-  const CallIndirectId: number;
-  const GetLocalid: number;
-  const SetLocalId: number;
-  const GetGlobalId: number;
-  const SetGlobalId: number;
-  const LoadId: number;
-  const StoreId: number;
-  const ConstId: number;
-  const UnaryId: number;
-  const BinaryId: number;
-  const SelectId: number;
-  const DropId: number;
-  const ReturnId: number;
-  const HostId: number;
-  const NopId: number;
-  const UnreachableId: number;
-  const AtomicCmpxchgId: number;
-  const AtomicRMWId: number;
-  const AtomicWaitId: number;
-  const AtomicWakeId: number;
+  const InvalidId: ExpressionId;
+  const BlockId: ExpressionId;
+  const IfId: ExpressionId;
+  const LoopId: ExpressionId;
+  const BreakId: ExpressionId;
+  const SwitchId: ExpressionId;
+  const CallId: ExpressionId;
+  const CallImportId: ExpressionId;
+  const CallIndirectId: ExpressionId;
+  const GetLocalid: ExpressionId;
+  const SetLocalId: ExpressionId;
+  const GetGlobalId: ExpressionId;
+  const SetGlobalId: ExpressionId;
+  const LoadId: ExpressionId;
+  const StoreId: ExpressionId;
+  const ConstId: ExpressionId;
+  const UnaryId: ExpressionId;
+  const BinaryId: ExpressionId;
+  const SelectId: ExpressionId;
+  const DropId: ExpressionId;
+  const ReturnId: ExpressionId;
+  const HostId: ExpressionId;
+  const NopId: ExpressionId;
+  const UnreachableId: ExpressionId;
+  const AtomicCmpxchgId: ExpressionId;
+  const AtomicRMWId: ExpressionId;
+  const AtomicWaitId: ExpressionId;
+  const AtomicWakeId: ExpressionId;
 
   interface I32Operations {
     load(offset: number, align: number, ptr: Expression): I32Expression;
@@ -42,9 +42,9 @@ declare module binaryen {
     load8_u(offset: number, align: number, ptr: Expression): I32Expression;
     load16_s(offset: number, align: number, ptr: Expression): I32Expression;
     load16_u(offset: number, align: number, ptr: Expression): I32Expression;
-    store(offset: number, align: number, ptr: Expression, value: I32Expression): I32Expression;
-    store8(offset: number, align: number, ptr: Expression, value: I32Expression): I32Expression;
-    store16(offset: number, align: number, ptr: Expression, value: I32Expression): I32Expression;
+    store(offset: number, align: number, ptr: Expression, value: I32Expression): Expression;
+    store8(offset: number, align: number, ptr: Expression, value: I32Expression): Expression;
+    store16(offset: number, align: number, ptr: Expression, value: I32Expression): Expression;
     const(value: number): I32Expression;
     clz(value: I32Expression): I32Expression;
     ctz(value: I32Expression): I32Expression;
@@ -89,9 +89,9 @@ declare module binaryen {
       load(offset: number, ptr: Expression): I32Expression;
       load8_u(offset: number, ptr: Expression): I32Expression;
       load16_u(offset: number, ptr: Expression): I32Expression;
-      store(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-      store8(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-      store16(offset: number, ptr: Expression, value: I32Expression): I32Expression;
+      store(offset: number, ptr: Expression, value: I32Expression): Expression;
+      store8(offset: number, ptr: Expression, value: I32Expression): Expression;
+      store16(offset: number, ptr: Expression, value: I32Expression): Expression;
       rmw: {
         add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
         sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
@@ -131,10 +131,10 @@ declare module binaryen {
     load16_u(offset: number, align: number, ptr: Expression): I64Expression;
     load32_s(offset: number, align: number, ptr: Expression): I64Expression;
     load32_u(offset: number, align: number, ptr: Expression): I64Expression;
-    store(offset: number, align: number, ptr: Expression, value: I64Expression): I64Expression;
-    store8(offset: number, align: number, ptr: Expression, value: I64Expression): I64Expression;
-    store16(offset: number, align: number, ptr: Expression, value: I64Expression): I64Expression;
-    store32(offset: number, align: number, ptr: Expression, value: I64Expression): I64Expression;
+    store(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
+    store8(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
+    store16(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
+    store32(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
     const(low: number, high: number): I64Expression;
     clz(value: I64Expression): I64Expression;
     ctz(value: I64Expression): I64Expression;
@@ -181,10 +181,10 @@ declare module binaryen {
       load8_u(offset: number, ptr: Expression): I64Expression;
       load16_u(offset: number, ptr: Expression): I64Expression;
       load32_u(offset: number, ptr: Expression): I64Expression;
-      store(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-      store8(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-      store16(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-      store32(offset: number, ptr: Expression, value: I64Expression): I64Expression;
+      store(offset: number, ptr: Expression, value: I64Expression): Expression;
+      store8(offset: number, ptr: Expression, value: I64Expression): Expression;
+      store16(offset: number, ptr: Expression, value: I64Expression): Expression;
+      store32(offset: number, ptr: Expression, value: I64Expression): Expression;
       rmw: {
         add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
         sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
@@ -227,7 +227,7 @@ declare module binaryen {
 
   interface F32Operations {
     load(offset: number, align: number, ptr: Expression): F32Expression;
-    store(offset: number, align: number, ptr: Expression, value: F32Expression): F32Expression;
+    store(offset: number, align: number, ptr: Expression, value: F32Expression): Expression;
     const(value: number): F32Expression;
     const_bits(value: number): F32Expression;
     neg(value: F32Expression): F32Expression;
@@ -264,7 +264,7 @@ declare module binaryen {
 
   interface F64Operations {
     load(offset: number, align: number, ptr: Expression): F64Expression;
-    store(offset: number, align: number, ptr: Expression, value: F32Expression): F64Expression;
+    store(offset: number, align: number, ptr: Expression, value: F32Expression): Expression;
     const(value: number): F64Expression;
     const_bits(low: number, high: number): F64Expression;
     neg(value: F64Expression): F64Expression;
@@ -390,6 +390,7 @@ declare module binaryen {
 
   // These are actually pointers internally
   abstract class Type { protected __Type__: number; }
+  abstract class ExpressionId { protected __ExpressionId__: number; }
   abstract class Statement { protected __Statement__: number; }
   abstract class Signature { protected __Signature__: number; }
   abstract class Function { protected __Function__: number; }

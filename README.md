@@ -5,6 +5,37 @@ binaryen.js
 
 [![npm](https://img.shields.io/npm/v/binaryen.svg)](https://www.npmjs.com/package/binaryen) [![npm (tag)](https://img.shields.io/npm/v/binaryen/nightly.svg)](https://www.npmjs.com/package/binaryen) [![Build Status](https://travis-ci.org/AssemblyScript/binaryen.js.svg?branch=master)](https://travis-ci.org/AssemblyScript/binaryen.js)
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Contents
+
+- [Usage](#usage)
+- [API](#api)
+  - [Types](#types)
+  - [Module construction](#module-construction)
+  - [Module manipulation](#module-manipulation)
+  - [Module validation](#module-validation)
+  - [Module creation](#module-creation)
+  - [Module debugging](#module-debugging)
+  - [Expression construction](#expression-construction)
+    - [Control flow](#control-flow)
+    - [Constants](#constants)
+    - [Variable accesses](#variable-accesses)
+    - [Integer operations](#integer-operations)
+    - [Floating point operations](#floating-point-operations)
+    - [Datatype conversions](#datatype-conversions)
+    - [Function calls](#function-calls)
+    - [Linear memory accesses](#linear-memory-accesses)
+    - [Host operations](#host-operations)
+    - [Atomic memory accesses 🦄](#atomic-memory-accesses-)
+    - [Atomic read-modify-write operations 🦄](#atomic-read-modify-write-operations-)
+    - [Atomic wait and wake operations 🦄](#atomic-wait-and-wake-operations-)
+  - [Expression manipulation](#expression-manipulation)
+  - [Relooper](#relooper)
+- [Building](#building)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 Usage
 -----
 
@@ -16,8 +47,13 @@ $> npm install binaryen
 var binaryen = require("binaryen");
 
 var myModule = new binaryen.Module();
-myModule.addFunction("main", myModule.addFunctionType("i", binaryen.i32, []), [], myModule.return(myModule.i32.const(0)));
-myModule.addExport("main", "main");
+
+myModule.addFunction("main", myModule.addFunctionType("i", binaryen.i32, []), [],
+  myModule.return(
+    myModule.i32.const(0)
+  )
+);
+myModule.addFunctionExport("main", "main");
 
 var textData = myModule.emitText();
 var wasmData = myModule.emitBinary();
@@ -35,258 +71,553 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
 API
 ---
 
-The API is documented in the rest of this document.
+[Future features](http://webassembly.org/docs/future-features/) 🦄 might not be supported by all runtimes.
 
 ### Types
 
- * `binaryen.none`: The none type.
- * `binaryen.i32`: The i32 type.
- * `binaryen.i64`: The i64 type.
- * `binaryen.f32`: The f32 type.
- * `binaryen.f64`: The f64 type.
+ * **none**: `Type`<br />
+   The none type, e.g., `void`.
 
-### Modules
+ * **i32**: `Type`<br />
+   32-bit integer type.
 
- * `binaryen.Module()`: Constructor for a Binaryen WebAssembly module. You need to create one of these first.
+ * **i64**: `Type`<br />
+   64-bit integer type.
 
-`Module` instances have the following properties.
+ * **f32**: `Type`<br />
+   32-bit float type.
 
-Module property operations:
+ * **f64**: `Type`<br />
+   64-bit float (double) type.
 
-  * `addFunctionType(name, resultType, paramTypes)`: Add a function type to the module, with a specified name, result type, and param types.
-  * `getFunctionTypeBySignature(resultType, paramTypes)`: Gets an existing function type by its signature. Returns `0` if there is no such function type yet.
-  * `addFunction(name, functionType, varTypes, body)`: Add a function, with a name, a function type, an array of local types, and a body.
-  * `addImport(internalName, externalModuleName, externalBaseName, functionType)`: Add an import, with an internal name (used by other things in the module), an external module name (the module from which we import), an external base name (the name we import from that module), and a function type (for function imports).
-  * `removeImport(internalName)`: Removes an import by its internal name.
-  * `addExport(internalName, externalName)`: Add an export, with an internal name and an external name (the name the outside sees it exported as).
-  * `removeExport(externalName)`: Removes an export by its external name.
-  * `setFunctionTable(funcs)`: Sets the function table to a array of functions.
-  * `setMemory(initial, maximum, exportName, segments)`: Sets the memory to having an initial size, maximum size, optional export name, and array of data segments.
-  * `setStart(start)`: Sets the start function (called when the module is instantiated) to a specified function.
+ * **undefined**: `Type`<br />
+   Special type used with blocks to let the API figure out its result type on its own.
 
-Module operations:
+### Module construction
 
-  * `emitBinary()`: Returns a binary for the module, which you can then compile and run in the browser.
-  * `emitAsmjs()`: Returns the module converted to asm.js, which can be run in older browsers as well.
-  * `emitText()`: Returns a text representation of the module, in s-expression format.
-  * `validate()`: Validates the module, checking it for correctness. Returns `1` if the module is valid, otherwise `0`.
-  * `optimize()`: Runs the standard optimization passes on the module.
-  * `runPasses(passes)`: Runs the specified passes on the module.
-  * `autoDrop()`: Automatically inserts `drop` operations. This lets you not worry about dropping when creating your code.
-  * `interpret()`: Run the module in the Binaryen interpreter (creates the module, and calls the start method). Useful for debugging.
-  * `dispose()`: Cleans up the module. If the Binaryen object can be garbage-collected anyhow, you don't need to do this, but if it stays around - e.g. if you create multiple `Module`s over time - then you should call this once a `Module` is no longer needed. (As binaryen.js uses compiled C++ code, we can't just rely on normal garbage collection to clean things up internally.)
+ * new **Module**(): `Module`<br />
+   Constructs a new module.
 
-Type-prefixed expressions:
+ * **parseText**(text: `string`): `Module`<br />
+   Creates a module from Binaryen's s-expression text format (not official stack-style text format).
 
-  * `i32`:
-    * `i32.load(offset, align, ptr)`: Create a 32-bit load, with an offset, alignment, and pointer.
-    * `i32.load8_s(offset, align, ptr)`: Create an 8-bit signed load, with an offset, alignment, and pointer.
-    * `i32.load8_u(offset, align, ptr)`: Create an 8-bit unsigned load, with an offset, alignment, and pointer.
-    * `i32.load16_s(offset, align, ptr)`: Create an 16-bit signed load, with an offset, alignment, and pointer.
-    * `i32.load16_u(offset, align, ptr)`: Create an 16-bit unsigned load, with an offset, alignment, and pointer.
-    * `i32.store(offset, align, ptr, value)`: Create a 32-bit store, with an offset, alignment, pointer, and value.
-    * `i32.store8(offset, align, ptr, value)`: Create an 8-bit store, with an offset, alignment, pointer, and value.
-    * `i32.store16(offset, align, ptr, value)`: Create a 16-bit store, with an offset, alignment, pointer, and value.
-    * `i32.const(value)`: Create an `i32` constant of a specified value.
-    * `i32.clz(value)`: Create a count-leading-zeros of a specified value.
-    * `i32.ctz(value)`: Create a count-trailing-zeros of a specified value.
-    * `i32.popcnt(value)`: Create a population-count (number of bits set) of a specified value.
-    * `i32.eqz(value)`: Create an equal-zero of a specified value.
-    * `i32.trunc_s.f32(value)`: Create a signed truncate of an `f32` to an `i32`.
-    * `i32.trunc_s.f64(value)`: Create a signed truncate of an `f64` to an `i32`.
-    * `i32.trunc_u.f32(value)`: Create an unsigned truncate of an `f32` to an `i32`.
-    * `i32.trunc_u.f64(value)`: Create an unsigned truncate of an `f64` to an `i32`.
-    * `i32.reinterpret(value)`: Create a reinterpret of an `f32` to an `i32`.
-    * `i32.wrap(value)`: Create a wrap of an `i64` to an `i32`.
-    * `i32.add(left, right)`: Create an add of two `i32`s.
-    * `i32.sub(left, right)`: Create a subtract of two `i32`s.
-    * `i32.mul(left, right)`: Create a multiply of two `i32`s.
-    * `i32.div_s(left, right)`: Create a signed divide of two `i32`s.
-    * `i32.div_u(left, right)`: Create an unsigned divide of two `i32`s.
-    * `i32.rem_s(left, right)`: Create a signed remainder of two `i32`s.
-    * `i32.rem_u(left, right)`: Create an unsigned remainder of two `i32`s.
-    * `i32.and(left, right)`: Create an and of two `i32`s.
-    * `i32.or(left, right)`: Create an or of two `i32`s.
-    * `i32.xor(left, right)`: Create a xor of two `i32`s.
-    * `i32.shl(left, right)`: Create a shift left on two `i32`s.
-    * `i32.shr_u(left, right)`: Create an unsigned (logical) shift right on two `i32`s.
-    * `i32.shr_s(left, right)`: Create a signed (arithmetic) shift right on two `i32`s.
-    * `i32.rotl(left, right)`: Create a rotate-left on two `i32`s.
-    * `i32.rotr(left, right)`: Create a rotate-right on two `i32`s.
-    * `i32.eq(left, right)`: Create an equals on two `i32`s.
-    * `i32.ne(left, right)`: Create a not-equals on two `i32`s.
-    * `i32.lt_s(left, right)`: Create a signed less-than on two `i32`s.
-    * `i32.lt_u(left, right)`: Create an unsigned less-than on two `i32`s.
-    * `i32.le_s(left, right)`: Create a signed less-or-equal on two `i32`s.
-    * `i32.le_u(left, right)`: Create an unsigned less-or-equal on two `i32`s.
-    * `i32.gt_s(left, right)`: Create a signed greater-than on two `i32`s.
-    * `i32.gt_u(left, right)`: Create an unsigned greater-than on two `i32`s.
-    * `i32.ge_s(left, right)`: Create a signed greater-or-equal on two `i32`s.
-    * `i32.ge_u(left, right)`: Create an unsigned greater-or-equal on two `i32`s.
-    * `i32.atomic`: See type-prefixed atomic expressions below.
-    * `i32.wait(ptr, expected, timeout)`: Load `i32` value, compare to expected (as `i32`), and wait for wake at same address.
-  * `i64`:
-    * `i64.load(offset, align, ptr)`: Create a 32-bit load, with an offset, alignment, and pointer.
-    * `i64.load8_s(offset, align, ptr)`: Create an 8-bit signed load, with an offset, alignment, and pointer.
-    * `i64.load8_u(offset, align, ptr)`: Create an 8-bit unsigned load, with an offset, alignment, and pointer.
-    * `i64.load16_s(offset, align, ptr)`: Create an 16-bit signed load, with an offset, alignment, and pointer.
-    * `i64.load16_u(offset, align, ptr)`: Create an 16-bit unsigned load, with an offset, alignment, and pointer.
-    * `i64.load32_s(offset, align, ptr)`: Create a 32-bit signed load, with an offset, alignment, and pointer.
-    * `i64.load32_u(offset, align, ptr)`: Create a 32-bit unsigned load, with an offset, alignment, and pointer.
-    * `i64.store(offset, align, ptr, value)`: Create a 32-bit store, with an offset, alignment, pointer, and value.
-    * `i64.store8(offset, align, ptr, value)`: Create an 8-bit store, with an offset, alignment, pointer, and value.
-    * `i64.store16(offset, align, ptr, value)`: Create a 16-bit store, with an offset, alignment, pointer, and value.
-    * `i64.store32(offset, align, ptr, value)`: Create a 32-bit store, with an offset, alignment, pointer, and value.
-    * `i64.const(low, high)`: Create an `i64` constant of a specified value, provided as low and high 32 bits.
-    * `i64.clz(value)`: Create a count-leading-zeros of a specified value.
-    * `i64.ctz(value)`: Create a count-trailing-zeros of a specified value.
-    * `i64.popcnt(value)`: Create a population-count (number of bits set) of a specified value.
-    * `i64.eqz(value)`: Create an equal-zero of a specified value.
-    * `i64.trunc_s.f32(value)`: Create a signed truncate of an `f32` to an `i64`.
-    * `i64.trunc_s.f64(value)`: Create a signed truncate of an `f64` to an `i64`.
-    * `i64.trunc_u.f32(value)`: Create an unsigned truncate of an `f32` to an `i64`.
-    * `i64.trunc_u.f64(value)`: Create an unsigned truncate of an `f64` to an `i64`.
-    * `i64.reinterpret(value)`: Create a reinterpret of an `f64` to an `i64`.
-    * `i64.extend_s(value)`: Create a signed extend of an `i32` to an `i64`.
-    * `i64.extend_u(value)`: Create an unsigned extend of an `i32` to an `i64`.
-    * `i64.add(left, right)`: Create an add of two `i64`s.
-    * `i64.sub(left, right)`: Create a subtract of two `i64`s.
-    * `i64.mul(left, right)`: Create a multiply of two `i64`s.
-    * `i64.div_s(left, right)`: Create a signed divide of two `i64`s.
-    * `i64.div_u(left, right)`: Create an unsigned divide of two `i64`s.
-    * `i64.rem_s(left, right)`: Create a signed remainder of two `i64`s.
-    * `i64.rem_u(left, right)`: Create an unsigned remainder of two `i64`s.
-    * `i64.and(left, right)`: Create an and of two `i64`s.
-    * `i64.or(left, right)`: Create an or of two `i64`s.
-    * `i64.xor(left, right)`: Create a xor of two `i64`s.
-    * `i64.shl(left, right)`: Create a shift left on two `i64`s.
-    * `i64.shr_u(left, right)`: Create an unsigned (logical) shift right on two `i64`s.
-    * `i64.shr_s(left, right)`: Create a signed (arithmetic) shift right on two `i64`s.
-    * `i64.rotl(left, right)`: Create a rotate-left on two `i64`s.
-    * `i64.rotr(left, right)`: Create a rotate-right on two `i64`s.
-    * `i64.eq(left, right)`: Create an equals on two `i64`s.
-    * `i64.ne(left, right)`: Create a not-equals on two `i64`s.
-    * `i64.lt_s(left, right)`: Create a signed less-than on two `i64`s.
-    * `i64.lt_u(left, right)`: Create an unsigned less-than on two `i64`s.
-    * `i64.le_s(left, right)`: Create a signed less-or-equal on two `i64`s.
-    * `i64.le_u(left, right)`: Create an unsigned less-or-equal on two `i64`s.
-    * `i64.gt_s(left, right)`: Create a signed greater-than on two `i64`s.
-    * `i64.gt_u(left, right)`: Create an unsigned greater-than on two `i64`s.
-    * `i64.ge_s(left, right)`: Create a signed greater-or-equal on two `i64`s.
-    * `i64.ge_u(left, right)`: Create an unsigned greater-or-equal on two `i64`s.
-    * `i64.atomic`: See type-prefixed atomic expressions below.
-    * `i64.wait(ptr, expected, timeout)`: Load `i64` value, compare to expected (as `i64`), and wait for wake at same address.
-  * `f32`:
-    * `f32.load(offset, align, ptr)`: Create an `f32` load, with an offset, alignment, and pointer.
-    * `f32.store(offset, align, ptr, value)`: Create an `f32` store, with an offset, alignment, pointer, and value.
-    * `f32.const(value)`: Create an `f32` constant of a specified value.
-    * `f32.const_bits(value)`: Create an `f32` constant of a specified value, reinterpreting the bits (this is useful for creating weird NaNs).
-    * `f32.neg(value)`: Create a negation of an `f32`.
-    * `f32.abs(value)`: Create a absolute value of an `f32`.
-    * `f32.ceil(value)`: Create a ceil of an `f32`.
-    * `f32.floor(value)`: Create a floor of an `f32`.
-    * `f32.trunc(value)`: Create a truncate of an `f32`.
-    * `f32.nearest(value)`: Create a nearest-value of an `f32`.
-    * `f32.sqrt(value)`: Create a square-root of an `f32`.
-    * `f32.reinterpret(value)`: Create a reinterpret of an `i32` to an `f32`.
-    * `f32.convert_s.i32(value)`: Create a signed conversion of an `i32` to an `f32`.
-    * `f32.convert_s.i64(value)`: Create a signed conversion of an `i64` to an `f32`.
-    * `f32.convert_u.i32(value)`: Create an unsigned conversion of an `i32` to an `f32`.
-    * `f32.convert_u.i64(value)`: Create an unsigned conversion of an `i64` to an `f32`.
-    * `f32.demote(value)`: Create a demotion of an `f64` to an `f32`.
-    * `f32.add(left, right)`: Create an add of two `f32`s.
-    * `f32.sub(left, right)`: Create a subtract of two `f32`s.
-    * `f32.mul(left, right)`: Create a multiply of two `f32`s.
-    * `f32.div(left, right)`: Create a divide of two `f32`s.
-    * `f32.copysign(left, right)`: Create a copysign (take magnitude of left, sign of right) of two `f32`s.
-    * `f32.min(left, right)`: Create a minimum on two `f32`s.
-    * `f32.max(left, right)`: Create a maximum on two `f32`s.
-    * `f32.eq(left, right)`: Create an equals on two `f32`s.
-    * `f32.ne(left, right)`: Create a not-equals on two `f32`s.
-    * `f32.lt(left, right)`: Create a less-than on two `f32`s.
-    * `f32.le(left, right)`: Create a less-or-equals on two `f32`s.
-    * `f32.gt(left, right)`: Create a greater-than on two `f32`s.
-    * `f32.ge(left, right)`: Create a greater-or-equals on two `f32`s.
-  * `f64`:
-    * `f64.load(offset, align, ptr)`: Create an `f64` load, with an offset, alignment, and pointer.
-    * `f64.store(offset, align, ptr, value)`: Create an `f64` store, with an offset, alignment, pointer, and value.
-    * `f64.const(value)`: Create an `f64` constant of a specified value.
-    * `f64.const_bits(low, high)`: Create an `f64` constant of a specified value, reinterpreting the low and high 32 bits (this is useful for creating weird NaNs).
-    * `f64.neg(value)`: Create a negation of an `f64`.
-    * `f64.abs(value)`: Create a absolute value of an `f64`.
-    * `f64.ceil(value)`: Create a ceil of an `f64`.
-    * `f64.floor(value)`: Create a floor of an `f64`.
-    * `f64.trunc(value)`: Create a truncate of an `f64`.
-    * `f64.nearest(value)`: Create a nearest-value of an `f64`.
-    * `f64.sqrt(value)`: Create a square-root of an `f64`.
-    * `f64.reinterpret(value)`: Create a reinterpret of an `i32` to an `f64`.
-    * `f64.convert_s.i32(value)`: Create a signed conversion of an `i32` to an `f64`.
-    * `f64.convert_s.i64(value)`: Create a signed conversion of an `i64` to an `f64`.
-    * `f64.convert_u.i32(value)`: Create an unsigned conversion of an `i32` to an `f64`.
-    * `f64.convert_u.i64(value)`: Create an unsigned conversion of an `i64` to an `f64`.
-    * `f64.promote(value)`: Create a promotion of an `f32` to an `f64`.
-    * `f64.add(left, right)`: Create an add of two `f64`s.
-    * `f64.sub(left, right)`: Create a subtract of two `f64`s.
-    * `f64.mul(left, right)`: Create a multiply of two `f64`s.
-    * `f64.div(left, right)`: Create a divide of two `f64`s.
-    * `f64.copysign(left, right)`: Create a copysign (take magnitude of left, sign of right) of two `f64`s.
-    * `f64.min(left, right)`: Create a minimum on two `f64`s.
-    * `f64.max(left, right)`: Create a maximum on two `f64`s.
-    * `f64.eq(left, right)`: Create an equals on two `f64`s.
-    * `f64.ne(left, right)`: Create a not-equals on two `f64`s.
-    * `f64.lt(left, right)`: Create a less-than on two `f64`s.
-    * `f64.le(left, right)`: Create a less-or-equals on two `f64`s.
-    * `f64.gt(left, right)`: Create a greater-than on two `f64`s.
-    * `f64.ge(left, right)`: Create a greater-or-equals on two `f64`s.
+ * **readBinary**(data: `Uint8Array`): `Module`<br />
+   Creates a module from binary data.
 
-Type-prefixed atomic expressions:
+### Module manipulation
 
-* `i32/i64.atomic.rmw`
-  * `i32/i64.atomic.rmw.add(offset, ptr, value)` Create a sign-agnostic atomic addition.
-  * `i32/i64.atomic.rmw.sub(offset, ptr, value)` Create a sign-agnostic atomic subtraction.
-  * `i32/i64.atomic.rmw.and(offset, ptr, value)` Create a sign-agnostic atomic bitwise and.
-  * `i32/i64.atomic.rmw.or(offset, ptr, value)` Create a sign-agnostic atomic bitwise inclusive or.
-  * `i32/i64.atomic.rmw.xor(offset, ptr, value)` Create a sign-agnostic atomic bitwise exclusive or.
-  * `i32/i64.atomic.rmw.xchg(offset, ptr, value)` Create a sign-agnostic atomic exchange.
-  * `i32/i64.atomic.rmw.cmpxchg(offset, ptr, expected, replacement)` Create a sign-agnostic atomic compare exchange.
-* `i32/i64.atomic.rmw8_u` Same as above, but with a zero-extended 1 byte value.
-* `i32/i64.atomic.rmw16_u` Same as above, but with a zero-extended 2 bytes value.
-* `i64.atomic.rmw32_u` Same as above, but with a zero-extended 4 bytes value.
+* Module#**addFunctionType**(name: `string`, resultType: `Type`, paramTypes: `Type[]`): `Signature`<br />
+  Adds a new function type.
 
-Unprefixed expressions:
+* Module#**getFunctionTypeBySignature**(resultType: `Type`, paramTypes: `Type[]`): `Signature`<br />
+  Gets an existing function type by its parametric signature. Returns `0` if there is no such function type.
 
-  * `block(label, children[, type])`: Create a block (a list of instructions), with an optional label, list of children and an optional result type.
-  * `if(condition, ifTrue, ifFalse`: Create an if or if-else, with a condition, code to execute if true, and optional code to execute if false.
-  * `loop(label, body)`: Create a loop, with an optional label, and body.
-  * `break(label, condition, value)`: Create a break, to a label, and with an optional condition, and optional value.
-  * `switch(labels, defaultLabel, condition, value)`: Create a switch (aka br_table), with a list of labels, a default label, a condition, and an optional value.
-  * `call(name, operands, type)`: Create a call, to a function name, with operands, and having a specific return type (note that we must specify the return type here as we may not have created the function being called yet, and we may want to optimize this function before we do so, so the API requires that each function be independent of the others, which means that we can't depend on the definition of another function).
-  * `callImport(name, operands, type)`: Similar to `call`, but calls an imported function.
-  * `callIndirect(target, operands, type)`: Similar to `call`, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
-  * `getLocal(index, type)`: Create a get_local, for the local at the specified index, and having a specific type (the type is required for the same reasons as in `call`).
-  * `setLocal(index, value)`: Create a set_local, for the local at the specified index, and setting the specified value.
-  * `teeLocal(index, value)`: Create a tee_local, for the local at the specified index, and setting the specified value.
-  * `getGlobal(name, type)`: Create a get_global, for the global with the specified name, and having the specific type (the type is required for the same reasons as in `call`).
-  * `setGlobal(name, value)`: Create a set_global, for the global with the specified name, and setting the specified value.
-  * `select(condition, ifTrue, ifFalse)`: Create a select operation, executing the condition, ifTrue, and ifFalse, and returning one of them based on the condition.
-  * `drop(value)`: Create a drop of a value.
-  * `return(value)`: Create a return with an optional value.
-  * `nop()`: Create a nop (no-operation).
-  * `unreachable()`: Create an unreachable (trap).
-  * `wake(ptr, wakeCount)`: Create a wake, waking up up to `wakeCount` waiters.
+* Module#**addFunction**(name: `string`, functionType: `Signature`, varTypes: `Type[]`, body: `Expression`): `Function`<br />
+  Adds a function. `varTypes` indicate additional locals, in the given order.
 
-(now done with `Module`s, returning to the `Binaryen` object)
+* Module#**getFunction**(name: `string`): `Function`<br />
+  Gets a function, by name,
 
-  * `Binaryen.readBinary(data)`: Reads a binary wasm module and returns a Binaryen `Module` object created from it.
-  * `Binaryen.parseText(text)`: Parses a module in text representation and returns a Binaryen `Module` object created from it.
-  * `Binaryen.emitText(expression)`: Returns a text representation of an individual expression, in s-expression format. Because Binaryen expression do not depend on their function or module, you can do this at any time.
-  * `setAPITracing(on)`: Sets whether API tracing is on. When on, this emits C API commands for everything you do. This can be very useful for filing bug reports.
-  * `Binaryen.Relooper()`: Constructor for a Binaryen Relooper instance. This lets you provide an arbitrary CFG, and the Relooper will structure it for WebAssembly.
+* Module#**removeFunction**(name: `string`): `void`<br />
+  Removes a function, by name.
 
-Relooper instances have the following methods:
+* Module#**addFunctionImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, functionType: `Signature`): `Import`<br />
+  Adds a function import.
 
-  * `addBlock(code)`: Adds a new block to the CFG, containing the provided code (expression) as its body.
-  * `addBranch(from, to, condition, code)`: Adds a branch from a block to another block, with a condition (or nothing, if this is the default branch to take from the origin - each block must have one such branch), and optional code to execute on the branch (useful for phis).
-  * `addBlockWithSwitch(code, condition)`: Adds a new block, which ends with a switch/br_table, with provided code and condition (that determines where we go in the switch).
-  * `addBranchForSwitch(from, to, indexes, code)`: Adds a branch from a block ending in a switch, to another block, using an array of indexes that determine where to go, and optional code to execute on the branch.
-  * `renderAndDispose(entry, labelHelper, module)`: Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins), a label helper variable (an index of a local we can use, necessary for irreducible control flow), and the module. This returns an expression - normal WebAssembly code - that you can use normally anywhere.
+* Module#**addTableImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`): `Import`<br />
+  Adds a table import. There's just one table for now, using name `"0"`.
+
+* Module#**addMemoryImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`): `Import`<br />
+  Adds a memory import. There's just one memory for now, using name `"0"`.
+
+* Module#**addGlobalImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, globalType: `Type`): `Import`<br />
+  Adds a global variable import. Imported globals must be immutable.
+
+* Module#**removeImport**(internalName: `string`): `void`<br />
+  Removes an import, by internal name.
+
+* Module#**addFunctionExport**(internalName: `string`, externalName: `string`): `Export`<br />
+  Adds a function export.
+
+* Module#**addTableExport**(internalName: `string`, externalName: `string`): `Export`<br />
+  Adds a table export. There's just one table for now, using name `"0"`.
+
+* Module#**addMemoryExport**(internalName: `string`, externalName: `string`): `Export`<br />
+  Adds a memory export. There's just one memory for now, using name `"0"`.
+
+* Module#**addGlobalExport**(internalName: `string`, externalName: `string`): `Export`<br />
+  Adds a global variable export. Exported globals must be immutable.
+
+* Module#**removeExport**(externalName: `string`): `void`<br />
+  Removes an export, by external name.
+
+* Module#**setFunctionTable**(funcs: `Function[]`): `void`<br />
+  Sets the contents of the function table. There's just one table for now, using name `"0"`.
+
+* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`): `void`<br />
+  Sets the memory. There's just one memory for now, using name `"0"`. Providing `exportName` also creates a memory export.
+
+* Module#**setStart**(start: `Function`): `void`<br />
+  Sets the start function.
+
+* Module#**optimize**(): `void`<br />
+  Optimizes the module using the default optimization passes.
+
+* Module#**optimizeFunction**(func: `Function | string`): `void`<br />
+  Optimizes a single function using the default optimization passes.
+
+* Module#**runPasses**(passes: `string[]`): `void`<br />
+  Runs the specified passes on the module.
+
+* Module#**runPassesOnFunction**(func: `Function | string`, passes: `string[]`): `void`<br />
+  Runs the specified passes on a single function.
+
+* Module#**autoDrop**(): `void`<br />
+  Enables automatic insertion of `drop` operations where needed. Lets you not worry about dropping when creating your code.
+
+### Module validation
+
+* Module#**validate**(): `boolean`<br />
+  Validates the module. Returns `true` if valid, otherwise prints validation errors and returns `false`.
+
+### Module creation
+
+* Module#**emitBinary**(): `Uint8Array`<br />
+  Returns the module in binary format.
+
+* Module#**emitText**(): `string`<br />
+  Returns the module in Binaryen's s-expression text format (not official stack-style text format).
+
+* Module#**emitAsmjs**(): `string`<br />
+  Returns the [asm.js](http://asmjs.org/) representation of the module.
+
+* Module#**dispose**(): `void`<br />
+  Releases the resources held by the module once it isn't needed anymore.
+
+### Module debugging
+
+* Module#**setAPITracing**(on: `boolean`): `void`<br />
+  Enables tracing of the C-API in the console. Can be very useful when filing bug reports.
+
+* Module#**interpret**(): `void`<br />
+  Runs the module in the interpreter, calling the start function.
+
+### Expression construction
+
+#### [Control flow](http://webassembly.org/docs/semantics/#control-constructs-and-instructions)
+
+* Module#**block**(label: `string | null`, children: `Expression[]`, type?: `Type`): `Expression`<br />
+  Creates a block. `type` defaults to the `undefined` type explained [above](#types).
+
+* Module#**if**(condition: `Expression`, ifTrue: `Expression`, ifFalse?: `Expression`): `Expression`<br />
+  Creates an if or if/else combination.
+  
+* Module#**loop**(label: `string | null`, body: `Expression`): `Expression`<br />
+  Creates a loop.
+
+* Module#**break**(label: `string`, condition?: `Expression`, value?: `Expression`): `Expression`<br />
+  Creates a break (br) to a label.
+  
+* Module#**switch**(labels: `string[]`, defaultLabel: `string`, condition: `Expression`, value?: `Expression`): `Expression`<br />
+  Creates a switch (br_table).
+
+* Module#**nop**(): `Expression`<br />
+  Creates a no-operation (nop) instruction.
+
+* Module#**return**(value?: `Expression`): `Expression`
+  Creates a return.
+
+* Module#**unreachable**(): `Expression`<br />
+  Creates an [unreachable](http://webassembly.org/docs/semantics/#unreachable) instruction that will always trap.
+
+* Module#**drop**(value: `Expression`): `Expression`<br />
+  Creates a [drop](http://webassembly.org/docs/semantics/#type-parametric-operators) of a value.
+
+* Module#**select**(condition: `Expression`, ifTrue: `Expression`, ifFalse: `Expression`): `Expression`<br />
+  Creates a [select](http://webassembly.org/docs/semantics/#type-parametric-operators), i.e., ternary if.
+
+#### [Constants](http://webassembly.org/docs/semantics/#constants)
+
+* Module#i32.**const**(value: `number`): `I32Expression`
+>
+* Module#i64.**const**(low: `number`, high: `number`): `I64Expression`
+>
+* Module#f32.**const**(value: `number`): `F32Expression`
+* Module#f32.**const_bits**(value: `number`): `F32Expression`
+>
+* Module#f64.**const**(value: `number`): `F64Expression`
+* Module#f64.**const_bits**(low: `number`, high: `number`): `F64Expression`
+
+#### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
+
+* Module#**getLocal**(index: `number`, type: `Type`): `Expression`<br />
+  Creates a get_local for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
+
+* Module#**setLocal**(index: `number`, value: `Expression`): `Expression`<br />
+  Creates a set_local for the local at the specified index.
+
+* Module#**teeLocal**(index: `number`, value: `Expression`): `Expression`<br />
+  Creates a tee_local for the local at the specified index. A tee differs from a set in that the value remains on the stack.
+
+* Module#**getGlobal**(name: `string`, type: `Type`): `Expression`<br />
+  Creates a get_global for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
+
+* Module#**setGlobal**(name: `string`, value: `Expression`): `Expression`<br />
+  Creates a set_global for the global with the specified name.
+
+#### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
+
+* Module#i32.**clz**(value: `I32Expression`): `I32Expression`
+* Module#i32.**ctz**(value: `I32Expression`): `I32Expression`
+* Module#i32.**popcnt**(value: `I32Expression`): `I32Expression`
+* Module#i32.**eqz**(value: `I32Expression`): `I32Expression`
+* Module#i32.**add**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**sub**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**mul**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**div_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**div_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**rem_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**rem_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**and**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**or**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**xor**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**shl**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**shr_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**shr_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**rotl**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**rotr**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**eq**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**ne**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**lt_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**lt_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**le_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**le_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**gt_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**gt_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**ge_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**ge_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+>
+* Module#i64.**clz**(value: `I64Expression`): `I64Expression`
+* Module#i64.**ctz**(value: `I64Expression`): `I64Expression`
+* Module#i64.**popcnt**(value: `I64Expression`): `I64Expression`
+* Module#i64.**eqz**(value: `I64Expression`): `I64Expression`
+* Module#i64.**add**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**sub**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**mul**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**div_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**div_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**rem_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**rem_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**and**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**or**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**xor**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**shl**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**shr_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**shr_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**rotl**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**rotr**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**eq**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**ne**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**lt_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**lt_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**le_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**le_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**gt_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**gt_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**ge_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**ge_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+
+#### [Floating point operations](http://webassembly.org/docs/semantics/#floating-point-operators)
+
+* Module#f32.**neg**(value: `F32Expression`): `F32Expression`
+* Module#f32.**abs**(value: `F32Expression`): `F32Expression`
+* Module#f32.**ceil**(value: `F32Expression`): `F32Expression`
+* Module#f32.**floor**(value: `F32Expression`): `F32Expression`
+* Module#f32.**trunc**(value: `F32Expression`): `F32Expression`
+* Module#f32.**nearest**(value: `F32Expression`): `F32Expression`
+* Module#f32.**sqrt**(value: `F32Expression`): `F32Expression`
+* Module#f32.**add**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**sub**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**mul**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**div**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**copysign**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**min**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**max**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**eq**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**ne**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**lt**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**le**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**gt**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**ge**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+>
+* Module#f64.**neg**(value: `F64Expression`): `F64Expression`
+* Module#f64.**abs**(value: `F64Expression`): `F64Expression`
+* Module#f64.**ceil**(value: `F64Expression`): `F64Expression`
+* Module#f64.**floor**(value: `F64Expression`): `F64Expression`
+* Module#f64.**trunc**(value: `F64Expression`): `F64Expression`
+* Module#f64.**nearest**(value: `F64Expression`): `F64Expression`
+* Module#f64.**sqrt**(value: `F64Expression`): `F64Expression`
+* Module#f64.**add**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**sub**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**mul**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**div**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**copysign**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**min**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**max**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**eq**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**ne**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**lt**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**le**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**gt**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**ge**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+
+#### [Datatype conversions](http://webassembly.org/docs/semantics/#datatype-conversions-truncations-reinterpretations-promotions-and-demotions)
+
+* Module#i32.**trunc_s.f32**(value: `F32Expression`): `I32Expression`
+* Module#i32.**trunc_s.f64**(value: `F64Expression`): `I32Expression`
+* Module#i32.**trunc_u.f32**(value: `F32Expression`): `I32Expression`
+* Module#i32.**trunc_u.f64**(value: `F64Expression`): `I32Expression`
+* Module#i32.**reinterpret**(value: `F32Expression`): `I32Expression`
+* Module#i32.**wrap**(value: `I64Expression`): `I32Expression`
+>
+* Module#i64.**trunc_s.f32**(value: `F32Expression`): `I64Expression`
+* Module#i64.**trunc_s.f64**(value: `F64Expression`): `I64Expression`
+* Module#i64.**trunc_u.f32**(value: `F32Expression`): `I64Expression`
+* Module#i64.**trunc_u.f64**(value: `F64Expression`): `I64Expression`
+* Module#i64.**reinterpret**(value: `F64Expression`): `I64Expression`
+* Module#i64.**extend_s**(value: `I32Expression`): `I64Expression`
+* Module#i64.**extend_u**(value: `I32Expression`): `I64Expression`
+>
+* Module#f32.**reinterpret**(value: `I32Expression`): `F32Expression`
+* Module#f32.**convert_s.i32**(value: `I32Expression`): `F32Expression`
+* Module#f32.**convert_s.i64**(value: `I64Expression`): `F32Expression`
+* Module#f32.**convert_u.i32**(value: `I32Expression`): `F32Expression`
+* Module#f32.**convert_u.i64**(value: `I64Expression`): `F32Expression`
+* Module#f32.**demote**(value: `F64Expression`): `F32Expression`
+>
+* Module#f64.**reinterpret**(value: `I32Expression`): `F64Expression`
+* Module#f64.**convert_s.i32**(value: `I32Expression`): `F64Expression`
+* Module#f64.**convert_s.i64**(value: `I64Expression`): `F64Expression`
+* Module#f64.**convert_u.i32**(value: `I32Expression`): `F64Expression`
+* Module#f64.**convert_u.i64**(value: `I64Expression`): `F64Expression`
+* Module#f64.**promote**(value: `F32Expression`): `F64Expression`
+
+#### [Function calls](http://webassembly.org/docs/semantics/#calls)
+
+* Module#**call**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+  Creates a call to a function. Note that we must specify the return type here as we may not have created the function being called yet.
+
+* Module#**callImport**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+  Similar to **call**, but calls an imported function.
+
+* Module#**callIndirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+  Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
+
+#### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
+
+* Module#i32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
+* Module#i32.**load8_s**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
+* Module#i32.**load8_u**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
+* Module#i32.**load16_s**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
+* Module#i32.**load16_u**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
+* Module#i32.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`<br />
+* Module#i32.**store8**(offset: `number`, align: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`<br />
+* Module#i32.**store16**(offset: `number`, align: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`<br />
+>
+* Module#i64.**load**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**load8_s**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**load8_u**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**load16_s**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**load16_u**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**load32_s**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**load32_u**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**store8**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**store16**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**store32**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+>
+* Module#f32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `F32Expression`
+* Module#f32.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `F32Expression`): `Expression`
+>
+* Module#f64.**load**(offset: `number`, align: `number`, ptr: `Expression`): `F64Expression`
+* Module#f64.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `F64Expression`): `Expression`
+
+#### [Host operations](http://webassembly.org/docs/semantics/#resizing)
+
+* Module#**currentMemory**(): `I32Expression`
+* Module#**growMemory**(value: `number`): `I32Expression`
+* Module#**hasFeature**(name: `string`): `Expression` 🦄
+
+#### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
+
+* Module#i32.**atomic.load**(offset: `number`, ptr: `Expression`): `I32Expression`
+* Module#i32.**atomic.load8_u**(offset: `number`, ptr: `Expression`): `I32Expression`
+* Module#i32.**atomic.load16_u**(offset: `number`, ptr: `Expression`): `I32Expression`
+* Module#i32.**atomic.store**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`
+* Module#i32.**atomic.store8**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`
+* Module#i32.**atomic.store16**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`
+>
+* Module#i64.**atomic.load**(offset: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**atomic.load8_u**(offset: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**atomic.load16_u**(offset: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**atomic.load32_u**(offset: `number`, ptr: `Expression`): `I64Expression`
+* Module#i64.**atomic.store**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**atomic.store8**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**atomic.store16**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**atomic.store32**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+
+#### [Atomic read-modify-write operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#read-modify-write) 🦄
+
+* Module#i32.**atomic.rmw.add**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.sub**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.and**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.or**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.xor**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.xchg**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I32Expression`, replacement: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.add**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.sub**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.and**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.or**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.xor**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.xchg**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw8_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I32Expression`, replacement: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.add**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.sub**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.and**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.or**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.xor**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.xchg**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw16_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I32Expression`, replacement: `I32Expression`): `I32Expression`
+>
+* Module#i64.**atomic.rmw.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw8_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw16_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw32_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
+
+#### [Atomic wait and wake operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-wake-operators) 🦄
+
+* Module#i32.**wait**(ptr: `Expression`, expected: `I32Expression`, timeout: `I64Expression`): `I32Expression`
+* Module#i64.**wait**(ptr: `Expression`, expected: `I64Expression`, timeout: `I64Expression`): `I32Expression`
+* Module#**wake**(ptr: `Expression`, wakeCount: `I64Expression`): `I64Expression`
+
+### Expression manipulation
+
+* **getExpressionId**(expr: `Expression`): `ExpressionId`<br />
+  Gets the id (kind) of the specified expression. Possible values are:
+
+  * **InvalidId**: `ExpressionId`
+  * **BlockId**: `ExpressionId`
+  * **IfId**: `ExpressionId`
+  * **LoopId**: `ExpressionId`
+  * **BreakId**: `ExpressionId`
+  * **SwitchId**: `ExpressionId`
+  * **CallId**: `ExpressionId`
+  * **CallImportId**: `ExpressionId`
+  * **CallIndirectId**: `ExpressionId`
+  * **GetLocalId**: `ExpressionId`
+  * **SetLocalId**: `ExpressionId`
+  * **GetGlobalId**: `ExpressionId`
+  * **SetGlobalId**: `ExpressionId`
+  * **LoadId**: `ExpressionId`
+  * **StoreId**: `ExpressionId`
+  * **ConstId**: `ExpressionId`
+  * **UnaryId**: `ExpressionId`
+  * **BinaryId**: `ExpressionId`
+  * **SelectId**: `ExpressionId`
+  * **DropId**: `ExpressionId`
+  * **ReturnId**: `ExpressionId`
+  * **HostId**: `ExpressionId`
+  * **NopId**: `ExpressionId`
+  * **UnreachableId**: `ExpressionId`
+  * **AtomicCmpxchgId**: `ExpressionId`
+  * **AtomicRMWId**: `ExpressionId`
+  * **AtomicWaitId**: `ExpressionId`
+  * **AtomicWakeId**: `ExpressionId`
+
+* **getExpressionType**(expr: `Expression`): `Type`<br />
+  Gets the type of the specified expression.
+
+* **getConstValueI32**(expr: `Expression`): `number`<br />
+  Gets the value of an i32.const (id=**ConstId**, type=**i32**) expression.
+
+* **getConstValueI64**(expr: `Expression`): `{ low: number, high: number }`<br />
+  Gets the value of an i64.const (id=**ConstId**, type=**i64**) expression.
+
+* **getConstValueF32**(expr: `Expression`): `number`<br />
+  Gets the value of an f32.const (id=**ConstId**, type=**f32**) expression.
+
+* **getConstValueF64**(expr: `Expression`): `number`<br />
+  Gets the value of an f64.const (id=**ConstId**, type=**f64**) expression.
+
+* **getFunctionBody**(func: `Function`): `Expression`<br />
+  Gets the body of a function.
+
+### Relooper
+
+* new **Relooper**(): `Relooper`<br />
+  Constructs a relooper instance. This lets you provide an arbitrary CFG, and the relooper will structure it for WebAssembly.
+
+* Relooper#**addBlock**(code: `Expression`): `RelooperBlock`<br />
+  Adds a new block to the CFG, containing the provided code as its body.
+
+* Relooper#**addBranch**(from: `RelooperBlock`, to: `RelooperBlock`, condition: `Expression`, code: `Expression`): `void`<br />
+  Adds a branch from a block to another block, with a condition (or nothing, if this is the default branch to take from the origin - each block must have one such branch), and optional code to execute on the branch (useful for phis).
+
+* Relooper#**addBlockWithSwitch**(code: `Expression`, condition: `Expression`): `RelooperBlock`<br />
+  Adds a new block, which ends with a switch/br_table, with provided code and condition (that determines where we go in the switch).
+
+* Relooper#**addBranchForSwitch**(from: `RelooperBlock`, to: `RelooperBlock`, indexes: `number[]`, code: `Expression`): `void`<br />
+  Adds a branch from a block ending in a switch, to another block, using an array of indexes that determine where to go, and optional code to execute on the branch.
+
+* Relooper#**renderAndDispose**(entry: `RelooperBlock`, labelHelper: `number`, module: `Module`): `Expression`<br />
+  Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins), a label helper variable (an index of a local we can use, necessary for irreducible control flow), and the module. This returns an expression - normal WebAssembly code - that you can use normally anywhere.
+
+Building
+--------
+
+Clone the GitHub repository including submodules and install the development dependencies:
+
+```
+$> git clone --recursive https://github.com/AssemblyScript/binaryen.js.git
+$> cd binaryen.js
+$> npm install
+```
+
+Make sure [Emscripten](https://github.com/kripken/emscripten) is properly set up on your system.
+
+Afterwards, to build the `binaryen` submodule to `index.js`, run:
+
+```
+$> npm run build
+```
+
+To run the [tests](./tests), do:
+
+```
+$> npm test
+```

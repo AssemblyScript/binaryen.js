@@ -1,6 +1,8 @@
 var fs = require("fs");
 var test = require("tape");
 
+var isUpdate = process.argv[2] === "update";
+
 // This test case exists to catch the most obvious issues before pushing the binary back to GitHub.
 // It's not intended to be a full test suite, but feel free to extend it / send a PR if necessary!
 
@@ -51,9 +53,30 @@ test("adding a function", function(test) {
   test.end();
 });
 
-test("adding an export", function(test) {
+test("adding a function import", function(test) {
   test.doesNotThrow(function() {
-    mod.addExport("main", "main");
+    mod.addFunctionImport("imported", "env", "provided", ftype);
+  });
+  test.end();
+});
+
+test("adding a function export", function(test) {
+  test.doesNotThrow(function() {
+    mod.addFunctionExport("main", "main");
+  });
+  test.end();
+});
+
+test("adding a memory import", function(test) {
+  test.doesNotThrow(function() {
+    mod.addMemoryImport("0", "env", "memory"); // doesn't work with a different internal name, yet
+  });
+  test.end();
+});
+
+test("adding a memory export", function(test) {
+  test.doesNotThrow(function() {
+    mod.addMemoryExport("0", "memory");
   });
   test.end();
 });
@@ -107,11 +130,26 @@ function stripComments(text) {
 
 test("fixtures", function(test) {
 
-  var textComp = fs.readFileSync(__dirname + "/fixtures/index.text", "utf8").replace(/\r?\n/g, "\n");
-  test.strictEqual(stripComments(text), stripComments(textComp), "should match text output");
+  if (isUpdate) {
+    fs.writeFileSync(__dirname + "/fixtures/index.wast", text, "utf8");
+  } else {
+    var textComp = fs.readFileSync(__dirname + "/fixtures/index.wast", "utf8").replace(/\r?\n/g, "\n");
+    test.strictEqual(stripComments(text), stripComments(textComp), "should match text output");
+  }
 
-  var binaryComp = fs.readFileSync(__dirname + "/fixtures/index.wasm");
-  test.ok(Buffer.compare(binary, binaryComp) === 0, "should match binary output");
+  if (isUpdate) {
+    fs.writeFileSync(__dirname + "/fixtures/index.wasm", binary);
+  } else {
+    var binaryComp = fs.readFileSync(__dirname + "/fixtures/index.wasm");
+    test.ok(Buffer.compare(binary, binaryComp) === 0, "should match binary output");
+  }
+
+  if (isUpdate) {
+    fs.writeFileSync(__dirname + "/fixtures/index.asm.js", asmjs, "utf8");
+  } else {
+    // var asmjsComp = fs.readFileSync(__dirname + "/fixtures/index.asm.js");
+    // test.strictEqual(asmjs, asmjsComp, "should match asm.js output");
+  }
 
   test.end();
 });

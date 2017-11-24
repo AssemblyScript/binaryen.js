@@ -20,6 +20,7 @@
   },
   "scripts": {
     "build": "node scripts/build",
+    "toc": "doctoc README.md --github --title \"## Contents\"",
     "test": "node tests"
   },
   "files": [
@@ -34,6 +35,7 @@
   ],
   "devDependencies": {
     "dateformat": "^2.0.0",
+    "doctoc": "^1.3.0",
     "glob": "^7.1.2",
     "semver": "^5.4.1",
     "simple-git": "^1.76.0",
