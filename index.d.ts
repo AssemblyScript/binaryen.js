@@ -325,7 +325,7 @@ declare module binaryen {
     addGlobalExport(internalName: string, externalName: string): Export;
     removeExport(externalName: string): void;
     setFunctionTable(funcs: number[]): void;
-    setMemory(initial: number, maximum: number, exportName?: string, segments?: MemorySegment[]): void;
+    setMemory(initial: number, maximum: number, exportName: string|null, segments: MemorySegment[]): void;
     setStart(start: binaryen.Function): void;
 
     emitBinary(): Uint8Array;
