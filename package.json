@@ -14,9 +14,9 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "bin": {
-    "binaryen-as": "bin/as",
-    "binaryen-dis": "bin/dis",
-    "binaryen-opt": "bin/opt"
+    "binaryen-as": "bin/as.js",
+    "binaryen-dis": "bin/dis.js",
+    "binaryen-opt": "bin/opt.js"
   },
   "scripts": {
     "build": "node scripts/build",
