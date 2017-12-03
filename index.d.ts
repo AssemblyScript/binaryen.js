@@ -166,16 +166,16 @@ declare module binaryen {
     shr_s(left: I64Expression, right: I64Expression): I64Expression;
     rotl(left: I64Expression, right: I64Expression): I64Expression;
     rotr(left: I64Expression, right: I64Expression): I64Expression;
-    eq(left: I64Expression, right: I64Expression): I64Expression;
-    ne(left: I64Expression, right: I64Expression): I64Expression;
-    lt_s(left: I64Expression, right: I64Expression): I64Expression;
-    lt_u(left: I64Expression, right: I64Expression): I64Expression;
-    le_s(left: I64Expression, right: I64Expression): I64Expression;
-    le_u(left: I64Expression, right: I64Expression): I64Expression;
-    gt_s(left: I64Expression, right: I64Expression): I64Expression;
-    gt_u(left: I64Expression, right: I64Expression): I64Expression;
-    ge_s(left: I64Expression, right: I64Expression): I64Expression;
-    ge_u(left: I64Expression, right: I64Expression): I64Expression;
+    eq(left: I64Expression, right: I64Expression): I32Expression;
+    ne(left: I64Expression, right: I64Expression): I32Expression;
+    lt_s(left: I64Expression, right: I64Expression): I32Expression;
+    lt_u(left: I64Expression, right: I64Expression): I32Expression;
+    le_s(left: I64Expression, right: I64Expression): I32Expression;
+    le_u(left: I64Expression, right: I64Expression): I32Expression;
+    gt_s(left: I64Expression, right: I64Expression): I32Expression;
+    gt_u(left: I64Expression, right: I64Expression): I32Expression;
+    ge_s(left: I64Expression, right: I64Expression): I32Expression;
+    ge_u(left: I64Expression, right: I64Expression): I32Expression;
     atomic: {
       load(offset: number, ptr: Expression): I64Expression;
       load8_u(offset: number, ptr: Expression): I64Expression;
@@ -254,12 +254,12 @@ declare module binaryen {
     copysign(left: F32Expression, right: F32Expression): F32Expression;
     min(left: F32Expression, right: F32Expression): F32Expression;
     max(left: F32Expression, right: F32Expression): F32Expression;
-    eq(left: F32Expression, right: F32Expression): F32Expression;
-    ne(left: F32Expression, right: F32Expression): F32Expression;
-    lt(left: F32Expression, right: F32Expression): F32Expression;
-    le(left: F32Expression, right: F32Expression): F32Expression;
-    gt(left: F32Expression, right: F32Expression): F32Expression;
-    ge(left: F32Expression, right: F32Expression): F32Expression;
+    eq(left: F32Expression, right: F32Expression): I32Expression;
+    ne(left: F32Expression, right: F32Expression): I32Expression;
+    lt(left: F32Expression, right: F32Expression): I32Expression;
+    le(left: F32Expression, right: F32Expression): I32Expression;
+    gt(left: F32Expression, right: F32Expression): I32Expression;
+    ge(left: F32Expression, right: F32Expression): I32Expression;
   }
 
   interface F64Operations {
@@ -291,12 +291,12 @@ declare module binaryen {
     copysign(left: F64Expression, right: F64Expression): F64Expression;
     min(left: F64Expression, right: F64Expression): F64Expression;
     max(left: F64Expression, right: F64Expression): F64Expression;
-    eq(left: F64Expression, right: F64Expression): F64Expression;
-    ne(left: F64Expression, right: F64Expression): F64Expression;
-    lt(left: F64Expression, right: F64Expression): F64Expression;
-    le(left: F64Expression, right: F64Expression): F64Expression;
-    gt(left: F64Expression, right: F64Expression): F64Expression;
-    ge(left: F64Expression, right: F64Expression): F64Expression;
+    eq(left: F64Expression, right: F64Expression): I32Expression;
+    ne(left: F64Expression, right: F64Expression): I32Expression;
+    lt(left: F64Expression, right: F64Expression): I32Expression;
+    le(left: F64Expression, right: F64Expression): I32Expression;
+    gt(left: F64Expression, right: F64Expression): I32Expression;
+    ge(left: F64Expression, right: F64Expression): I32Expression;
   }
 
   interface MemorySegment {
@@ -325,7 +325,7 @@ declare module binaryen {
     addGlobalExport(internalName: string, externalName: string): Export;
     removeExport(externalName: string): void;
     setFunctionTable(funcs: number[]): void;
-    setMemory(initial: number, maximum: number, exportName: string|null, segments: MemorySegment[]): void;
+    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[]): void;
     setStart(start: binaryen.Function): void;
 
     emitBinary(): Uint8Array;
