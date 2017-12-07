@@ -345,25 +345,39 @@ declare module binaryen {
     f32: F32Operations;
     f64: F64Operations;
 
-    block(label: string, children: Statement[], type?: Type): Statement;
+    block(label: string, children: Statement[], resultType?: Type): Statement;
     if(condition: I32Expression, ifTrue: Statement, ifFalse?: Statement): Statement;
     loop(label: string, body: Statement): Statement;
+
     break(label: string, condition?: I32Expression, value?: I32Expression): Statement;
+    /* alias */ br(label: string, condition?: I32Expression, value?: I32Expression): Statement;
+    /* alias */ br_if(label: string, condition?: I32Expression, value?: I32Expression): Statement;
     switch(labels: string[], defaultLabel: string, condition: I32Expression, value?: I32Expression): Statement;
     call(name: string, operands: Expression[], type: Type): Expression;
     callImport(name: string, operands: Expression[], type: Type): Expression;
+    /* alias */ call_import(name: string, operands: Expression[], type: Type): Expression;
     callIndirect(target: I32Expression, operands: Expression[], type: Type): Expression;
+    /* alias */ call_indirect(target: I32Expression, operands: Expression[], type: Type): Expression;
     getLocal(index: number, type: Type): Expression;
+    /* alias */ get_local(index: number, type: Type): Expression;
     setLocal(index: number, value: Expression): Statement;
+    /* alias */ set_local(index: number, value: Expression): Statement;
     teeLocal(index: number, value: Expression): Expression;
+    /* alias */ tee_local(index: number, value: Expression): Expression;
     getGlobal(name: string, type: Type): Expression;
+    /* alias */ get_global(name: string, type: Type): Expression;
     setGlobal(name: string, value: Expression): Expression;
+    /* alias */ set_global(name: string, value: Expression): Expression;
     select(condition: I32Expression, ifTrue: Expression, ifFalse: Expression): Expression;
     drop(value: Expression): Statement;
     return(value?: Expression): Statement;
     nop(): Statement;
     growMemory(value: Expression): Expression;
+    /* alias */ grow_memory(value: Expression): Expression;
     currentMemory(): Expression;
+    /* alias */ current_memory(): Expression;
+    hasFeature(name: string): Expression;
+    /* alias */ has_feature(name: string): Expression;
     unreachable(): Statement;
     wake(ptr: Expression, wakeCount: I64Expression): I64Expression;
   }

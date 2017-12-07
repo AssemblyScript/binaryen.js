@@ -206,18 +206,18 @@ API
 
 #### [Control flow](http://webassembly.org/docs/semantics/#control-constructs-and-instructions)
 
-* Module#**block**(label: `string | null`, children: `Expression[]`, type?: `Type`): `Expression`<br />
-  Creates a block. `type` defaults to the `undefined` type explained [above](#types).
+* Module#**block**(label: `string | null`, children: `Expression[]`, resultType?: `Type`): `Expression`<br />
+  Creates a block. `resultType` defaults to `none`.
 
 * Module#**if**(condition: `Expression`, ifTrue: `Expression`, ifFalse?: `Expression`): `Expression`<br />
   Creates an if or if/else combination.
-  
+
 * Module#**loop**(label: `string | null`, body: `Expression`): `Expression`<br />
   Creates a loop.
 
 * Module#**break**(label: `string`, condition?: `Expression`, value?: `Expression`): `Expression`<br />
   Creates a break (br) to a label.
-  
+
 * Module#**switch**(labels: `string[]`, defaultLabel: `string`, condition: `Expression`, value?: `Expression`): `Expression`<br />
   Creates a switch (br_table).
 
@@ -234,7 +234,7 @@ API
   Creates a [drop](http://webassembly.org/docs/semantics/#type-parametric-operators) of a value.
 
 * Module#**select**(condition: `Expression`, ifTrue: `Expression`, ifFalse: `Expression`): `Expression`<br />
-  Creates a [select](http://webassembly.org/docs/semantics/#type-parametric-operators), i.e., ternary if.
+  Creates a [select](http://webassembly.org/docs/semantics/#type-parametric-operators) of one of two values.
 
 #### [Constants](http://webassembly.org/docs/semantics/#constants)
 
@@ -264,6 +264,8 @@ API
 
 * Module#**setGlobal**(name: `string`, value: `Expression`): `Expression`<br />
   Creates a set_global for the global with the specified name.
+
+Variable access methods above are also aliased in underscore notation, e.g., `get_local`.
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
 
@@ -413,6 +415,8 @@ API
 * Module#**callIndirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
 
+Function call methods above are also aliased in underscore notation, e.g., `call_indirect`.
+
 #### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
 
 * Module#i32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
@@ -447,6 +451,8 @@ API
 * Module#**currentMemory**(): `I32Expression`
 * Module#**growMemory**(value: `number`): `I32Expression`
 * Module#**hasFeature**(name: `string`): `Expression` 🦄
+
+Host operation methods above are also aliased in underscore notation, e.g., `current_memory`.
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
