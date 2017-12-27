@@ -5,7 +5,8 @@ declare module binaryen {
   const i64: Type;
   const f32: Type;
   const f64: Type;
-  const undefined: Type;
+  const unreachable: Type;
+  const auto: Type;
 
   const InvalidId: ExpressionId;
   const BlockId: ExpressionId;
@@ -35,6 +36,11 @@ declare module binaryen {
   const AtomicRMWId: ExpressionId;
   const AtomicWaitId: ExpressionId;
   const AtomicWakeId: ExpressionId;
+
+  const ExternalFunction: ExternalKind;
+  const ExternalTable: ExternalKind;
+  const ExternalMemory: ExternalKind;
+  const ExternalGlobal: ExternalKind;
 
   interface I32Operations {
     load(offset: number, align: number, ptr: Expression): I32Expression;
@@ -306,19 +312,17 @@ declare module binaryen {
 
   class Module {
 
-    addFunctionType(name: string, resultType: Type, paramTypes: Type[]): Signature;
-    getFunctionTypeBySignature(resultType: Type, paramTypes: Type[]): Signature;
-    addFunction(name: string, functionType: Signature, varTypes: Type[], body: Statement): Function;
+    addFunctionType(name: string, resultType: Type, paramTypes: Type[]): FunctionType;
+    getFunctionTypeBySignature(resultType: Type, paramTypes: Type[]): FunctionType;
+    addFunction(name: string, functionType: FunctionType, varTypes: Type[], body: Statement): Function;
     getFunction(name: string): Function;
     removeFunction(name: string): void;
     addGlobal(name: string, type: Type, mutable: boolean, init: Expression): Global;
-    /* deprecated */ addImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType?: Signature): Import;
-    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType: Signature): Import;
+    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType: FunctionType): Import;
     addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): Import;
     addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): Import;
     addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): Import;
     removeImport(internalName: string): void;
-    /* deprecated */ addExport(internalName: string, externalName: string): Export;
     addFunctionExport(internalName: string, externalName: string): Export;
     addTableExport(internalName: string, externalName: string): Export;
     addMemoryExport(internalName: string, externalName: string): Export;
@@ -384,11 +388,11 @@ declare module binaryen {
 
   function getExpressionId(expression: Expression): number;
   function getExpressionType(expression: Expression): Type;
-  function getConstValueI32(expression: Expression): number;
-  function getConstValueI64(expression: Expression): { low: number, high: number };
-  function getConstValueF32(expression: Expression): number;
-  function getConstValueF64(expression: Expression): number;
-  function getFunctionBody(func: Function): Expression;
+  function getExpressionInfo(expression: Expression): { [key: string]: any; id: ExpressionId, type: Type };
+  function getFunctionTypeInfo(ftype: FunctionType): { name: string, params: Type[], result: Type };
+  function getFunctionInfo(func: Function): { name: string, type: FunctionType, params: Type[], result: Type, vars: Type[], body: Expression };
+  function getImportInfo(import_: Import): { kind: ExternalKind; module: string, base: string, name: string, globalType?: Type, functionType?: string };
+  function getExportInfo(export_: Export): { kind: ExternalKind; name: string, value: string };
   function emitText(expression: Expression): string;
   function readBinary(data: Uint8Array): Module;
   function parseText(text: string): Module;
@@ -405,8 +409,9 @@ declare module binaryen {
   // These are actually pointers internally
   abstract class Type { protected __Type__: number; }
   abstract class ExpressionId { protected __ExpressionId__: number; }
+  abstract class ExternalKind { protected __ExternalKind__: number; }
   abstract class Statement { protected __Statement__: number; }
-  abstract class Signature { protected __Signature__: number; }
+  abstract class FunctionType { protected __FunctionType__: number; }
   abstract class Function { protected __Function__: number; }
   abstract class Expression { protected __Expression__: number; }
   abstract class Global { protected __Global__: number; }
