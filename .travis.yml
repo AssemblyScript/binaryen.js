@@ -20,11 +20,12 @@ env:
   - CCACHE_HARDLINK=1
   - CCACHE_MAXSIZE="256m"
   - LLVM="$HOME/emscripten-fastcomp/build/bin"
+  - EMSCRIPTEN_VERSION="1.37.22"
   - EMSCRIPTEN="$HOME/emscripten"
   - PATH="$HOME/emscripten:$HOME/cmake/bin:$PATH"
 
 install: # install cmake and node.js
-- mkdir $HOME/cmake && wget -qO- https://cmake.org/files/v3.9/cmake-3.9.4-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
+- mkdir $HOME/cmake && wget -qO- https://cmake.org/files/v3.10/cmake-3.10.1-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
 - nvm install 8
 
 before_script: # setup ccache, git and emscripten
@@ -36,9 +37,9 @@ before_script: # setup ccache, git and emscripten
   echo "https://${GH_TOKEN}:@github.com" > .git/credentials &&
   echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > $HOME/.npmrc
 - export RC=1
-- git clone -b incoming --depth 1 https://github.com/kripken/emscripten-fastcomp $HOME/emscripten-fastcomp &&
-  git clone -b incoming --depth 1 https://github.com/kripken/emscripten-fastcomp-clang $HOME/emscripten-fastcomp/tools/clang &&
-  git clone -b incoming --depth 1 https://github.com/kripken/emscripten $HOME/emscripten &&
+- git clone -b $EMSCRIPTEN_VERSION --depth 1 https://github.com/kripken/emscripten-fastcomp $HOME/emscripten-fastcomp &&
+  git clone -b $EMSCRIPTEN_VERSION --depth 1 https://github.com/kripken/emscripten-fastcomp-clang $HOME/emscripten-fastcomp/tools/clang &&
+  git clone -b $EMSCRIPTEN_VERSION --depth 1 https://github.com/kripken/emscripten $HOME/emscripten &&
   mkdir $HOME/emscripten-fastcomp/build &&
   export CC="ccache clang" &&
   export CXX="ccache clang++" &&

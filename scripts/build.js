@@ -41,9 +41,6 @@ console.log("Found " + exportedFunctions.length + " exported functions:\n\n  " +
 var commonOptions = [
   "-s", "DEMANGLE_SUPPORT=1",
   "-s", "DISABLE_EXCEPTION_CATCHING=0",
-  "-s", /^win/.test(process.platform)
-    ? "EXPORTED_FUNCTIONS=\"[" + exportedFunctions.map(name => "\\\"_" + name + "\\\"").join(",") + "]\""
-    : "EXPORTED_FUNCTIONS='[" + exportedFunctions.map(name => "\"_" + name + "\"").join(",") + "]'",
   "--memory-init-file", "0",
   "--llvm-lto", "1",
   "-std=c++11",
@@ -51,12 +48,13 @@ var commonOptions = [
 ];
 
 function precompile() {
-  var cmd = '"' + path.join(emscriptenDirectory, "em++") + '"';
-  var arg = commonOptions.concat([
+  var arg = [
+    path.join(emscriptenDirectory, "em++")
+  ].concat(commonOptions).concat([
     "-o", "shared.bc"
   ]).concat(sourceFiles);
-  console.log(cmd + " " + arg.join(" ") + "\n");
-  var proc = child_process.spawnSync(cmd, arg, { stdio: "inherit", shell: true });
+  console.log(arg.join(" ") + "\n");
+  var proc = child_process.spawnSync("python", arg, { stdio: "inherit" });
   if (proc.error)
     throw proc.error;
   if (proc.status !== 0)
@@ -64,27 +62,30 @@ function precompile() {
 }
 
 function compile(options) {
-  var cmd = '"' + path.join(emscriptenDirectory, "em++") + '"';
-  var arg = commonOptions.concat([
+  var arg = [
+    path.join(emscriptenDirectory, "em++")
+  ].concat(commonOptions).concat([
+    "-s", "EXPORTED_FUNCTIONS=[" + exportedFunctions.map(name => "\"_" + name + "\"").join(",") + "]",
     "-Oz",
     "-o", options.out,
     "shared.bc"
-  ]);
-  arg = arg.concat(/.js$/.test(options.out)
+  ]).concat(
+    /.js$/.test(options.out)
     ? [
       "-s", "ALLOW_MEMORY_GROWTH=1",
       "-s", "ELIMINATE_DUPLICATE_FUNCTIONS=1",
       "-Wno-almost-asm",
-      "--closure", "1",
+      // "--closure", "1",
       "--pre-js", options.pre,
       "--post-js", options.post
     ] : [
       "-s", "WASM=1",
       "-s", "SIDE_MODULE=1",
       "-s", "BINARYEN_METHOD='native-wasm'"
-    ]);
-  console.log(cmd + " " + arg.join(" ") + "\n");
-  var proc = child_process.spawnSync(cmd, arg, { stdio: "inherit", shell: true });
+    ]
+  );
+  console.log(arg.join(" ") + "\n");
+  var proc = child_process.spawnSync("python", arg, { stdio: "inherit" });
   if (proc.error)
     throw proc.error;
   if (proc.status !== 0)
