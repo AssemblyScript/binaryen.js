@@ -15,6 +15,7 @@ binaryen.js
   - [Module construction](#module-construction)
   - [Module manipulation](#module-manipulation)
   - [Module validation](#module-validation)
+  - [Module optimization](#module-optimization)
   - [Module creation](#module-creation)
   - [Module debugging](#module-debugging)
   - [Expression construction](#expression-construction)
@@ -46,15 +47,32 @@ $> npm install binaryen
 ```js
 var binaryen = require("binaryen");
 
+// Create a module with a single function
 var myModule = new binaryen.Module();
 
-myModule.addFunction("main", myModule.addFunctionType("i", binaryen.i32, []), [],
-  myModule.return(
-    myModule.i32.const(0)
-  )
+myModule.addFunction("add", myModule.addFunctionType("iii", binaryen.i32, [ binaryen.i32, binaryen.i32 ]), [ binaryen.i32 ],
+  myModule.block(null, [
+    myModule.setLocal(2,
+      myModule.i32.add(
+        myModule.getLocal(0, binaryen.i32),
+        myModule.getLocal(1, binaryen.i32)
+      )
+    ),
+    myModule.return(
+      myModule.getLocal(2, binaryen.i32)
+    )
+  ])
 );
-myModule.addFunctionExport("main", "main");
+myModule.addFunctionExport("add", "add");
 
+// Optimize the module using default passes and levels
+myModule.optimize();
+
+// Validate the module
+if (!myModule.validate())
+  throw new Error("validation error");
+
+// Generate text format and binary
 var textData = myModule.emitText();
 var wasmData = myModule.emitBinary();
 ...
@@ -90,8 +108,11 @@ API
  * **f64**: `Type`<br />
    64-bit float (double) type.
 
- * **undefined**: `Type`<br />
-   Special type used with blocks to let the API figure out its result type on its own.
+ * **auto**: `Type`<br />
+   Special type used in **Module#block** exclusively. Lets the API figure out a block's result type automatically.
+
+ * **unreachable**: `Type`<br />
+   Special type indicating unreachable code when obtaining information about an expression.
 
 ### Module construction
 
@@ -160,6 +181,61 @@ API
 * Module#**setStart**(start: `Function`): `void`<br />
   Sets the start function.
 
+* Module#**autoDrop**(): `void`<br />
+  Enables automatic insertion of `drop` operations where needed. Lets you not worry about dropping when creating your code.
+
+* **getFunctionTypeInfo**(ftype: `FunctionType`: `FunctionTypeInfo`<br />
+  Obtains information about a function type.
+
+  * FunctionTypeInfo#**name**: `string | null`
+  * FunctionTypeInfo#**params**: `Type[]`
+  * FunctionTypeInfo#**result**: `Type`
+
+* **getFunctionInfo**(ftype: `Function`: `FunctionInfo`<br />
+  Obtains information about a function.
+
+  * FunctionInfo#**name**: `string | null`
+  * FunctionInfo#**type**: `FunctionType`
+  * FunctionInfo#**params**: `Type[]`
+  * FunctionInfo#**result**: `Type`
+  * FunctionInfo#**vars**: `Type`
+  * FunctionInfo#**body**: `Expression`
+
+* **getImportInfo**(import_: `Import`): `ImportInfo`<br />
+  Obtains information about an import, always including:
+
+  * ImportInfo#**kind**: `ExternalKind`
+  * ImportInfo#**module**: `string`
+  * ImportInfo#**base**: `string`
+  * ImportInfo#**name**: `string`
+
+  Additional properties depend on the expression's `kind` and are usually equivalent to the respective parameters when creating such an import:
+
+  * GlobalImportInfo#**globalType**: `Type`
+  >
+  * FunctionImportInfo#**functionType**: `FunctionType`
+
+  Possible `ExternalKind` values are:
+
+  * **ExternalFunction**: `ExternalKind`
+  * **ExternalTable**: `ExternalKind`
+  * **ExternalMemory**: `ExternalKind`
+  * **ExternalGlobal**: `ExternalKind`
+
+* **getExportInfo**(export_: `Export`): `ExportInfo`<br />
+  Obtains information about an export.
+
+  * ExportInfo#**kind**: `ExternalKind`
+  * ExportInfo#**name**: `string`
+  * ExportInfo#**value**: `string`
+
+### Module validation
+
+* Module#**validate**(): `boolean`<br />
+  Validates the module. Returns `true` if valid, otherwise prints validation errors and returns `false`.
+
+### Module optimization
+
 * Module#**optimize**(): `void`<br />
   Optimizes the module using the default optimization passes.
 
@@ -172,13 +248,23 @@ API
 * Module#**runPassesOnFunction**(func: `Function | string`, passes: `string[]`): `void`<br />
   Runs the specified passes on a single function.
 
-* Module#**autoDrop**(): `void`<br />
-  Enables automatic insertion of `drop` operations where needed. Lets you not worry about dropping when creating your code.
+* **getOptimizeLevel**(): `number`<br />
+  Gets the currently set optimize level. `0`, `1`, `2` correspond to `-O0`, `-O1`, `-O2` (default), etc.
 
-### Module validation
+* **setOptimizeLevel**(level: `number`): `void`<br />
+  Sets the optimization level to use. `0`, `1`, `2` correspond to `-O0`, `-O1`, `-O2` (default), etc.
 
-* Module#**validate**(): `boolean`<br />
-  Validates the module. Returns `true` if valid, otherwise prints validation errors and returns `false`.
+* **getShrinkLevel**(): `number`<br />
+  Gets the currently set shrink level. `0`, `1`, `2` correspond to `-O0`, `-Os` (default), `-Oz`.
+
+* **setShrinkLevel**(level: `number`): `void`<br />
+  Sets the shrink level to use. `0`, `1`, `2` correspond to `-O0`, `-Os` (default), `-Oz`.
+
+* **getDebugInfo**(): `boolean`<br />
+  Gets whether generating debug information is currently enabled or not.
+
+* **setDebugInfo**(on: `boolean`): `void`<br />
+  Enables or disables debug information in emitted binaries.
 
 ### Module creation
 
@@ -238,15 +324,15 @@ API
 
 #### [Constants](http://webassembly.org/docs/semantics/#constants)
 
-* Module#i32.**const**(value: `number`): `I32Expression`
+* Module#i32.**const**(value: `number`): `Expression`
 >
-* Module#i64.**const**(low: `number`, high: `number`): `I64Expression`
+* Module#i64.**const**(low: `number`, high: `number`): `Expression`
 >
-* Module#f32.**const**(value: `number`): `F32Expression`
-* Module#f32.**const_bits**(value: `number`): `F32Expression`
+* Module#f32.**const**(value: `number`): `Expression`
+* Module#f32.**const_bits**(value: `number`): `Expression`
 >
-* Module#f64.**const**(value: `number`): `F64Expression`
-* Module#f64.**const_bits**(low: `number`, high: `number`): `F64Expression`
+* Module#f64.**const**(value: `number`): `Expression`
+* Module#f64.**const_bits**(low: `number`, high: `number`): `Expression`
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
@@ -269,140 +355,140 @@ Variable access methods above are also aliased in underscore notation, e.g., `ge
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
 
-* Module#i32.**clz**(value: `I32Expression`): `I32Expression`
-* Module#i32.**ctz**(value: `I32Expression`): `I32Expression`
-* Module#i32.**popcnt**(value: `I32Expression`): `I32Expression`
-* Module#i32.**eqz**(value: `I32Expression`): `I32Expression`
-* Module#i32.**add**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**sub**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**mul**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**div_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**div_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**rem_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**rem_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**and**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**or**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**xor**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**shl**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**shr_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**shr_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**rotl**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**rotr**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**eq**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**ne**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**lt_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**lt_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**le_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**le_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**gt_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**gt_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**ge_s**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
-* Module#i32.**ge_u**(left: `I32Expression`, right: `I32Expression`): `I32Expression`
+* Module#i32.**clz**(value: `Expression`): `Expression`
+* Module#i32.**ctz**(value: `Expression`): `Expression`
+* Module#i32.**popcnt**(value: `Expression`): `Expression`
+* Module#i32.**eqz**(value: `Expression`): `Expression`
+* Module#i32.**add**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**sub**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**mul**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**div_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**div_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**rem_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**rem_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**and**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**or**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**xor**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**shl**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**shr_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**shr_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**rotl**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**rotr**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**eq**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**ne**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**lt_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**lt_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**le_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**le_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**gt_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**gt_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**ge_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i32.**ge_u**(left: `Expression`, right: `Expression`): `Expression`
 >
-* Module#i64.**clz**(value: `I64Expression`): `I64Expression`
-* Module#i64.**ctz**(value: `I64Expression`): `I64Expression`
-* Module#i64.**popcnt**(value: `I64Expression`): `I64Expression`
-* Module#i64.**eqz**(value: `I64Expression`): `I64Expression`
-* Module#i64.**add**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**sub**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**mul**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**div_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**div_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**rem_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**rem_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**and**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**or**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**xor**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**shl**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**shr_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**shr_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**rotl**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**rotr**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**eq**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**ne**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**lt_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**lt_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**le_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**le_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**gt_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**gt_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**ge_s**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
-* Module#i64.**ge_u**(left: `I64Expression`, right: `I64Expression`): `I64Expression`
+* Module#i64.**clz**(value: `Expression`): `Expression`
+* Module#i64.**ctz**(value: `Expression`): `Expression`
+* Module#i64.**popcnt**(value: `Expression`): `Expression`
+* Module#i64.**eqz**(value: `Expression`): `Expression`
+* Module#i64.**add**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**sub**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**mul**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**div_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**div_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**rem_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**rem_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**and**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**or**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**xor**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**shl**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**shr_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**shr_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**rotl**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**rotr**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**eq**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**ne**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**lt_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**lt_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**le_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**le_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**gt_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**gt_u**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**ge_s**(left: `Expression`, right: `Expression`): `Expression`
+* Module#i64.**ge_u**(left: `Expression`, right: `Expression`): `Expression`
 
 #### [Floating point operations](http://webassembly.org/docs/semantics/#floating-point-operators)
 
-* Module#f32.**neg**(value: `F32Expression`): `F32Expression`
-* Module#f32.**abs**(value: `F32Expression`): `F32Expression`
-* Module#f32.**ceil**(value: `F32Expression`): `F32Expression`
-* Module#f32.**floor**(value: `F32Expression`): `F32Expression`
-* Module#f32.**trunc**(value: `F32Expression`): `F32Expression`
-* Module#f32.**nearest**(value: `F32Expression`): `F32Expression`
-* Module#f32.**sqrt**(value: `F32Expression`): `F32Expression`
-* Module#f32.**add**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**sub**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**mul**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**div**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**copysign**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**min**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**max**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**eq**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**ne**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**lt**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**le**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**gt**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
-* Module#f32.**ge**(left: `F32Expression`, right: `F32Expression`): `F32Expression`
+* Module#f32.**neg**(value: `Expression`): `Expression`
+* Module#f32.**abs**(value: `Expression`): `Expression`
+* Module#f32.**ceil**(value: `Expression`): `Expression`
+* Module#f32.**floor**(value: `Expression`): `Expression`
+* Module#f32.**trunc**(value: `Expression`): `Expression`
+* Module#f32.**nearest**(value: `Expression`): `Expression`
+* Module#f32.**sqrt**(value: `Expression`): `Expression`
+* Module#f32.**add**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**sub**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**mul**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**div**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**copysign**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**min**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**max**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**eq**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**ne**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**lt**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**le**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**gt**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f32.**ge**(left: `Expression`, right: `Expression`): `Expression`
 >
-* Module#f64.**neg**(value: `F64Expression`): `F64Expression`
-* Module#f64.**abs**(value: `F64Expression`): `F64Expression`
-* Module#f64.**ceil**(value: `F64Expression`): `F64Expression`
-* Module#f64.**floor**(value: `F64Expression`): `F64Expression`
-* Module#f64.**trunc**(value: `F64Expression`): `F64Expression`
-* Module#f64.**nearest**(value: `F64Expression`): `F64Expression`
-* Module#f64.**sqrt**(value: `F64Expression`): `F64Expression`
-* Module#f64.**add**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**sub**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**mul**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**div**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**copysign**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**min**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**max**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**eq**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**ne**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**lt**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**le**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**gt**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
-* Module#f64.**ge**(left: `F64Expression`, right: `F64Expression`): `F64Expression`
+* Module#f64.**neg**(value: `Expression`): `Expression`
+* Module#f64.**abs**(value: `Expression`): `Expression`
+* Module#f64.**ceil**(value: `Expression`): `Expression`
+* Module#f64.**floor**(value: `Expression`): `Expression`
+* Module#f64.**trunc**(value: `Expression`): `Expression`
+* Module#f64.**nearest**(value: `Expression`): `Expression`
+* Module#f64.**sqrt**(value: `Expression`): `Expression`
+* Module#f64.**add**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**sub**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**mul**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**div**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**copysign**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**min**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**max**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**eq**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**ne**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**lt**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**le**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**gt**(left: `Expression`, right: `Expression`): `Expression`
+* Module#f64.**ge**(left: `Expression`, right: `Expression`): `Expression`
 
 #### [Datatype conversions](http://webassembly.org/docs/semantics/#datatype-conversions-truncations-reinterpretations-promotions-and-demotions)
 
-* Module#i32.**trunc_s.f32**(value: `F32Expression`): `I32Expression`
-* Module#i32.**trunc_s.f64**(value: `F64Expression`): `I32Expression`
-* Module#i32.**trunc_u.f32**(value: `F32Expression`): `I32Expression`
-* Module#i32.**trunc_u.f64**(value: `F64Expression`): `I32Expression`
-* Module#i32.**reinterpret**(value: `F32Expression`): `I32Expression`
-* Module#i32.**wrap**(value: `I64Expression`): `I32Expression`
+* Module#i32.**trunc_s.f32**(value: `Expression`): `Expression`
+* Module#i32.**trunc_s.f64**(value: `Expression`): `Expression`
+* Module#i32.**trunc_u.f32**(value: `Expression`): `Expression`
+* Module#i32.**trunc_u.f64**(value: `Expression`): `Expression`
+* Module#i32.**reinterpret**(value: `Expression`): `Expression`
+* Module#i32.**wrap**(value: `Expression`): `Expression`
 >
-* Module#i64.**trunc_s.f32**(value: `F32Expression`): `I64Expression`
-* Module#i64.**trunc_s.f64**(value: `F64Expression`): `I64Expression`
-* Module#i64.**trunc_u.f32**(value: `F32Expression`): `I64Expression`
-* Module#i64.**trunc_u.f64**(value: `F64Expression`): `I64Expression`
-* Module#i64.**reinterpret**(value: `F64Expression`): `I64Expression`
-* Module#i64.**extend_s**(value: `I32Expression`): `I64Expression`
-* Module#i64.**extend_u**(value: `I32Expression`): `I64Expression`
+* Module#i64.**trunc_s.f32**(value: `Expression`): `Expression`
+* Module#i64.**trunc_s.f64**(value: `Expression`): `Expression`
+* Module#i64.**trunc_u.f32**(value: `Expression`): `Expression`
+* Module#i64.**trunc_u.f64**(value: `Expression`): `Expression`
+* Module#i64.**reinterpret**(value: `Expression`): `Expression`
+* Module#i64.**extend_s**(value: `Expression`): `Expression`
+* Module#i64.**extend_u**(value: `Expression`): `Expression`
 >
-* Module#f32.**reinterpret**(value: `I32Expression`): `F32Expression`
-* Module#f32.**convert_s.i32**(value: `I32Expression`): `F32Expression`
-* Module#f32.**convert_s.i64**(value: `I64Expression`): `F32Expression`
-* Module#f32.**convert_u.i32**(value: `I32Expression`): `F32Expression`
-* Module#f32.**convert_u.i64**(value: `I64Expression`): `F32Expression`
-* Module#f32.**demote**(value: `F64Expression`): `F32Expression`
+* Module#f32.**reinterpret**(value: `Expression`): `Expression`
+* Module#f32.**convert_s.i32**(value: `Expression`): `Expression`
+* Module#f32.**convert_s.i64**(value: `Expression`): `Expression`
+* Module#f32.**convert_u.i32**(value: `Expression`): `Expression`
+* Module#f32.**convert_u.i64**(value: `Expression`): `Expression`
+* Module#f32.**demote**(value: `Expression`): `Expression`
 >
-* Module#f64.**reinterpret**(value: `I32Expression`): `F64Expression`
-* Module#f64.**convert_s.i32**(value: `I32Expression`): `F64Expression`
-* Module#f64.**convert_s.i64**(value: `I64Expression`): `F64Expression`
-* Module#f64.**convert_u.i32**(value: `I32Expression`): `F64Expression`
-* Module#f64.**convert_u.i64**(value: `I64Expression`): `F64Expression`
-* Module#f64.**promote**(value: `F32Expression`): `F64Expression`
+* Module#f64.**reinterpret**(value: `Expression`): `Expression`
+* Module#f64.**convert_s.i32**(value: `Expression`): `Expression`
+* Module#f64.**convert_s.i64**(value: `Expression`): `Expression`
+* Module#f64.**convert_u.i32**(value: `Expression`): `Expression`
+* Module#f64.**convert_u.i64**(value: `Expression`): `Expression`
+* Module#f64.**promote**(value: `Expression`): `Expression`
 
 #### [Function calls](http://webassembly.org/docs/semantics/#calls)
 
@@ -419,117 +505,117 @@ Function call methods above are also aliased in underscore notation, e.g., `call
 
 #### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
 
-* Module#i32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
-* Module#i32.**load8_s**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
-* Module#i32.**load8_u**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
-* Module#i32.**load16_s**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
-* Module#i32.**load16_u**(offset: `number`, align: `number`, ptr: `Expression`): `I32Expression`<br />
-* Module#i32.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`<br />
-* Module#i32.**store8**(offset: `number`, align: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`<br />
-* Module#i32.**store16**(offset: `number`, align: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`<br />
+* Module#i32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`<br />
+* Module#i32.**load8_s**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`<br />
+* Module#i32.**load8_u**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`<br />
+* Module#i32.**load16_s**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`<br />
+* Module#i32.**load16_u**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`<br />
+* Module#i32.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`<br />
+* Module#i32.**store8**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`<br />
+* Module#i32.**store16**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`<br />
 >
-* Module#i64.**load**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**load8_s**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**load8_u**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**load16_s**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**load16_u**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**load32_s**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**load32_u**(offset: `number`, align: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
-* Module#i64.**store8**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
-* Module#i64.**store16**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
-* Module#i64.**store32**(offset: `number`, align: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**load**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**load8_s**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**load8_u**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**load16_s**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**load16_u**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**load32_s**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**load32_u**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**store8**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**store16**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**store32**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`
 >
-* Module#f32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `F32Expression`
-* Module#f32.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `F32Expression`): `Expression`
+* Module#f32.**load**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#f32.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`
 >
-* Module#f64.**load**(offset: `number`, align: `number`, ptr: `Expression`): `F64Expression`
-* Module#f64.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `F64Expression`): `Expression`
+* Module#f64.**load**(offset: `number`, align: `number`, ptr: `Expression`): `Expression`
+* Module#f64.**store**(offset: `number`, align: `number`, ptr: `Expression`, value: `Expression`): `Expression`
 
 #### [Host operations](http://webassembly.org/docs/semantics/#resizing)
 
-* Module#**currentMemory**(): `I32Expression`
-* Module#**growMemory**(value: `number`): `I32Expression`
+* Module#**currentMemory**(): `Expression`
+* Module#**growMemory**(value: `number`): `Expression`
 * Module#**hasFeature**(name: `string`): `Expression` 🦄
 
 Host operation methods above are also aliased in underscore notation, e.g., `current_memory`.
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
-* Module#i32.**atomic.load**(offset: `number`, ptr: `Expression`): `I32Expression`
-* Module#i32.**atomic.load8_u**(offset: `number`, ptr: `Expression`): `I32Expression`
-* Module#i32.**atomic.load16_u**(offset: `number`, ptr: `Expression`): `I32Expression`
-* Module#i32.**atomic.store**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`
-* Module#i32.**atomic.store8**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`
-* Module#i32.**atomic.store16**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `Expression`
+* Module#i32.**atomic.load**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i32.**atomic.load8_u**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i32.**atomic.load16_u**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i32.**atomic.store**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.store8**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.store16**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
 >
-* Module#i64.**atomic.load**(offset: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**atomic.load8_u**(offset: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**atomic.load16_u**(offset: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**atomic.load32_u**(offset: `number`, ptr: `Expression`): `I64Expression`
-* Module#i64.**atomic.store**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
-* Module#i64.**atomic.store8**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
-* Module#i64.**atomic.store16**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
-* Module#i64.**atomic.store32**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `Expression`
+* Module#i64.**atomic.load**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**atomic.load8_u**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**atomic.load16_u**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**atomic.load32_u**(offset: `number`, ptr: `Expression`): `Expression`
+* Module#i64.**atomic.store**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.store8**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.store16**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.store32**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
 
 #### [Atomic read-modify-write operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#read-modify-write) 🦄
 
-* Module#i32.**atomic.rmw.add**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw.sub**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw.and**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw.or**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw.xor**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw.xchg**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I32Expression`, replacement: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.add**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.sub**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.and**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.or**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.xor**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.xchg**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw8_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I32Expression`, replacement: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.add**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.sub**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.and**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.or**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.xor**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.xchg**(offset: `number`, ptr: `Expression`, value: `I32Expression`): `I32Expression`
-* Module#i32.**atomic.rmw16_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I32Expression`, replacement: `I32Expression`): `I32Expression`
+* Module#i32.**atomic.rmw.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw8_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i32.**atomic.rmw16_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
 >
-* Module#i64.**atomic.rmw.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw8_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw16_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.add**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.sub**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.and**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.or**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.xor**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.xchg**(offset: `number`, ptr: `Expression`, value: `I64Expression`): `I64Expression`
-* Module#i64.**atomic.rmw32_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `I64Expression`, replacement: `I64Expression`): `I64Expression`
+* Module#i64.**atomic.rmw.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw8_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw16_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.add**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.sub**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.and**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.or**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.xor**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.xchg**(offset: `number`, ptr: `Expression`, value: `Expression`): `Expression`
+* Module#i64.**atomic.rmw32_u.cmpxchg**(offset: `number`, ptr: `Expression`, expected: `Expression`, replacement: `Expression`): `Expression`
 
 #### [Atomic wait and wake operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-wake-operators) 🦄
 
-* Module#i32.**wait**(ptr: `Expression`, expected: `I32Expression`, timeout: `I64Expression`): `I32Expression`
-* Module#i64.**wait**(ptr: `Expression`, expected: `I64Expression`, timeout: `I64Expression`): `I32Expression`
-* Module#**wake**(ptr: `Expression`, wakeCount: `I64Expression`): `I64Expression`
+* Module#i32.**wait**(ptr: `Expression`, expected: `Expression`, timeout: `Expression`): `Expression`
+* Module#i64.**wait**(ptr: `Expression`, expected: `Expression`, timeout: `Expression`): `Expression`
+* Module#**wake**(ptr: `Expression`, wakeCount: `Expression`): `Expression`
 
 ### Expression manipulation
 
@@ -568,20 +654,109 @@ Host operation methods above are also aliased in underscore notation, e.g., `cur
 * **getExpressionType**(expr: `Expression`): `Type`<br />
   Gets the type of the specified expression.
 
-* **getConstValueI32**(expr: `Expression`): `number`<br />
-  Gets the value of an i32.const (id=**ConstId**, type=**i32**) expression.
+* **getExpressionInfo**(expr: `Expression`: `ExpressionInfo`<br />
+  Obtains information about an expression, always including:
 
-* **getConstValueI64**(expr: `Expression`): `{ low: number, high: number }`<br />
-  Gets the value of an i64.const (id=**ConstId**, type=**i64**) expression.
+  * Info#**id**: `ExpressionId`
+  * Info#**type**: `Type`
 
-* **getConstValueF32**(expr: `Expression`): `number`<br />
-  Gets the value of an f32.const (id=**ConstId**, type=**f32**) expression.
+  Additional properties depend on the expression's `id` and are usually equivalent to the respective parameters when creating such an expression:
 
-* **getConstValueF64**(expr: `Expression`): `number`<br />
-  Gets the value of an f64.const (id=**ConstId**, type=**f64**) expression.
+  * BlockInfo#**name**: `string`
+  * BlockInfo#**children**: `Expression[]`
+  >
+  * IfInfo#**condition**: `Expression`
+  * IfInfo#**ifTrue**: `Expression`
+  * IfInfo#**ifFalse**: `Expression | null`
+  >
+  * LoopInfo#**name**: `string`
+  * LoopInfo#**body**: `Expression`
+  >
+  * BreakInfo#**name**: `string`
+  * BreakInfo#**condition**: `Expression`
+  * BreakInfo#**value**: `Expression`
+  >
+  * SwitchInfo#**names**: `string[]`
+  * SwitchInfo#**defaultName**: `string | null`
+  * SwitchInfo#**condition**: `Expression`
+  * SwitchInfo#**value**: `Expression`
+  >
+  * CallInfo#**target**: `string`
+  * CallInfo#**operands**: `Expression[]`
+  >
+  * CallImportInfo#**target**: `string`
+  * CallImportInfo#**operands**: `Expression[]`
+  >
+  * CallIndirectInfo#**target**: `Expression`
+  * CallIndirectInfo#**operands**: `Expression[]`
+  >
+  * GetLocalInfo#**index**: `number`
+  >
+  * SetLocalInfo#**isTee**: `boolean`
+  * SetLocalInfo#**index**: `number`
+  * SetLocalInfo#**value**: `Expression`
+  >
+  * GetGlobalInfo#**name**: `string`
+  >
+  * SetGlobalInfo#**name**: `string`
+  * SetGlobalValue#**value**: `Expression`
+  >
+  * LoadInfo#**isAtomic**: `boolean`
+  * LoadInfo#**isSigned**: `boolean`
+  * LoadInfo#**offset**: `number`
+  * LoadInfo#**bytes**: `number`
+  * LoadInfo#**align**: `number`
+  * LoadInfo#**ptr**: `Expression`
+  >
+  * StoreInfo#**isAtomic**: `boolean`
+  * StoreInfo#**offset**: `number`
+  * StoreInfo#**bytes**: `number`
+  * StoreInfo#**align**: `number`
+  * StoreInfo#**ptr**: `Expression`
+  * StoreInfo#**value**: `Expression`
+  >
+  * ConstInfo#**value**: `number | { low: number, high: number }`
+  >
+  * UnaryInfo#**op**: `number`
+  * UnaryInfo#**value**: `Expression`
+  >
+  * BinaryInfo#**op**: `number`
+  * BinaryInfo#**left**: `Expression`
+  * BinaryInfo#**right**: `Expression`
+  >
+  * SelectInfo#**ifTrue**: `Expression`
+  * SelectInfo#**ifFalse**: `Expression`
+  * SelectInfo#**condition**: `Expression`
+  >
+  * DropInfo#**value**: `Expression`
+  >
+  * ReturnInfo#**value**: `Expression | null`
+  >
+  * HostInfo#**op**: `number`
+  * HostInfo#**nameOperand**: `string`
+  * HostInfo#**operands**: `Expression[]`
+  >
+  * AtomicRMWInfo#**op**: `number`
+  * AtomicRMWInfo#**bytes**: `number`
+  * AtomicRMWInfo#**offset**: `number`
+  * AtomicRMWInfo#**ptr**: `Expression`
+  * AtomicRMWInfo#**value**: `Expression`
+  >
+  * AtomicCmpxchgInfo#**bytes**: `number`
+  * AtomicCmpxchgInfo#**offset**: `number`
+  * AtomicCmpxchgInfo#**ptr**: `Expression`
+  * AtomicCmpxchgInfo#**expected**: `Expression`
+  * AtomicCmpxchgInfo#**replacement**: `Expression`
+  >
+  * AtomicWaitInfo#**ptr**: `Expression`
+  * AtomicWaitInfo#**expected**: `Expression`
+  * AtomicWaitInfo#**timeout**: `Expression`
+  * AtomicWaitInfo#**expectedType**: `Type`
+  >
+  * AtomicWakeInfo#**ptr**: `Expression`
+  * AtomicWakeInfo#**wakeCount**: `Expression`
 
-* **getFunctionBody**(func: `Function`): `Expression`<br />
-  Gets the body of a function.
+  NopInfo and UnreachableInfo do not include any additional properties.
 
 ### Relooper
 

@@ -43,270 +43,270 @@ declare module binaryen {
   const ExternalGlobal: ExternalKind;
 
   interface I32Operations {
-    load(offset: number, align: number, ptr: Expression): I32Expression;
-    load8_s(offset: number, align: number, ptr: Expression): I32Expression;
-    load8_u(offset: number, align: number, ptr: Expression): I32Expression;
-    load16_s(offset: number, align: number, ptr: Expression): I32Expression;
-    load16_u(offset: number, align: number, ptr: Expression): I32Expression;
-    store(offset: number, align: number, ptr: Expression, value: I32Expression): Expression;
-    store8(offset: number, align: number, ptr: Expression, value: I32Expression): Expression;
-    store16(offset: number, align: number, ptr: Expression, value: I32Expression): Expression;
-    const(value: number): I32Expression;
-    clz(value: I32Expression): I32Expression;
-    ctz(value: I32Expression): I32Expression;
-    popcnt(value: I32Expression): I32Expression;
-    eqz(value: I32Expression): I32Expression;
+    load(offset: number, align: number, ptr: Expression): Expression;
+    load8_s(offset: number, align: number, ptr: Expression): Expression;
+    load8_u(offset: number, align: number, ptr: Expression): Expression;
+    load16_s(offset: number, align: number, ptr: Expression): Expression;
+    load16_u(offset: number, align: number, ptr: Expression): Expression;
+    store(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    store8(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    store16(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    const(value: number): Expression;
+    clz(value: Expression): Expression;
+    ctz(value: Expression): Expression;
+    popcnt(value: Expression): Expression;
+    eqz(value: Expression): Expression;
     trunc_s: {
-      f32(value: F32Expression): I32Expression;
-      f64(value: F64Expression): I32Expression;
+      f32(value: Expression): Expression;
+      f64(value: Expression): Expression;
     };
     trunc_u: {
-      f32(value: F32Expression): I32Expression;
-      f64(value: F64Expression): I32Expression;
+      f32(value: Expression): Expression;
+      f64(value: Expression): Expression;
     }
-    reinterpret(value: F32Expression): I32Expression;
-    wrap(value: I64Expression): I32Expression;
-    add(left: I32Expression, right: I32Expression): I32Expression;
-    sub(left: I32Expression, right: I32Expression): I32Expression;
-    mul(left: I32Expression, right: I32Expression): I32Expression;
-    div_s(left: I32Expression, right: I32Expression): I32Expression;
-    div_u(left: I32Expression, right: I32Expression): I32Expression;
-    rem_s(left: I32Expression, right: I32Expression): I32Expression;
-    rem_u(left: I32Expression, right: I32Expression): I32Expression;
-    and(left: I32Expression, right: I32Expression): I32Expression;
-    or(left: I32Expression, right: I32Expression): I32Expression;
-    xor(left: I32Expression, right: I32Expression): I32Expression;
-    shl(left: I32Expression, right: I32Expression): I32Expression;
-    shr_u(left: I32Expression, right: I32Expression): I32Expression;
-    shr_s(left: I32Expression, right: I32Expression): I32Expression;
-    rotl(left: I32Expression, right: I32Expression): I32Expression;
-    rotr(left: I32Expression, right: I32Expression): I32Expression;
-    eq(left: I32Expression, right: I32Expression): I32Expression;
-    ne(left: I32Expression, right: I32Expression): I32Expression;
-    lt_s(left: I32Expression, right: I32Expression): I32Expression;
-    lt_u(left: I32Expression, right: I32Expression): I32Expression;
-    le_s(left: I32Expression, right: I32Expression): I32Expression;
-    le_u(left: I32Expression, right: I32Expression): I32Expression;
-    gt_s(left: I32Expression, right: I32Expression): I32Expression;
-    gt_u(left: I32Expression, right: I32Expression): I32Expression;
-    ge_s(left: I32Expression, right: I32Expression): I32Expression;
-    ge_u(left: I32Expression, right: I32Expression): I32Expression;
+    reinterpret(value: Expression): Expression;
+    wrap(value: Expression): Expression;
+    add(left: Expression, right: Expression): Expression;
+    sub(left: Expression, right: Expression): Expression;
+    mul(left: Expression, right: Expression): Expression;
+    div_s(left: Expression, right: Expression): Expression;
+    div_u(left: Expression, right: Expression): Expression;
+    rem_s(left: Expression, right: Expression): Expression;
+    rem_u(left: Expression, right: Expression): Expression;
+    and(left: Expression, right: Expression): Expression;
+    or(left: Expression, right: Expression): Expression;
+    xor(left: Expression, right: Expression): Expression;
+    shl(left: Expression, right: Expression): Expression;
+    shr_u(left: Expression, right: Expression): Expression;
+    shr_s(left: Expression, right: Expression): Expression;
+    rotl(left: Expression, right: Expression): Expression;
+    rotr(left: Expression, right: Expression): Expression;
+    eq(left: Expression, right: Expression): Expression;
+    ne(left: Expression, right: Expression): Expression;
+    lt_s(left: Expression, right: Expression): Expression;
+    lt_u(left: Expression, right: Expression): Expression;
+    le_s(left: Expression, right: Expression): Expression;
+    le_u(left: Expression, right: Expression): Expression;
+    gt_s(left: Expression, right: Expression): Expression;
+    gt_u(left: Expression, right: Expression): Expression;
+    ge_s(left: Expression, right: Expression): Expression;
+    ge_u(left: Expression, right: Expression): Expression;
     atomic: {
-      load(offset: number, ptr: Expression): I32Expression;
-      load8_u(offset: number, ptr: Expression): I32Expression;
-      load16_u(offset: number, ptr: Expression): I32Expression;
-      store(offset: number, ptr: Expression, value: I32Expression): Expression;
-      store8(offset: number, ptr: Expression, value: I32Expression): Expression;
-      store16(offset: number, ptr: Expression, value: I32Expression): Expression;
+      load(offset: number, ptr: Expression): Expression;
+      load8_u(offset: number, ptr: Expression): Expression;
+      load16_u(offset: number, ptr: Expression): Expression;
+      store(offset: number, ptr: Expression, value: Expression): Expression;
+      store8(offset: number, ptr: Expression, value: Expression): Expression;
+      store16(offset: number, ptr: Expression, value: Expression): Expression;
       rmw: {
-        add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        and(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        or(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        xor(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        xchg(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I32Expression, replacement: I32Expression): I32Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       },
       rmw_8u: {
-        add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        and(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        or(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        xor(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        xchg(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I32Expression, replacement: I32Expression): I32Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       },
       rmw_16u: {
-        add(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        sub(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        and(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        or(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        xor(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        xchg(offset: number, ptr: Expression, value: I32Expression): I32Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I32Expression, replacement: I32Expression): I32Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       }
     },
-    wait(ptr: Expression, expected: I32Expression, timeout: I64Expression): I32Expression;
+    wait(ptr: Expression, expected: Expression, timeout: Expression): Expression;
   }
 
   interface I64Operations {
-    load(offset: number, align: number, ptr: Expression): I64Expression;
-    load8_s(offset: number, align: number, ptr: Expression): I64Expression;
-    load8_u(offset: number, align: number, ptr: Expression): I64Expression;
-    load16_s(offset: number, align: number, ptr: Expression): I64Expression;
-    load16_u(offset: number, align: number, ptr: Expression): I64Expression;
-    load32_s(offset: number, align: number, ptr: Expression): I64Expression;
-    load32_u(offset: number, align: number, ptr: Expression): I64Expression;
-    store(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
-    store8(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
-    store16(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
-    store32(offset: number, align: number, ptr: Expression, value: I64Expression): Expression;
-    const(low: number, high: number): I64Expression;
-    clz(value: I64Expression): I64Expression;
-    ctz(value: I64Expression): I64Expression;
-    popcnt(value: I64Expression): I64Expression;
-    eqz(value: I64Expression): I64Expression;
+    load(offset: number, align: number, ptr: Expression): Expression;
+    load8_s(offset: number, align: number, ptr: Expression): Expression;
+    load8_u(offset: number, align: number, ptr: Expression): Expression;
+    load16_s(offset: number, align: number, ptr: Expression): Expression;
+    load16_u(offset: number, align: number, ptr: Expression): Expression;
+    load32_s(offset: number, align: number, ptr: Expression): Expression;
+    load32_u(offset: number, align: number, ptr: Expression): Expression;
+    store(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    store8(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    store16(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    store32(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    const(low: number, high: number): Expression;
+    clz(value: Expression): Expression;
+    ctz(value: Expression): Expression;
+    popcnt(value: Expression): Expression;
+    eqz(value: Expression): Expression;
     trunc_s: {
-      f32(value: F32Expression): I64Expression;
-      f64(value: F64Expression): I64Expression;
+      f32(value: Expression): Expression;
+      f64(value: Expression): Expression;
     };
     trunc_u: {
-      f32(value: F32Expression): I64Expression;
-      f64(value: F64Expression): I64Expression;
+      f32(value: Expression): Expression;
+      f64(value: Expression): Expression;
     }
-    reinterpret(value: F64Expression): I64Expression;
-    extend_s(value: I32Expression): I64Expression;
-    extend_u(value: I32Expression): I64Expression;
-    add(left: I64Expression, right: I64Expression): I64Expression;
-    sub(left: I64Expression, right: I64Expression): I64Expression;
-    mul(left: I64Expression, right: I64Expression): I64Expression;
-    div_s(left: I64Expression, right: I64Expression): I64Expression;
-    div_u(left: I64Expression, right: I64Expression): I64Expression;
-    rem_s(left: I64Expression, right: I64Expression): I64Expression;
-    rem_u(left: I64Expression, right: I64Expression): I64Expression;
-    and(left: I64Expression, right: I64Expression): I64Expression;
-    or(left: I64Expression, right: I64Expression): I64Expression;
-    xor(left: I64Expression, right: I64Expression): I64Expression;
-    shl(left: I64Expression, right: I64Expression): I64Expression;
-    shr_u(left: I64Expression, right: I64Expression): I64Expression;
-    shr_s(left: I64Expression, right: I64Expression): I64Expression;
-    rotl(left: I64Expression, right: I64Expression): I64Expression;
-    rotr(left: I64Expression, right: I64Expression): I64Expression;
-    eq(left: I64Expression, right: I64Expression): I32Expression;
-    ne(left: I64Expression, right: I64Expression): I32Expression;
-    lt_s(left: I64Expression, right: I64Expression): I32Expression;
-    lt_u(left: I64Expression, right: I64Expression): I32Expression;
-    le_s(left: I64Expression, right: I64Expression): I32Expression;
-    le_u(left: I64Expression, right: I64Expression): I32Expression;
-    gt_s(left: I64Expression, right: I64Expression): I32Expression;
-    gt_u(left: I64Expression, right: I64Expression): I32Expression;
-    ge_s(left: I64Expression, right: I64Expression): I32Expression;
-    ge_u(left: I64Expression, right: I64Expression): I32Expression;
+    reinterpret(value: Expression): Expression;
+    extend_s(value: Expression): Expression;
+    extend_u(value: Expression): Expression;
+    add(left: Expression, right: Expression): Expression;
+    sub(left: Expression, right: Expression): Expression;
+    mul(left: Expression, right: Expression): Expression;
+    div_s(left: Expression, right: Expression): Expression;
+    div_u(left: Expression, right: Expression): Expression;
+    rem_s(left: Expression, right: Expression): Expression;
+    rem_u(left: Expression, right: Expression): Expression;
+    and(left: Expression, right: Expression): Expression;
+    or(left: Expression, right: Expression): Expression;
+    xor(left: Expression, right: Expression): Expression;
+    shl(left: Expression, right: Expression): Expression;
+    shr_u(left: Expression, right: Expression): Expression;
+    shr_s(left: Expression, right: Expression): Expression;
+    rotl(left: Expression, right: Expression): Expression;
+    rotr(left: Expression, right: Expression): Expression;
+    eq(left: Expression, right: Expression): Expression;
+    ne(left: Expression, right: Expression): Expression;
+    lt_s(left: Expression, right: Expression): Expression;
+    lt_u(left: Expression, right: Expression): Expression;
+    le_s(left: Expression, right: Expression): Expression;
+    le_u(left: Expression, right: Expression): Expression;
+    gt_s(left: Expression, right: Expression): Expression;
+    gt_u(left: Expression, right: Expression): Expression;
+    ge_s(left: Expression, right: Expression): Expression;
+    ge_u(left: Expression, right: Expression): Expression;
     atomic: {
-      load(offset: number, ptr: Expression): I64Expression;
-      load8_u(offset: number, ptr: Expression): I64Expression;
-      load16_u(offset: number, ptr: Expression): I64Expression;
-      load32_u(offset: number, ptr: Expression): I64Expression;
-      store(offset: number, ptr: Expression, value: I64Expression): Expression;
-      store8(offset: number, ptr: Expression, value: I64Expression): Expression;
-      store16(offset: number, ptr: Expression, value: I64Expression): Expression;
-      store32(offset: number, ptr: Expression, value: I64Expression): Expression;
+      load(offset: number, ptr: Expression): Expression;
+      load8_u(offset: number, ptr: Expression): Expression;
+      load16_u(offset: number, ptr: Expression): Expression;
+      load32_u(offset: number, ptr: Expression): Expression;
+      store(offset: number, ptr: Expression, value: Expression): Expression;
+      store8(offset: number, ptr: Expression, value: Expression): Expression;
+      store16(offset: number, ptr: Expression, value: Expression): Expression;
+      store32(offset: number, ptr: Expression, value: Expression): Expression;
       rmw: {
-        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       },
       rmw_8u: {
-        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       },
       rmw_16u: {
-        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       },
       rmw_32u: {
-        add(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        sub(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        and(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        or(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xor(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        xchg(offset: number, ptr: Expression, value: I64Expression): I64Expression;
-        cmpxchg(offset: number, ptr: Expression, expected: I64Expression, replacement: I64Expression): I64Expression;
+        add(offset: number, ptr: Expression, value: Expression): Expression;
+        sub(offset: number, ptr: Expression, value: Expression): Expression;
+        and(offset: number, ptr: Expression, value: Expression): Expression;
+        or(offset: number, ptr: Expression, value: Expression): Expression;
+        xor(offset: number, ptr: Expression, value: Expression): Expression;
+        xchg(offset: number, ptr: Expression, value: Expression): Expression;
+        cmpxchg(offset: number, ptr: Expression, expected: Expression, replacement: Expression): Expression;
       }
     },
-    wait(ptr: Expression, expected: I64Expression, timeout: I64Expression): I32Expression;
+    wait(ptr: Expression, expected: Expression, timeout: Expression): Expression;
   }
 
   interface F32Operations {
-    load(offset: number, align: number, ptr: Expression): F32Expression;
-    store(offset: number, align: number, ptr: Expression, value: F32Expression): Expression;
-    const(value: number): F32Expression;
-    const_bits(value: number): F32Expression;
-    neg(value: F32Expression): F32Expression;
-    abs(value: F32Expression): F32Expression;
-    ceil(value: F32Expression): F32Expression;
-    floor(value: F32Expression): F32Expression;
-    trunc(value: F32Expression): F32Expression;
-    nearest(value: F32Expression): F32Expression;
-    sqrt(value: F32Expression): F32Expression;
-    reinterpret(value: I32Expression): F32Expression;
+    load(offset: number, align: number, ptr: Expression): Expression;
+    store(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    const(value: number): Expression;
+    const_bits(value: number): Expression;
+    neg(value: Expression): Expression;
+    abs(value: Expression): Expression;
+    ceil(value: Expression): Expression;
+    floor(value: Expression): Expression;
+    trunc(value: Expression): Expression;
+    nearest(value: Expression): Expression;
+    sqrt(value: Expression): Expression;
+    reinterpret(value: Expression): Expression;
     convert_s: {
-      i32(value: I32Expression): F32Expression;
-      i64(value: I64Expression): F32Expression;
+      i32(value: Expression): Expression;
+      i64(value: Expression): Expression;
     };
     convert_u: {
-      i32(value: I32Expression): F32Expression;
-      i64(value: I64Expression): F32Expression;
+      i32(value: Expression): Expression;
+      i64(value: Expression): Expression;
     };
-    demote(value: F64Expression): F32Expression;
-    add(left: F32Expression, right: F32Expression): F32Expression;
-    sub(left: F32Expression, right: F32Expression): F32Expression;
-    mul(left: F32Expression, right: F32Expression): F32Expression;
-    div(left: F32Expression, right: F32Expression): F32Expression;
-    copysign(left: F32Expression, right: F32Expression): F32Expression;
-    min(left: F32Expression, right: F32Expression): F32Expression;
-    max(left: F32Expression, right: F32Expression): F32Expression;
-    eq(left: F32Expression, right: F32Expression): I32Expression;
-    ne(left: F32Expression, right: F32Expression): I32Expression;
-    lt(left: F32Expression, right: F32Expression): I32Expression;
-    le(left: F32Expression, right: F32Expression): I32Expression;
-    gt(left: F32Expression, right: F32Expression): I32Expression;
-    ge(left: F32Expression, right: F32Expression): I32Expression;
+    demote(value: Expression): Expression;
+    add(left: Expression, right: Expression): Expression;
+    sub(left: Expression, right: Expression): Expression;
+    mul(left: Expression, right: Expression): Expression;
+    div(left: Expression, right: Expression): Expression;
+    copysign(left: Expression, right: Expression): Expression;
+    min(left: Expression, right: Expression): Expression;
+    max(left: Expression, right: Expression): Expression;
+    eq(left: Expression, right: Expression): Expression;
+    ne(left: Expression, right: Expression): Expression;
+    lt(left: Expression, right: Expression): Expression;
+    le(left: Expression, right: Expression): Expression;
+    gt(left: Expression, right: Expression): Expression;
+    ge(left: Expression, right: Expression): Expression;
   }
 
   interface F64Operations {
-    load(offset: number, align: number, ptr: Expression): F64Expression;
-    store(offset: number, align: number, ptr: Expression, value: F32Expression): Expression;
-    const(value: number): F64Expression;
-    const_bits(low: number, high: number): F64Expression;
-    neg(value: F64Expression): F64Expression;
-    abs(value: F64Expression): F64Expression;
-    ceil(value: F64Expression): F64Expression;
-    floor(value: F64Expression): F64Expression;
-    trunc(value: F64Expression): F64Expression;
-    nearest(value: F64Expression): F64Expression;
-    sqrt(value: F64Expression): F64Expression;
-    reinterpret(value: I32Expression): F64Expression;
+    load(offset: number, align: number, ptr: Expression): Expression;
+    store(offset: number, align: number, ptr: Expression, value: Expression): Expression;
+    const(value: number): Expression;
+    const_bits(low: number, high: number): Expression;
+    neg(value: Expression): Expression;
+    abs(value: Expression): Expression;
+    ceil(value: Expression): Expression;
+    floor(value: Expression): Expression;
+    trunc(value: Expression): Expression;
+    nearest(value: Expression): Expression;
+    sqrt(value: Expression): Expression;
+    reinterpret(value: Expression): Expression;
     convert_s: {
-      i32(value: I32Expression): F64Expression;
-      i64(value: I64Expression): F64Expression;
+      i32(value: Expression): Expression;
+      i64(value: Expression): Expression;
     };
     convert_u: {
-      i32(value: I32Expression): F64Expression;
-      i64(value: I64Expression): F64Expression;
+      i32(value: Expression): Expression;
+      i64(value: Expression): Expression;
     };
-    promote(value: F32Expression): F64Expression;
-    add(left: F64Expression, right: F64Expression): F64Expression;
-    sub(left: F64Expression, right: F64Expression): F64Expression;
-    mul(left: F64Expression, right: F64Expression): F64Expression;
-    div(left: F64Expression, right: F64Expression): F64Expression;
-    copysign(left: F64Expression, right: F64Expression): F64Expression;
-    min(left: F64Expression, right: F64Expression): F64Expression;
-    max(left: F64Expression, right: F64Expression): F64Expression;
-    eq(left: F64Expression, right: F64Expression): I32Expression;
-    ne(left: F64Expression, right: F64Expression): I32Expression;
-    lt(left: F64Expression, right: F64Expression): I32Expression;
-    le(left: F64Expression, right: F64Expression): I32Expression;
-    gt(left: F64Expression, right: F64Expression): I32Expression;
-    ge(left: F64Expression, right: F64Expression): I32Expression;
+    promote(value: Expression): Expression;
+    add(left: Expression, right: Expression): Expression;
+    sub(left: Expression, right: Expression): Expression;
+    mul(left: Expression, right: Expression): Expression;
+    div(left: Expression, right: Expression): Expression;
+    copysign(left: Expression, right: Expression): Expression;
+    min(left: Expression, right: Expression): Expression;
+    max(left: Expression, right: Expression): Expression;
+    eq(left: Expression, right: Expression): Expression;
+    ne(left: Expression, right: Expression): Expression;
+    lt(left: Expression, right: Expression): Expression;
+    le(left: Expression, right: Expression): Expression;
+    gt(left: Expression, right: Expression): Expression;
+    ge(left: Expression, right: Expression): Expression;
   }
 
   interface MemorySegment {
-    offset: I32Expression;
+    offset: Expression;
     data: Uint8Array;
   }
 
@@ -350,18 +350,18 @@ declare module binaryen {
     f64: F64Operations;
 
     block(label: string, children: Statement[], resultType?: Type): Statement;
-    if(condition: I32Expression, ifTrue: Statement, ifFalse?: Statement): Statement;
+    if(condition: Expression, ifTrue: Statement, ifFalse?: Statement): Statement;
     loop(label: string, body: Statement): Statement;
 
-    break(label: string, condition?: I32Expression, value?: I32Expression): Statement;
-    /* alias */ br(label: string, condition?: I32Expression, value?: I32Expression): Statement;
-    /* alias */ br_if(label: string, condition?: I32Expression, value?: I32Expression): Statement;
-    switch(labels: string[], defaultLabel: string, condition: I32Expression, value?: I32Expression): Statement;
+    break(label: string, condition?: Expression, value?: Expression): Statement;
+    /* alias */ br(label: string, condition?: Expression, value?: Expression): Statement;
+    /* alias */ br_if(label: string, condition?: Expression, value?: Expression): Statement;
+    switch(labels: string[], defaultLabel: string, condition: Expression, value?: Expression): Statement;
     call(name: string, operands: Expression[], type: Type): Expression;
     callImport(name: string, operands: Expression[], type: Type): Expression;
     /* alias */ call_import(name: string, operands: Expression[], type: Type): Expression;
-    callIndirect(target: I32Expression, operands: Expression[], type: Type): Expression;
-    /* alias */ call_indirect(target: I32Expression, operands: Expression[], type: Type): Expression;
+    callIndirect(target: Expression, operands: Expression[], type: Type): Expression;
+    /* alias */ call_indirect(target: Expression, operands: Expression[], type: Type): Expression;
     getLocal(index: number, type: Type): Expression;
     /* alias */ get_local(index: number, type: Type): Expression;
     setLocal(index: number, value: Expression): Statement;
@@ -372,7 +372,7 @@ declare module binaryen {
     /* alias */ get_global(name: string, type: Type): Expression;
     setGlobal(name: string, value: Expression): Expression;
     /* alias */ set_global(name: string, value: Expression): Expression;
-    select(condition: I32Expression, ifTrue: Expression, ifFalse: Expression): Expression;
+    select(condition: Expression, ifTrue: Expression, ifFalse: Expression): Expression;
     drop(value: Expression): Statement;
     return(value?: Expression): Statement;
     nop(): Statement;
@@ -383,7 +383,7 @@ declare module binaryen {
     hasFeature(name: string): Expression;
     /* alias */ has_feature(name: string): Expression;
     unreachable(): Statement;
-    wake(ptr: Expression, wakeCount: I64Expression): I64Expression;
+    wake(ptr: Expression, wakeCount: Expression): Expression;
   }
 
   function getExpressionId(expression: Expression): number;
@@ -417,10 +417,6 @@ declare module binaryen {
   abstract class Global { protected __Global__: number; }
   abstract class Import { protected __Import__: number; }
   abstract class Export { protected __Export__: number; }
-  abstract class I32Expression extends Expression { protected __I32Expression__: number; }
-  abstract class I64Expression extends Expression { protected __I64Expression__: number; }
-  abstract class F32Expression extends Expression { protected __F32Expression__: number; }
-  abstract class F64Expression extends Expression { protected __F64Expression__: number; }
   abstract class RelooperBlock { protected __RelooperBlock__: number; }
 }
 
