@@ -21,7 +21,9 @@
   "scripts": {
     "build": "node scripts/build",
     "toc": "doctoc README.md --github --title \"## Contents\"",
-    "test": "node tests"
+    "test": "npm run test:check && npm run test:binaryen",
+    "test:check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
+    "test:binaryen": "node tests"
   },
   "files": [
     "index.js",
@@ -39,6 +41,7 @@
     "glob": "^7.1.2",
     "semver": "^5.4.1",
     "simple-git": "^1.85.0",
-    "tape": "^4.8.0"
+    "tape": "^4.8.0",
+    "typescript": "^2.6.2"
   }
 }
