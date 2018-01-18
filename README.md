@@ -673,13 +673,13 @@ Host operation methods above are also aliased in underscore notation, e.g., `cur
   * LoopInfo#**body**: `Expression`
   >
   * BreakInfo#**name**: `string`
-  * BreakInfo#**condition**: `Expression`
-  * BreakInfo#**value**: `Expression`
+  * BreakInfo#**condition**: `Expression | null`
+  * BreakInfo#**value**: `Expression | null`
   >
   * SwitchInfo#**names**: `string[]`
   * SwitchInfo#**defaultName**: `string | null`
   * SwitchInfo#**condition**: `Expression`
-  * SwitchInfo#**value**: `Expression`
+  * SwitchInfo#**value**: `Expression | null`
   >
   * CallInfo#**target**: `string`
   * CallInfo#**operands**: `Expression[]`
@@ -733,7 +733,7 @@ Host operation methods above are also aliased in underscore notation, e.g., `cur
   * ReturnInfo#**value**: `Expression | null`
   >
   * HostInfo#**op**: `number`
-  * HostInfo#**nameOperand**: `string`
+  * HostInfo#**nameOperand**: `string | null`
   * HostInfo#**operands**: `Expression[]`
   >
   * AtomicRMWInfo#**op**: `number`

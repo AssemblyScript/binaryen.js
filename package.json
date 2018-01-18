@@ -39,7 +39,7 @@
     "dateformat": "^2.2.0",
     "doctoc": "^1.3.0",
     "glob": "^7.1.2",
-    "semver": "^5.4.1",
+    "semver": "^5.5.0",
     "simple-git": "^1.85.0",
     "tape": "^4.8.0",
     "typescript": "^2.6.2"

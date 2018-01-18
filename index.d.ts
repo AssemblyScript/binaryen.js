@@ -388,11 +388,201 @@ declare module binaryen {
 
   function getExpressionId(expression: Expression): number;
   function getExpressionType(expression: Expression): Type;
-  function getExpressionInfo(expression: Expression): { [key: string]: any; id: ExpressionId, type: Type };
-  function getFunctionTypeInfo(ftype: FunctionType): { name: string, params: Type[], result: Type };
-  function getFunctionInfo(func: Function): { name: string, type: FunctionType, params: Type[], result: Type, vars: Type[], body: Expression };
-  function getImportInfo(import_: Import): { kind: ExternalKind; module: string, base: string, name: string, globalType?: Type, functionType?: string };
-  function getExportInfo(export_: Export): { kind: ExternalKind; name: string, value: string };
+  function getExpressionInfo(expression: Expression): ExpressionInfo;
+
+  interface ExpressionInfo {
+    id: ExpressionId;
+    type: Type;
+  }
+
+  interface BlockInfo extends ExpressionInfo {
+    name: string;
+    children: Expression[];
+  }
+
+  interface IfInfo extends ExpressionInfo {
+    condition: Expression;
+    ifTrue: Expression;
+    ifFalse: Expression | null;
+  }
+
+  interface LoopInfo extends ExpressionInfo {
+    name: string;
+    body: Expression;
+  }
+
+  interface BreakInfo extends ExpressionInfo {
+    name: string;
+    condition: Expression | null;
+    value: Expression | null;
+  }
+
+  interface SwitchInfo extends ExpressionInfo {
+    names: string[];
+    defaultName: string | null;
+    condition: Expression;
+    value: Expression | null;
+  }
+
+  interface CallInfo extends ExpressionInfo {
+    target: string;
+    operands: Expression[];
+  }
+
+  interface CallImportInfo extends ExpressionInfo {
+    target: string;
+    operands: Expression[];
+  }
+
+  interface CallIndirectInfo extends ExpressionInfo {
+    target: Expression;
+    operands: Expression[];
+  }
+
+  interface GetLocalInfo extends ExpressionInfo {
+    index: number;
+  }
+
+  interface SetLocalInfo extends ExpressionInfo {
+    isTee: boolean;
+    index: number;
+    value: Expression;
+  }
+
+  interface GetGlobalInfo extends ExpressionInfo {
+    name: string;
+  }
+
+  interface SetGlobalInfo extends ExpressionInfo {
+    name: string;
+    value: Expression;
+  }
+
+  interface LoadInfo extends ExpressionInfo {
+    isAtomic: boolean;
+    isSigned: boolean;
+    offset: number;
+    bytes: number;
+    align: number;
+    ptr: Expression;
+  }
+
+  interface StoreInfo extends ExpressionInfo {
+    isAtomic: boolean;
+    offset: number;
+    bytes: number;
+    align: number;
+    ptr: Expression;
+    value: Expression;
+  }
+
+  interface ConstInfo extends ExpressionInfo {
+    value: number | { low: number, high: number };
+  }
+
+  interface UnaryInfo extends ExpressionInfo {
+    op: number; // TODO: declare ops
+    value: Expression;
+  }
+
+  interface BinaryInfo extends ExpressionInfo {
+    op: number; // TODO: declare ops
+    left: Expression;
+    right: Expression;
+  }
+
+  interface SelectInfo extends ExpressionInfo {
+    ifTrue: Expression;
+    ifFalse: Expression;
+    condition: Expression;
+  }
+
+  interface DropInfo extends ExpressionInfo {
+    value: Expression;
+  }
+
+  interface ReturnInfo extends ExpressionInfo {
+    value: Expression | null;
+  }
+
+  interface HostInfo extends ExpressionInfo {
+    op: number; // TODO: declare ops
+    nameOperand: string | null;
+    operands: Expression[];
+  }
+
+  interface AtomicRMWInfo extends ExpressionInfo {
+    op: number; // TODO: declare ops
+    bytes: number;
+    offset: number;
+    ptr: Expression;
+    value: Expression;
+  }
+
+  interface AtomicCmpxchgInfo extends ExpressionInfo {
+    bytes: number;
+    offset: number;
+    ptr: Expression;
+    expected: Expression;
+    replacement: Expression;
+  }
+
+  interface AtomicWaitInfo extends ExpressionInfo {
+    ptr: Expression;
+    expected: Expression;
+    timeout: Expression;
+    expectedType: Type;
+  }
+
+  interface AtomicWakeInfo extends ExpressionInfo {
+    ptr: Expression;
+    wakeCount: Expression;
+  }
+
+  function getFunctionTypeInfo(ftype: FunctionType): FunctionTypeInfo;
+
+  interface FunctionTypeInfo {
+    name: string;
+    params: Type[];
+    result: Type;
+  }
+
+  function getFunctionInfo(func: Function): FunctionInfo;
+
+  interface FunctionInfo {
+    name: string;
+    ype: FunctionType;
+    params: Type[];
+    result: Type;
+    vars: Type[];
+    body: Expression
+  }
+
+  function getImportInfo(import_: Import): ImportInfo;
+
+  interface ImportInfo {
+    kind: ExternalKind;
+    module: string;
+    base: string;
+    name: string;
+  }
+
+  interface GlobalImportInfo extends ImportInfo {
+    globalType: Type;
+  }
+
+  interface FunctionImportInfo extends ImportInfo {
+    functionType: string;
+  }
+
+  function getExportInfo(export_: Export): ExportInfo;
+
+  interface ExportInfo {
+    kind: ExternalKind;
+    name: string;
+    value: string;
+  }
+
   function emitText(expression: Expression): string;
   function readBinary(data: Uint8Array): Module;
   function parseText(text: string): Module;

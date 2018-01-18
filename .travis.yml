@@ -20,7 +20,7 @@ env:
   - CCACHE_HARDLINK=1
   - CCACHE_MAXSIZE="256m"
   - LLVM="$HOME/emscripten-fastcomp/build/bin"
-  - EMSCRIPTEN_VERSION="1.37.22"
+  - EMSCRIPTEN_VERSION="incoming"
   - EMSCRIPTEN="$HOME/emscripten"
   - PATH="$HOME/emscripten:$HOME/cmake/bin:$PATH"
 
