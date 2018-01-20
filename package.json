@@ -36,6 +36,7 @@
     "bin/opt.js"
   ],
   "devDependencies": {
+    "chalk": "^2.3.0",
     "dateformat": "^2.2.0",
     "doctoc": "^1.3.0",
     "glob": "^7.1.2",

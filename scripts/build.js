@@ -1,6 +1,7 @@
-var glob = require("glob");
-var fs   = require("fs");
-var path = require("path");
+var glob  = require("glob");
+var fs    = require("fs");
+var path  = require("path");
+var chalk = require("chalk");
 var child_process = require("child_process");
 
 var projectDirectory = ".";
@@ -37,81 +38,92 @@ while (match = expression.exec(headerSource))
   if (exportedFunctions.indexOf(match[1]) < 0)
     exportedFunctions.push(match[1]);
 console.log("Found " + exportedFunctions.length + " exported functions:\n\n  " + exportedFunctions.join("\n  ") + "\n");
+var exportedFunctionsArg = exportedFunctions.map(name => "\"_" + name + "\"").join(",");
 
 var commonOptions = [
-  "-s", "DEMANGLE_SUPPORT=1",
-  "-s", "DISABLE_EXCEPTION_CATCHING=0",
   "--memory-init-file", "0",
   "--llvm-lto", "1",
   "-std=c++11",
-  "-I" + sourceDirectory
+  "-I" + sourceDirectory,
+  "-s", "DEMANGLE_SUPPORT=1",
+  "-s", "DISABLE_EXCEPTION_CATCHING=0"
 ];
 
-function precompile() {
-  var arg = [
-    path.join(emscriptenDirectory, "em++")
-  ].concat(commonOptions).concat([
-    "-o", "shared.bc"
-  ]).concat(sourceFiles);
-  console.log(arg.join(" ") + "\n");
-  var proc = child_process.spawnSync("python", arg, { stdio: "inherit" });
+/** Runs a command using the specified arguments. */
+function runCommand(cmd, args) {
+  var prev = null;
+  console.log(chalk.cyanBright(cmd) + " " + args.map(arg => {
+    if (arg.startsWith("-"))
+      return chalk.gray("\\") + "\n " + chalk.bold(arg);
+    return arg;
+  }).join(" ") + "\n");
+  var proc = child_process.spawnSync(cmd, args, { stdio: "inherit" });
   if (proc.error)
     throw proc.error;
   if (proc.status !== 0)
     throw Error("exited with " + proc.status);
+  return proc;
 }
 
-function compile(options) {
-  var arg = [
+/** Compiles shared bitcode used to build the targets below. */
+function compileShared() {
+  runCommand("python", [
     path.join(emscriptenDirectory, "em++")
-  ].concat(commonOptions).concat([
-    "-s", "EXPORTED_FUNCTIONS=[" + exportedFunctions.map(name => "\"_" + name + "\"").join(",") + "]",
-    "-Oz",
-    "-o", options.out,
+  ].concat(sourceFiles).concat(commonOptions).concat([
+    "-o", "shared.bc"
+  ]));
+}
+
+/** Compiles the JavaScript target. */
+function compileJs(options) {
+  runCommand("python", [
+    path.join(emscriptenDirectory, "em++"),
     "shared.bc"
-  ]).concat(
-    /.js$/.test(options.out)
-    ? [
-      "-s", "ALLOW_MEMORY_GROWTH=1",
-      "-s", "ELIMINATE_DUPLICATE_FUNCTIONS=1",
-      "-Wno-almost-asm",
-      // "--closure", "1",
-      "--pre-js", options.pre,
-      "--post-js", options.post
-    ] : [
-      "-s", "WASM=1",
-      "-s", "SIDE_MODULE=1",
-      "-s", "BINARYEN_METHOD='native-wasm'"
-    ]
-  );
-  console.log(arg.join(" ") + "\n");
-  var proc = child_process.spawnSync("python", arg, { stdio: "inherit" });
-  if (proc.error)
-    throw proc.error;
-  if (proc.status !== 0)
-    throw Error("exited with " + proc.status);
+  ].concat(commonOptions).concat([
+    "--post-js", options.post,
+    "--closure", "1",
+    "-s", "EXPORTED_FUNCTIONS=[" + exportedFunctionsArg + "]",
+    "-s", "ALLOW_MEMORY_GROWTH=1",
+    "-s", "ELIMINATE_DUPLICATE_FUNCTIONS=1",
+    "-s", "MODULARIZE_INSTANCE=1",
+    "-s", "EXPORT_NAME=\"Binaryen\"",
+    "-o", options.out,
+    "-Oz"
+  ]));
+}
+
+/** Compiles the WebAssembly target. */
+function compileWasm(options) {
+  run("python", [
+    path.join(emscriptenDirectory, "em++"),
+    "shared.bc"
+  ].concat(commonOptions).concat([
+    "--post-js", options.post,
+    "--closure", "1",
+    "-s", "EXPORTED_FUNCTIONS=[" + exportedFunctionsArg + "]",
+    "-s", "ALLOW_MEMORY_GROWTH=1",
+    "-s", "BINARYEN=1",
+    "-s", "BINARYEN_METHOD=\"native-wasm\"",
+    "-s", "MODULARIZE_INSTANCE=1",
+    "-s", "EXPORT_NAME=\"Binaryen\"",
+    "-o", options.out,
+    "-Oz"
+  ]));
 }
 
 console.log("Compiling shared bitcode ...\n");
-precompile();
+compileShared();
 
 console.log("\nCompiling binaryen.js ...\n");
-compile({
-  pre: path.join(sourceDirectory, "js", "binaryen.js-pre.js"),
+compileJs({
   post: path.join(sourceDirectory, "js", "binaryen.js-post.js"),
   out: "index.js"
 });
 
-// console.log("\nCompiling minimal.js ...\n");
-// compile({
-//   pre: path.join(projectDirectory, "js", "minimal-pre.js"),
-//   post: path.join(projectDirectory, "js", "minimal-post.js"),
-//   out: "minimal.js"
-// });
+// NOT YET FUNCTIONAL, but possible. Requires some changes to post.js
 
-// console.log("\nCompiling minimal.wasm ...\n");
-// compile({
-//   pre: path.join(projectDirectory, "js", "minimal-pre.js"),
-//   post: path.join(projectDirectory, "js", "minimal-post.js"),
-//   out: "minimal.wasm"
+// console.log("\nCompiling binaryen-wasm.js ...\n");
+// compileJs({
+//   post: path.join(sourceDirectory, "js", "binaryen.js-post.js"),
+//   out: "binaryen-wasm.js"
 // });
