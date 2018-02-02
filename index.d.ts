@@ -310,6 +310,11 @@ declare module binaryen {
     data: Uint8Array;
   }
 
+  interface BinaryWithSourceMap {
+    binary: Uint8Array;
+    sourceMap: string | null;
+  }
+
   class Module {
 
     addFunctionType(name: string, resultType: Type, paramTypes: Type[]): FunctionType;
@@ -333,6 +338,7 @@ declare module binaryen {
     setStart(start: binaryen.Function): void;
 
     emitBinary(): Uint8Array;
+    emitBinary(sourceMapUrl: string | null): BinaryWithSourceMap;
     emitText(): string;
     emitAsmjs(): string;
     validate(): number;
@@ -342,6 +348,9 @@ declare module binaryen {
     runPassesOnFunction(func: string|Function, passes: string[]): void;
     autoDrop(): void;
     interpret(): void;
+    addDebugInfoFileName(filename: string): number;
+    getDebugInfoFileName(index: number): string | null;
+    setDebugLocation(func: Function, expr: Expression, fileIndex: number, lineNumber: number, columnNumber: number): void;
     dispose(): void;
 
     i32: I32Operations;

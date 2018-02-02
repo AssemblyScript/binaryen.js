@@ -17,7 +17,6 @@ binaryen.js
   - [Module validation](#module-validation)
   - [Module optimization](#module-optimization)
   - [Module creation](#module-creation)
-  - [Module debugging](#module-debugging)
   - [Expression construction](#expression-construction)
     - [Control flow](#control-flow)
     - [Constants](#constants)
@@ -33,6 +32,8 @@ binaryen.js
     - [Atomic wait and wake operations 🦄](#atomic-wait-and-wake-operations-)
   - [Expression manipulation](#expression-manipulation)
   - [Relooper](#relooper)
+  - [Source maps](#source-maps)
+  - [Debugging](#debugging)
 - [Building](#building)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -271,6 +272,12 @@ API
 * Module#**emitBinary**(): `Uint8Array`<br />
   Returns the module in binary format.
 
+* Module#**emitBinary**(sourceMapUrl: `string | null`): `BinaryWithSourceMap`<br />
+  Returns the module in binary format with its source map. If `sourceMapUrl` is `null`, source map generation is skipped.
+
+  * BinaryWithSourceMap#**binary**: `Uint8Array`
+  * BinaryWithSourceMap#**sourceMap**: `string | null`
+
 * Module#**emitText**(): `string`<br />
   Returns the module in Binaryen's s-expression text format (not official stack-style text format).
 
@@ -279,14 +286,6 @@ API
 
 * Module#**dispose**(): `void`<br />
   Releases the resources held by the module once it isn't needed anymore.
-
-### Module debugging
-
-* Module#**setAPITracing**(on: `boolean`): `void`<br />
-  Enables tracing of the C-API in the console. Can be very useful when filing bug reports.
-
-* Module#**interpret**(): `void`<br />
-  Runs the module in the interpreter, calling the start function.
 
 ### Expression construction
 
@@ -336,22 +335,20 @@ API
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
-* Module#**getLocal**(index: `number`, type: `Type`): `Expression`<br />
+* Module#**getLocal/get_local**(index: `number`, type: `Type`): `Expression`<br />
   Creates a get_local for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
 
-* Module#**setLocal**(index: `number`, value: `Expression`): `Expression`<br />
+* Module#**setLocal/set_local**(index: `number`, value: `Expression`): `Expression`<br />
   Creates a set_local for the local at the specified index.
 
-* Module#**teeLocal**(index: `number`, value: `Expression`): `Expression`<br />
+* Module#**teeLocal/tee_local**(index: `number`, value: `Expression`): `Expression`<br />
   Creates a tee_local for the local at the specified index. A tee differs from a set in that the value remains on the stack.
 
-* Module#**getGlobal**(name: `string`, type: `Type`): `Expression`<br />
+* Module#**getGlobal/get_global**(name: `string`, type: `Type`): `Expression`<br />
   Creates a get_global for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
 
-* Module#**setGlobal**(name: `string`, value: `Expression`): `Expression`<br />
+* Module#**setGlobal/set_global**(name: `string`, value: `Expression`): `Expression`<br />
   Creates a set_global for the global with the specified name.
-
-Variable access methods above are also aliased in underscore notation, e.g., `get_local`.
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
 
@@ -495,13 +492,11 @@ Variable access methods above are also aliased in underscore notation, e.g., `ge
 * Module#**call**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Creates a call to a function. Note that we must specify the return type here as we may not have created the function being called yet.
 
-* Module#**callImport**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+* Module#**callImport/call_import**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Similar to **call**, but calls an imported function.
 
-* Module#**callIndirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+* Module#**callIndirect/call_indirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
-
-Function call methods above are also aliased in underscore notation, e.g., `call_indirect`.
 
 #### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
 
@@ -534,11 +529,9 @@ Function call methods above are also aliased in underscore notation, e.g., `call
 
 #### [Host operations](http://webassembly.org/docs/semantics/#resizing)
 
-* Module#**currentMemory**(): `Expression`
-* Module#**growMemory**(value: `number`): `Expression`
-* Module#**hasFeature**(name: `string`): `Expression` 🦄
-
-Host operation methods above are also aliased in underscore notation, e.g., `current_memory`.
+* Module#**currentMemory/current_memory**(): `Expression`
+* Module#**growMemory/get_memory**(value: `number`): `Expression`
+* Module#**hasFeature/has_feature**(name: `string`): `Expression` 🦄
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
@@ -777,6 +770,25 @@ Host operation methods above are also aliased in underscore notation, e.g., `cur
 
 * Relooper#**renderAndDispose**(entry: `RelooperBlock`, labelHelper: `number`, module: `Module`): `Expression`<br />
   Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins), a label helper variable (an index of a local we can use, necessary for irreducible control flow), and the module. This returns an expression - normal WebAssembly code - that you can use normally anywhere.
+
+### Source maps
+
+* Module#**addDebugInfoFileName**(filename: `string`): `number`<br />
+  Adds a debug info file name to the module and returns its index.
+
+* Module#**getDebugInfoFileName**(index: `number`): `string | null` <br />
+  Gets the name of the debug info file at the specified index.
+
+* Module#**setDebugLocation**(func: `Function`, expr: `Expression`, fileIndex: `number`, lineNumber: `number`, columnNumber: `number`): `void`<br />
+  Sets the debug location of the specified `Expression` within the specified `Function`.
+
+### Debugging
+
+* Module#**setAPITracing**(on: `boolean`): `void`<br />
+  Enables tracing of the C-API in the console. Can be very useful when filing bug reports.
+
+* Module#**interpret**(): `void`<br />
+  Runs the module in the interpreter, calling the start function.
 
 Building
 --------
