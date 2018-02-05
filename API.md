@@ -1,63 +1,14 @@
-binaryen.js
-===========
+binaryen.js API
+===============
 
-**binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate WebAssembly using a JavaScript API.
+Overview
+--------
 
-[![npm](https://img.shields.io/npm/v/binaryen.svg)](https://www.npmjs.com/package/binaryen) [![npm (tag)](https://img.shields.io/npm/v/binaryen/nightly.svg)](https://www.npmjs.com/package/binaryen) [![Build Status](https://travis-ci.org/AssemblyScript/binaryen.js.svg?branch=master)](https://travis-ci.org/AssemblyScript/binaryen.js)
+binaryen.js is a port of Binaryen to the Web, allowing you to generate WebAssembly using a JavaScript API. To get a feel for the API, see the "hello world" test at `test/binaryen.js/hello-world.js`, and other tests in that directory for more examples.
 
-Usage
------
+The API is documented in the rest of this document.
 
-```
-$> npm install binaryen
-```
-
-```js
-var binaryen = require("binaryen");
-
-// Create a module with a single function
-var myModule = new binaryen.Module();
-
-myModule.addFunction("add", myModule.addFunctionType("iii", binaryen.i32, [ binaryen.i32, binaryen.i32 ]), [ binaryen.i32 ],
-  myModule.block(null, [
-    myModule.setLocal(2,
-      myModule.i32.add(
-        myModule.getLocal(0, binaryen.i32),
-        myModule.getLocal(1, binaryen.i32)
-      )
-    ),
-    myModule.return(
-      myModule.getLocal(2, binaryen.i32)
-    )
-  ])
-);
-myModule.addFunctionExport("add", "add");
-
-// Optimize the module using default passes and levels
-myModule.optimize();
-
-// Validate the module
-if (!myModule.validate())
-  throw new Error("validation error");
-
-// Generate text format and binary
-var textData = myModule.emitText();
-var wasmData = myModule.emitBinary();
-...
-```
-
-The buildbot also publishes nightly versions once a day if there have been changes. The latest nightly can be installed through
-
-```
-$> npm install binaryen@nightly
-```
-
-or you can use one of the [previous versions](https://github.com/AssemblyScript/binaryen.js/tags) instead if necessary.
-
-API
----
-<!-- START API.md -->
-
+<!-- BEGIN API -->
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 ### Contents
@@ -787,30 +738,3 @@ API
 
 * Module#**interpret**(): `void`<br />
   Runs the module in the interpreter, calling the start function.
-
-<!-- END API.md -->
-
-Building
---------
-
-Clone the GitHub repository including submodules and install the development dependencies:
-
-```
-$> git clone --recursive https://github.com/AssemblyScript/binaryen.js.git
-$> cd binaryen.js
-$> npm install
-```
-
-Make sure [Emscripten](https://github.com/kripken/emscripten) is properly set up on your system.
-
-Afterwards, to build the `binaryen` submodule to `index.js`, run:
-
-```
-$> npm run build
-```
-
-To run the [tests](./tests), do:
-
-```
-$> npm test
-```
