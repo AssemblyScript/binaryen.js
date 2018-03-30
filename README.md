@@ -43,7 +43,11 @@ if (!myModule.validate())
 // Generate text format and binary
 var textData = myModule.emitText();
 var wasmData = myModule.emitBinary();
-...
+
+// Example usage with the WebAssembly API
+var compiled = new WebAssembly.Module(wasmData);
+var instance = new WebAssembly.Instance(compiled, {});
+console.log(instance.exports.add(41, 1));
 ```
 
 The buildbot also publishes nightly versions once a day if there have been changes. The latest nightly can be installed through
