@@ -18,8 +18,7 @@ var sourceFiles = [];
   "ir/*.cpp",
   "passes/*.cpp",
   "support/!(archive|file|command-line).cpp",
-  "wasm/!(wasm-io).cpp",
-  "wasm-emscripten.cpp"
+  "wasm/!(wasm-io).cpp"
 ]
 .forEach(pattern => {
   var matches = glob.sync(pattern = sourceDirectory + "/" + pattern);
