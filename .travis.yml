@@ -60,7 +60,7 @@ script: # build binaryen.js
     export VERSION &&
     if [[ $VERSION != *nightly* ]]; then
       export RELEASE=1 &&
-      echo "Building release v$VERSION (@$TAG) ...";
+      echo "Building release v$VERSION ...";
     else
       unset RELEASE &&
       echo "Building nightly v$VERSION ...";

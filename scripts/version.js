@@ -37,7 +37,7 @@ function latest(repo) {
           return resolve();
         };
       }
-      return reject(Error("no matching tags"));
+      return reject(Error("no matching tags: " + tags.all.join(", ")));
     });
   });
 }

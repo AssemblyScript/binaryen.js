@@ -17,8 +17,8 @@ var sourceFiles = [];
   "emscripten-optimizer/*.cpp",
   "ir/*.cpp",
   "passes/*.cpp",
-  "support/!(archive|file|command-line).cpp",
-  "wasm/!(wasm-io).cpp"
+  "support/!(archive|command-line|path).cpp",
+  "wasm/*.cpp"
 ]
 .forEach(pattern => {
   var matches = glob.sync(pattern = sourceDirectory + "/" + pattern);
@@ -45,6 +45,7 @@ var commonOptions = [
   "-std=c++11",
   "-I" + sourceDirectory,
   "-s", "DEMANGLE_SUPPORT=1",
+  "-s", "NO_FILESYSTEM=1",
   "-s", "DISABLE_EXCEPTION_CATCHING=0"
 ];
 
@@ -81,6 +82,7 @@ function compileJs(options) {
   ].concat(commonOptions).concat([
     "--post-js", options.post,
     "--closure", "1",
+    "-s", "WASM=0",
     "-s", "EXPORTED_FUNCTIONS=[" + exportedFunctionsArg + "]",
     "-s", "ALLOW_MEMORY_GROWTH=1",
     "-s", "ELIMINATE_DUPLICATE_FUNCTIONS=1",
