@@ -5,8 +5,9 @@ var chalk = require("chalk");
 var child_process = require("child_process");
 
 var projectDirectory = ".";
-var sourceDirectory = path.join("binaryen", "src");
-var emscriptenDirectory = process.env.EMSCRIPTEN || path.join(".", "emscripten");
+var binaryenDirectory = path.join(projectDirectory, "binaryen");
+var sourceDirectory = path.join(binaryenDirectory, "src");
+var emscriptenDirectory = process.env.EMSCRIPTEN || path.join(projectDirectory, "emscripten");
 
 // collect source files
 var sourceFiles = [];
@@ -46,7 +47,8 @@ var commonOptions = [
   "-I" + sourceDirectory,
   "-s", "DEMANGLE_SUPPORT=1",
   "-s", "NO_FILESYSTEM=1",
-  "-s", "DISABLE_EXCEPTION_CATCHING=0"
+  "-s", "DISABLE_EXCEPTION_CATCHING=0",
+  "-s", "ERROR_ON_UNDEFINED_SYMBOLS=1"
 ];
 
 /** Runs a command using the specified arguments. */
@@ -63,6 +65,17 @@ function runCommand(cmd, args) {
   if (proc.status !== 0)
     throw Error("exited with " + proc.status);
   return proc;
+}
+
+/** Compiles embedded intrinsics used by the targets below. */
+function compileIntrinsics() {
+  var target = path.join(sourceDirectory, "passes", "WasmIntrinsics.cpp");
+  runCommand("python", [
+    path.join(binaryenDirectory, "scripts", "embedwast.py"),
+    path.join(sourceDirectory, "passes", "wasm-intrinsics.wast"),
+    target
+  ]);
+  sourceFiles.push(target);
 }
 
 /** Compiles shared bitcode used to build the targets below. */
@@ -112,7 +125,10 @@ function compileWasm(options) {
   ]));
 }
 
-console.log("Compiling shared bitcode ...\n");
+console.log("Compiling embedded intrinsics ...\n");
+compileIntrinsics();
+
+console.log("\nCompiling shared bitcode ...\n");
 compileShared();
 
 console.log("\nCompiling binaryen.js ...\n");
