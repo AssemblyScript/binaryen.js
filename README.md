@@ -58,6 +58,20 @@ $> npm install binaryen@nightly
 
 or you can use one of the [previous versions](https://github.com/AssemblyScript/binaryen.js/tags) instead if necessary.
 
+### Usage with a CDN
+
+* **[RawGit](https://rawgit.com)** serves the files from GitHub:
+
+  URL: https://cdn.rawgit.com/AssemblyScript/binaryen.js/master/index.js
+
+  Replace `master` with any [tag](https://github.com/AssemblyScript/binaryen.js/releases) or commit hash to use a specific version.
+
+* **[UNPKG](https://unpkg.com)** serves the files from npm:
+
+  URL: https://unpkg.com/binaryen@latest/index.js
+
+  Replace `latest` with any published version to use a specific version, or use `nightly` for the latest build.
+
 API
 ---
 <!-- START API.md -->
@@ -85,6 +99,7 @@ API
   - [Atomic memory accesses 🦄](#atomic-memory-accesses-)
   - [Atomic read-modify-write operations 🦄](#atomic-read-modify-write-operations-)
   - [Atomic wait and wake operations 🦄](#atomic-wait-and-wake-operations-)
+  - [Sign extension operations 🦄](#sign-extension-operations-)
 - [Expression manipulation](#expression-manipulation)
 - [Relooper](#relooper)
 - [Source maps](#source-maps)
@@ -136,6 +151,9 @@ API
 * Module#**getFunctionTypeBySignature**(resultType: `Type`, paramTypes: `Type[]`): `Signature`<br />
   Gets an existing function type by its parametric signature. Returns `0` if there is no such function type.
 
+* Module#**removeFunctionType**(name: `string`): `void`<br />
+  Removes a function type.
+
 * Module#**addFunction**(name: `string`, functionType: `Signature`, varTypes: `Type[]`, body: `Expression`): `Function`<br />
   Adds a function. `varTypes` indicate additional locals, in the given order.
 
@@ -171,6 +189,9 @@ API
 
 * Module#**addGlobalExport**(internalName: `string`, externalName: `string`): `Export`<br />
   Adds a global variable export. Exported globals must be immutable.
+
+* Module#**addGlobal**(name: `string`, type: `Type`, mutable: `number`, value: `Expression`): `Global`<br />
+  Adds a global instance variable.
 
 * Module#**removeExport**(externalName: `string`): `void`<br />
   Removes an export, by external name.
@@ -337,19 +358,19 @@ API
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
-* Module#**getLocal/get_local**(index: `number`, type: `Type`): `Expression`<br />
+* Module#**get_local/getLocal**(index: `number`, type: `Type`): `Expression`<br />
   Creates a get_local for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
 
-* Module#**setLocal/set_local**(index: `number`, value: `Expression`): `Expression`<br />
+* Module#**set_local/setLocal**(index: `number`, value: `Expression`): `Expression`<br />
   Creates a set_local for the local at the specified index.
 
-* Module#**teeLocal/tee_local**(index: `number`, value: `Expression`): `Expression`<br />
+* Module#**tee_local/teeLocal**(index: `number`, value: `Expression`): `Expression`<br />
   Creates a tee_local for the local at the specified index. A tee differs from a set in that the value remains on the stack.
 
-* Module#**getGlobal/get_global**(name: `string`, type: `Type`): `Expression`<br />
+* Module#**get_global/getGlobal**(name: `string`, type: `Type`): `Expression`<br />
   Creates a get_global for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
 
-* Module#**setGlobal/set_global**(name: `string`, value: `Expression`): `Expression`<br />
+* Module#**set_global/setGlobal**(name: `string`, value: `Expression`): `Expression`<br />
   Creates a set_global for the global with the specified name.
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
@@ -494,10 +515,10 @@ API
 * Module#**call**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Creates a call to a function. Note that we must specify the return type here as we may not have created the function being called yet.
 
-* Module#**callImport/call_import**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+* Module#**call_import/callImport**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Similar to **call**, but calls an imported function.
 
-* Module#**callIndirect/call_indirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+* Module#**call_indirect/callIndirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
 
 #### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
@@ -531,9 +552,9 @@ API
 
 #### [Host operations](http://webassembly.org/docs/semantics/#resizing)
 
-* Module#**currentMemory/current_memory**(): `Expression`
-* Module#**growMemory/get_memory**(value: `number`): `Expression`
-* Module#**hasFeature/has_feature**(name: `string`): `Expression` 🦄
+* Module#**current_memory/currentMemory**(): `Expression`
+* Module#**grow_memory/growMemory**(value: `number`): `Expression`
+* Module#**has_feature/hasFeature**(name: `string`): `Expression` 🦄
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
@@ -611,6 +632,15 @@ API
 * Module#i32.**wait**(ptr: `Expression`, expected: `Expression`, timeout: `Expression`): `Expression`
 * Module#i64.**wait**(ptr: `Expression`, expected: `Expression`, timeout: `Expression`): `Expression`
 * Module#**wake**(ptr: `Expression`, wakeCount: `Expression`): `Expression`
+
+#### [Sign extension operations](https://github.com/WebAssembly/sign-extension-ops/blob/master/proposals/sign-extension-ops/Overview.md) 🦄
+
+* Module#i32.**extend8_s**(value: `Expression`): `Expression`
+* Module#i32.**extend16_s**(value: `Expression`): `Expression`
+>
+* Module#i64.**extend8_s**(value: `Expression`): `Expression`
+* Module#i64.**extend16_s**(value: `Expression`): `Expression`
+* Module#i64.**extend32_s**(value: `Expression`): `Expression`
 
 ### Expression manipulation
 
