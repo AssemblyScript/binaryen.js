@@ -1,7 +1,7 @@
 {
   "name": "binaryen",
   "description": "JavaScript version of Binaryen, a compiler infrastructure and toolchain library for WebAssembly.",
-  "version": "48.0.0",
+  "version": "49.0.0",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
