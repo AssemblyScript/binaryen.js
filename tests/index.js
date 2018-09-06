@@ -118,6 +118,7 @@ test("optimizing the module", function(test) {
 var asmjs;
 test("emitting asmjs", function(test) {
   test.doesNotThrow(function() {
+    mod.removeImport("0"); // wasm2js doesn't support non-function imports (here: memory)
     asmjs = mod.emitAsmjs();
   });
   test.ok(typeof asmjs === "string" && asmjs.length, "should return a non-empty string");
