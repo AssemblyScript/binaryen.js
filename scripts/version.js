@@ -27,8 +27,7 @@ var dst = {
 function latest(repo) {
   return new Promise((resolve, reject) => {
     repo.git.tags({ "--sort": "-committerdate" }, (err, tags) => {
-      if (err)
-        return reject(err);
+      if (err) return reject(err);
       for (var i = 0; i < tags.all.length; ++i) {
         var result = repo.filter(tags.all[i]);
         if (result !== null) {
@@ -39,19 +38,21 @@ function latest(repo) {
       }
       return reject(Error("no matching tags: " + tags.all.join(", ")));
     });
+  }).catch(err => {
+    console.error(err.stack);
+    process.exit(1);
   });
 }
 
-Promise.all([
-  latest(src),
-  latest(dst)
-]).then(() => {
-  if (process.argv[2] === "tag")
-    console.log(src.tag);
-  else if (semver.gt(src.version, dst.version))
-    console.log(src.version);
-  else
-    console.log(src.version + "-nightly." + dateFormat(Date.UTC(), "yyyymmdd"));
-}).catch(err => {
-  throw err;
-});
+if (process.argv[2] === "tag") {
+  latest(src).then(() => console.log(src.tag));
+} else {
+  latest(src).then(() => {
+    latest(dst).then(() => {
+      if (semver.gt(src.version, dst.version))
+        console.log(src.version);
+      else
+        console.log(src.version + "-nightly." + dateFormat(Date.UTC(), "yyyymmdd"));
+    });
+  });
+}
