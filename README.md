@@ -175,9 +175,6 @@ API
 * Module#**addGlobalImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, globalType: `Type`): `Import`<br />
   Adds a global variable import. Imported globals must be immutable.
 
-* Module#**removeImport**(internalName: `string`): `void`<br />
-  Removes an import, by internal name.
-
 * Module#**addFunctionExport**(internalName: `string`, externalName: `string`): `Export`<br />
   Adds a function export.
 
@@ -196,7 +193,7 @@ API
 * Module#**removeExport**(externalName: `string`): `void`<br />
   Removes an export, by external name.
 
-* Module#**setFunctionTable**(funcs: `Function[]`): `void`<br />
+* Module#**setFunctionTable**(initial: `number`, maximum: `number`, funcs: `string[]`): `void`<br />
   Sets the contents of the function table. There's just one table for now, using name `"0"`.
 
 * Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`): `void`<br />
@@ -218,33 +215,22 @@ API
 * **getFunctionInfo**(ftype: `Function`: `FunctionInfo`<br />
   Obtains information about a function.
 
-  * FunctionInfo#**name**: `string | null`
+  * FunctionInfo#**name**: `string`
+  * FunctionInfo#**module**: `string | null` (if imported)
+  * FunctionInfo#**base**: `string | null` (if imported)
   * FunctionInfo#**type**: `FunctionType`
   * FunctionInfo#**params**: `Type[]`
   * FunctionInfo#**result**: `Type`
   * FunctionInfo#**vars**: `Type`
   * FunctionInfo#**body**: `Expression`
 
-* **getImportInfo**(import_: `Import`): `ImportInfo`<br />
+* **getGlobalInfo**(global: `Global`): `GlobalInfo`<br />
   Obtains information about an import, always including:
 
-  * ImportInfo#**kind**: `ExternalKind`
-  * ImportInfo#**module**: `string`
-  * ImportInfo#**base**: `string`
-  * ImportInfo#**name**: `string`
-
-  Additional properties depend on the expression's `kind` and are usually equivalent to the respective parameters when creating such an import:
-
-  * GlobalImportInfo#**globalType**: `Type`
-  >
-  * FunctionImportInfo#**functionType**: `FunctionType`
-
-  Possible `ExternalKind` values are:
-
-  * **ExternalFunction**: `ExternalKind`
-  * **ExternalTable**: `ExternalKind`
-  * **ExternalMemory**: `ExternalKind`
-  * **ExternalGlobal**: `ExternalKind`
+  * GlobalInfo#**name**: `string`
+  * GlobalInfo#**module**: `string | null` (if imported)
+  * GlobalInfo#**base**: `string | null` (if imported)
+  * GlobalInfo#**type**: `Type`
 
 * **getExportInfo**(export_: `Export`): `ExportInfo`<br />
   Obtains information about an export.
@@ -252,6 +238,13 @@ API
   * ExportInfo#**kind**: `ExternalKind`
   * ExportInfo#**name**: `string`
   * ExportInfo#**value**: `string`
+
+  Possible `ExternalKind` values are:
+
+  * **ExternalFunction**: `ExternalKind`
+  * **ExternalTable**: `ExternalKind`
+  * **ExternalMemory**: `ExternalKind`
+  * **ExternalGlobal**: `ExternalKind`
 
 ### Module validation
 
@@ -515,9 +508,6 @@ API
 * Module#**call**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Creates a call to a function. Note that we must specify the return type here as we may not have created the function being called yet.
 
-* Module#**call_import/callImport**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
-  Similar to **call**, but calls an imported function.
-
 * Module#**call_indirect/callIndirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
   Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
 
@@ -554,7 +544,6 @@ API
 
 * Module#**current_memory/currentMemory**(): `Expression`
 * Module#**grow_memory/growMemory**(value: `number`): `Expression`
-* Module#**has_feature/hasFeature**(name: `string`): `Expression` 🦄
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 

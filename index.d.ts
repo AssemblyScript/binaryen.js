@@ -15,7 +15,6 @@ declare module binaryen {
   const BreakId: ExpressionId;
   const SwitchId: ExpressionId;
   const CallId: ExpressionId;
-  const CallImportId: ExpressionId;
   const CallIndirectId: ExpressionId;
   const GetLocalid: ExpressionId;
   const SetLocalId: ExpressionId;
@@ -327,13 +326,12 @@ declare module binaryen {
     addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): Import;
     addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): Import;
     addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): Import;
-    removeImport(internalName: string): void;
     addFunctionExport(internalName: string, externalName: string): Export;
     addTableExport(internalName: string, externalName: string): Export;
     addMemoryExport(internalName: string, externalName: string): Export;
     addGlobalExport(internalName: string, externalName: string): Export;
     removeExport(externalName: string): void;
-    setFunctionTable(funcs: number[]): void;
+    setFunctionTable(initial: number, maximum: number, funcs: number[]): void;
     setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[]): void;
     setStart(start: binaryen.Function): void;
 
@@ -367,7 +365,6 @@ declare module binaryen {
     /* alias */ br_if(label: string, condition?: Expression, value?: Expression): Statement;
     switch(labels: string[], defaultLabel: string, condition: Expression, value?: Expression): Statement;
     call(name: string, operands: Expression[], type: Type): Expression;
-    callImport(name: string, operands: Expression[], type: Type): Expression;
     /* alias */ call_import(name: string, operands: Expression[], type: Type): Expression;
     callIndirect(target: Expression, operands: Expression[], type: Type): Expression;
     /* alias */ call_indirect(target: Expression, operands: Expression[], type: Type): Expression;
@@ -389,8 +386,6 @@ declare module binaryen {
     /* alias */ grow_memory(value: Expression): Expression;
     currentMemory(): Expression;
     /* alias */ current_memory(): Expression;
-    hasFeature(name: string): Expression;
-    /* alias */ has_feature(name: string): Expression;
     unreachable(): Statement;
     wake(ptr: Expression, wakeCount: Expression): Expression;
   }
@@ -560,28 +555,22 @@ declare module binaryen {
 
   interface FunctionInfo {
     name: string;
-    ype: FunctionType;
+    module: string | null;
+    base: string | null;
+    type: FunctionType;
     params: Type[];
     result: Type;
     vars: Type[];
     body: Expression
   }
 
-  function getImportInfo(import_: Import): ImportInfo;
+  function getGlobalInfo(global: Global): GlobalInfo;
 
-  interface ImportInfo {
-    kind: ExternalKind;
-    module: string;
-    base: string;
+  interface GlobalInfo {
     name: string;
-  }
-
-  interface GlobalImportInfo extends ImportInfo {
-    globalType: Type;
-  }
-
-  interface FunctionImportInfo extends ImportInfo {
-    functionType: string;
+    module: string | null;
+    base: string | null;
+    type: Type;
   }
 
   function getExportInfo(export_: Export): ExportInfo;
