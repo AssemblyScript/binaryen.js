@@ -199,7 +199,7 @@ a.setDebugInfo=function(b){return a._BinaryenSetDebugInfo(b)};a.setAPITracing=fu
 
   return Binaryen;
 }
-)();
+)(typeof Binaryen === 'object' ? Binaryen : {});
 if (typeof exports === 'object' && typeof module === 'object')
     module.exports = Binaryen;
   else if (typeof define === 'function' && define['amd'])
