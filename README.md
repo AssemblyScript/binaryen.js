@@ -60,17 +60,14 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
 
 ### Usage with a CDN
 
-* **[RawGit](https://rawgit.com)** serves the files from GitHub:
+  * From GitHub via [jsDelivr](https://www.jsdelivr.com):<br />
+    `https://cdn.jsdelivr.net/gh/AssemblyScript/binaryen.js@VERSION/index.js`
+  * From npm via [jsDelivr](https://www.jsdelivr.com):<br />
+    `https://cdn.jsdelivr.net/npm/binaryen@VERSION/index.js`
+  * From npm via [UNPKG](https://unpkg.com):<br />
+    `https://unpkg.com/binaryen@VERSION/index.js`
 
-  URL: https://cdn.rawgit.com/AssemblyScript/binaryen.js/master/index.js
-
-  Replace `master` with any [tag](https://github.com/AssemblyScript/binaryen.js/releases) or commit hash to use a specific version.
-
-* **[UNPKG](https://unpkg.com)** serves the files from npm:
-
-  URL: https://unpkg.com/binaryen@latest/index.js
-
-  Replace `latest` with any published version to use a specific version, or use `nightly` for the latest build.
+  Replace `VERSION` with a [specific version](https://github.com/AssemblyScript/binaryen.js/releases) or omit it (not recommended in production) to use master/latest.
 
 API
 ---

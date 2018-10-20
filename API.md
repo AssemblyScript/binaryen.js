@@ -158,7 +158,7 @@ The API is documented in the rest of this document.
   * FunctionInfo#**body**: `Expression`
 
 * **getGlobalInfo**(global: `Global`): `GlobalInfo`<br />
-  Obtains information about an import, always including:
+  Obtains information about a global.
 
   * GlobalInfo#**name**: `string`
   * GlobalInfo#**module**: `string | null` (if imported)
