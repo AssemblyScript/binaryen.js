@@ -16,4 +16,12 @@ test("emitting js", function(test) {
   test.end();
 });
 
+test("wrapping a module", function(test) {
+  var wrapped = binaryen.wrapModule(mod.ptr);
+  test.doesNotThrow(function() {
+    test.ok(wrapped.getFunction("main"));
+  });
+  test.end();
+});
+
 // </js only>

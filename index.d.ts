@@ -314,7 +314,11 @@ declare module binaryen {
     sourceMap: string | null;
   }
 
+  function wrapModule(ptr: number): Module;
+
   class Module {
+    readonly ptr: number;
+    constructor();
 
     addFunctionType(name: string, resultType: Type, paramTypes: Type[]): FunctionType;
     getFunctionTypeBySignature(resultType: Type, paramTypes: Type[]): FunctionType;
@@ -587,11 +591,12 @@ declare module binaryen {
   function setAPITracing(on: boolean): void;
 
   class Relooper {
+    constructor(module: Module);
     addBlock(expression: Expression): RelooperBlock;
     addBranch(from: RelooperBlock, to: RelooperBlock, condition: Expression, code: Expression): void;
     addBlockWithSwitch(code: Expression, condition: Expression): RelooperBlock;
     addBranchForSwitch(from: RelooperBlock, to: RelooperBlock, indexes: number[], code: Expression): void;
-    renderAndDispose(entry: RelooperBlock, labelHelper: number, module: Module): Expression;
+    renderAndDispose(entry: RelooperBlock, labelHelper: number): Expression;
   }
 
   // These are actually pointers internally
