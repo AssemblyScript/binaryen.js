@@ -140,6 +140,9 @@ API
  * **readBinary**(data: `Uint8Array`): `Module`<br />
    Creates a module from binary data.
 
+ * **wrapModule**(ptr: `number`): `Module`<br />
+   Wraps a module pointer as used with the underlying C-API as a JS module object.
+
 ### Module manipulation
 
 * Module#**addFunctionType**(name: `string`, resultType: `Type`, paramTypes: `Type[]`): `Signature`<br />
@@ -771,7 +774,7 @@ API
 
 ### Relooper
 
-* new **Relooper**(): `Relooper`<br />
+* new **Relooper**(module: `Module`): `Relooper`<br />
   Constructs a relooper instance. This lets you provide an arbitrary CFG, and the relooper will structure it for WebAssembly.
 
 * Relooper#**addBlock**(code: `Expression`): `RelooperBlock`<br />
@@ -786,8 +789,8 @@ API
 * Relooper#**addBranchForSwitch**(from: `RelooperBlock`, to: `RelooperBlock`, indexes: `number[]`, code: `Expression`): `void`<br />
   Adds a branch from a block ending in a switch, to another block, using an array of indexes that determine where to go, and optional code to execute on the branch.
 
-* Relooper#**renderAndDispose**(entry: `RelooperBlock`, labelHelper: `number`, module: `Module`): `Expression`<br />
-  Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins), a label helper variable (an index of a local we can use, necessary for irreducible control flow), and the module. This returns an expression - normal WebAssembly code - that you can use normally anywhere.
+* Relooper#**renderAndDispose**(entry: `RelooperBlock`, labelHelper: `number`): `Expression`<br />
+  Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins) and a label helper variable (an index of a local we can use, necessary for irreducible control flow). This returns an expression - normal WebAssembly code - that you can use normally anywhere.
 
 ### Source maps
 
