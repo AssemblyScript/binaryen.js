@@ -25,6 +25,7 @@ env:
 install: # install cmake and node.js
 - mkdir $HOME/cmake && wget -qO- https://cmake.org/files/v3.10/cmake-3.10.1-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
 - nvm install 8
+- pyenv install --list && pyenv install 2.7.12 && pyenv global 2.7.12
 
 before_script: # setup ccache, git and emscripten
 - ccache -z -M $CCACHE_MAXSIZE &&
