@@ -565,7 +565,7 @@ declare module binaryen {
     params: Type[];
     result: Type;
     vars: Type[];
-    body: Expression
+    body: Expression;
   }
 
   function getGlobalInfo(global: Global): GlobalInfo;
@@ -575,6 +575,8 @@ declare module binaryen {
     module: string | null;
     base: string | null;
     type: Type;
+    mutable: boolean;
+    init: Expression;
   }
 
   function getExportInfo(export_: Export): ExportInfo;
