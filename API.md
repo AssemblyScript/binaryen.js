@@ -164,6 +164,8 @@ The API is documented in the rest of this document.
   * GlobalInfo#**module**: `string | null` (if imported)
   * GlobalInfo#**base**: `string | null` (if imported)
   * GlobalInfo#**type**: `Type`
+  * GlobalInfo#**mutable**: `boolean`
+  * GlobalInfo#**init**: `Expression`
 
 * **getExportInfo**(export_: `Export`): `ExportInfo`<br />
   Obtains information about an export.
