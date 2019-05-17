@@ -32,7 +32,7 @@ console.log("Collected " + sourceFiles.length + " source files:\n\n  " + sourceF
 // determine exported functions
 var headerSource = require("fs").readFileSync(path.join(sourceDirectory, "binaryen-c.h"), "utf8");
 var exportedFunctions = [];
-var expression = /\b(Binaryen\w+)\([^)]*\);/g;
+var expression = /\b((?:Binaryen|Relooper)\w+)\([^)]*\);/g;
 var match;
 while (match = expression.exec(headerSource))
   if (exportedFunctions.indexOf(match[1]) < 0)
