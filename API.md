@@ -59,11 +59,14 @@ The API is documented in the rest of this document.
  * **f64**: `Type`<br />
    64-bit float (double) type.
 
- * **auto**: `Type`<br />
-   Special type used in **Module#block** exclusively. Lets the API figure out a block's result type automatically.
+ * **v128**: `Type`<br />
+   128-bit vector type. 🦄
 
  * **unreachable**: `Type`<br />
    Special type indicating unreachable code when obtaining information about an expression.
+
+ * **auto**: `Type`<br />
+   Special type used in **Module#block** exclusively. Lets the API figure out a block's result type automatically.
 
 ### Module construction
 
@@ -129,7 +132,7 @@ The API is documented in the rest of this document.
 * Module#**setFunctionTable**(initial: `number`, maximum: `number`, funcs: `string[]`): `void`<br />
   Sets the contents of the function table. There's just one table for now, using name `"0"`.
 
-* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`): `void`<br />
+* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`, flags?: `number[]`, shared?: `boolean`): `void`<br />
   Sets the memory. There's just one memory for now, using name `"0"`. Providing `exportName` also creates a memory export.
 
 * Module#**setStart**(start: `Function`): `void`<br />

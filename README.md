@@ -123,11 +123,14 @@ API
  * **f64**: `Type`<br />
    64-bit float (double) type.
 
- * **auto**: `Type`<br />
-   Special type used in **Module#block** exclusively. Lets the API figure out a block's result type automatically.
+ * **v128**: `Type`<br />
+   128-bit vector type. 🦄
 
  * **unreachable**: `Type`<br />
    Special type indicating unreachable code when obtaining information about an expression.
+
+ * **auto**: `Type`<br />
+   Special type used in **Module#block** exclusively. Lets the API figure out a block's result type automatically.
 
 ### Module construction
 
@@ -139,9 +142,6 @@ API
 
  * **readBinary**(data: `Uint8Array`): `Module`<br />
    Creates a module from binary data.
-
- * **wrapModule**(ptr: `number`): `Module`<br />
-   Wraps a module pointer as used with the underlying C-API as a JS module object.
 
 ### Module manipulation
 
@@ -196,7 +196,7 @@ API
 * Module#**setFunctionTable**(initial: `number`, maximum: `number`, funcs: `string[]`): `void`<br />
   Sets the contents of the function table. There's just one table for now, using name `"0"`.
 
-* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`): `void`<br />
+* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`, flags?: `number[]`, shared?: `boolean`): `void`<br />
   Sets the memory. There's just one memory for now, using name `"0"`. Providing `exportName` also creates a memory export.
 
 * Module#**setStart**(start: `Function`): `void`<br />
@@ -225,12 +225,14 @@ API
   * FunctionInfo#**body**: `Expression`
 
 * **getGlobalInfo**(global: `Global`): `GlobalInfo`<br />
-  Obtains information about an import, always including:
+  Obtains information about a global.
 
   * GlobalInfo#**name**: `string`
   * GlobalInfo#**module**: `string | null` (if imported)
   * GlobalInfo#**base**: `string | null` (if imported)
   * GlobalInfo#**type**: `Type`
+  * GlobalInfo#**mutable**: `boolean`
+  * GlobalInfo#**init**: `Expression`
 
 * **getExportInfo**(export_: `Export`): `ExportInfo`<br />
   Obtains information about an export.
@@ -351,20 +353,20 @@ API
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
-* Module#**get_local/getLocal**(index: `number`, type: `Type`): `Expression`<br />
-  Creates a get_local for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
+* Module#**local.get**(index: `number`, type: `Type`): `Expression`<br />
+  Creates a local.get for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
 
-* Module#**set_local/setLocal**(index: `number`, value: `Expression`): `Expression`<br />
-  Creates a set_local for the local at the specified index.
+* Module#**local.set**(index: `number`, value: `Expression`): `Expression`<br />
+  Creates a local.set for the local at the specified index.
 
-* Module#**tee_local/teeLocal**(index: `number`, value: `Expression`): `Expression`<br />
-  Creates a tee_local for the local at the specified index. A tee differs from a set in that the value remains on the stack.
+* Module#**local.tee**(index: `number`, value: `Expression`): `Expression`<br />
+  Creates a local.tee for the local at the specified index. A tee differs from a set in that the value remains on the stack.
 
-* Module#**get_global/getGlobal**(name: `string`, type: `Type`): `Expression`<br />
-  Creates a get_global for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
+* Module#**global.get**(name: `string`, type: `Type`): `Expression`<br />
+  Creates a global.get for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
 
-* Module#**set_global/setGlobal**(name: `string`, value: `Expression`): `Expression`<br />
-  Creates a set_global for the global with the specified name.
+* Module#**global.set**(name: `string`, value: `Expression`): `Expression`<br />
+  Creates a global.set for the global with the specified name.
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
 
@@ -542,8 +544,8 @@ API
 
 #### [Host operations](http://webassembly.org/docs/semantics/#resizing)
 
-* Module#**current_memory/currentMemory**(): `Expression`
-* Module#**grow_memory/growMemory**(value: `number`): `Expression`
+* Module#**memory.size**(): `Expression`
+* Module#**memory.grow**(value: `number`): `Expression`
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
@@ -645,10 +647,10 @@ API
   * **CallId**: `ExpressionId`
   * **CallImportId**: `ExpressionId`
   * **CallIndirectId**: `ExpressionId`
-  * **GetLocalId**: `ExpressionId`
-  * **SetLocalId**: `ExpressionId`
-  * **GetGlobalId**: `ExpressionId`
-  * **SetGlobalId**: `ExpressionId`
+  * **LocalGetId**: `ExpressionId`
+  * **LocalSetId**: `ExpressionId`
+  * **GlobalGetId**: `ExpressionId`
+  * **GlobalSetId**: `ExpressionId`
   * **LoadId**: `ExpressionId`
   * **StoreId**: `ExpressionId`
   * **ConstId**: `ExpressionId`
@@ -668,7 +670,7 @@ API
 * **getExpressionType**(expr: `Expression`): `Type`<br />
   Gets the type of the specified expression.
 
-* **getExpressionInfo**(expr: `Expression`: `ExpressionInfo`<br />
+* **getExpressionInfo**(expr: `Expression`): `ExpressionInfo`<br />
   Obtains information about an expression, always including:
 
   * Info#**id**: `ExpressionId`
@@ -704,16 +706,16 @@ API
   * CallIndirectInfo#**target**: `Expression`
   * CallIndirectInfo#**operands**: `Expression[]`
   >
-  * GetLocalInfo#**index**: `number`
+  * LocalGetInfo#**index**: `number`
   >
-  * SetLocalInfo#**isTee**: `boolean`
-  * SetLocalInfo#**index**: `number`
-  * SetLocalInfo#**value**: `Expression`
+  * LocalSetInfo#**isTee**: `boolean`
+  * LocalSetInfo#**index**: `number`
+  * LocalSetInfo#**value**: `Expression`
   >
-  * GetGlobalInfo#**name**: `string`
+  * GlobalGetInfo#**name**: `string`
   >
-  * SetGlobalInfo#**name**: `string`
-  * SetGlobalValue#**value**: `Expression`
+  * GlobalSetInfo#**name**: `string`
+  * GlobalSetInfo#**value**: `Expression`
   >
   * LoadInfo#**isAtomic**: `boolean`
   * LoadInfo#**isSigned**: `boolean`
@@ -774,7 +776,7 @@ API
 
 ### Relooper
 
-* new **Relooper**(module: `Module`): `Relooper`<br />
+* new **Relooper**(): `Relooper`<br />
   Constructs a relooper instance. This lets you provide an arbitrary CFG, and the relooper will structure it for WebAssembly.
 
 * Relooper#**addBlock**(code: `Expression`): `RelooperBlock`<br />
@@ -789,8 +791,8 @@ API
 * Relooper#**addBranchForSwitch**(from: `RelooperBlock`, to: `RelooperBlock`, indexes: `number[]`, code: `Expression`): `void`<br />
   Adds a branch from a block ending in a switch, to another block, using an array of indexes that determine where to go, and optional code to execute on the branch.
 
-* Relooper#**renderAndDispose**(entry: `RelooperBlock`, labelHelper: `number`): `Expression`<br />
-  Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins) and a label helper variable (an index of a local we can use, necessary for irreducible control flow). This returns an expression - normal WebAssembly code - that you can use normally anywhere.
+* Relooper#**renderAndDispose**(entry: `RelooperBlock`, labelHelper: `number`, module: `Module`): `Expression`<br />
+  Renders and cleans up the Relooper instance. Call this after you have created all the blocks and branches, giving it the entry block (where control flow begins), a label helper variable (an index of a local we can use, necessary for irreducible control flow), and the module. This returns an expression - normal WebAssembly code - that you can use normally anywhere.
 
 ### Source maps
 
