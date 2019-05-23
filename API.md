@@ -286,20 +286,20 @@ The API is documented in the rest of this document.
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
-* Module#**get_local/getLocal**(index: `number`, type: `Type`): `Expression`<br />
-  Creates a get_local for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
+* Module#**local.get**(index: `number`, type: `Type`): `Expression`<br />
+  Creates a local.get for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
 
-* Module#**set_local/setLocal**(index: `number`, value: `Expression`): `Expression`<br />
-  Creates a set_local for the local at the specified index.
+* Module#**local.set**(index: `number`, value: `Expression`): `Expression`<br />
+  Creates a local.set for the local at the specified index.
 
-* Module#**tee_local/teeLocal**(index: `number`, value: `Expression`): `Expression`<br />
-  Creates a tee_local for the local at the specified index. A tee differs from a set in that the value remains on the stack.
+* Module#**local.tee**(index: `number`, value: `Expression`): `Expression`<br />
+  Creates a local.tee for the local at the specified index. A tee differs from a set in that the value remains on the stack.
 
-* Module#**get_global/getGlobal**(name: `string`, type: `Type`): `Expression`<br />
-  Creates a get_global for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
+* Module#**global.get**(name: `string`, type: `Type`): `Expression`<br />
+  Creates a global.get for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
 
-* Module#**set_global/setGlobal**(name: `string`, value: `Expression`): `Expression`<br />
-  Creates a set_global for the global with the specified name.
+* Module#**global.set**(name: `string`, value: `Expression`): `Expression`<br />
+  Creates a global.set for the global with the specified name.
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
 
@@ -477,8 +477,8 @@ The API is documented in the rest of this document.
 
 #### [Host operations](http://webassembly.org/docs/semantics/#resizing)
 
-* Module#**current_memory/currentMemory**(): `Expression`
-* Module#**grow_memory/growMemory**(value: `number`): `Expression`
+* Module#**memory.size**(): `Expression`
+* Module#**memory.grow**(value: `number`): `Expression`
 
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
@@ -580,10 +580,10 @@ The API is documented in the rest of this document.
   * **CallId**: `ExpressionId`
   * **CallImportId**: `ExpressionId`
   * **CallIndirectId**: `ExpressionId`
-  * **GetLocalId**: `ExpressionId`
-  * **SetLocalId**: `ExpressionId`
-  * **GetGlobalId**: `ExpressionId`
-  * **SetGlobalId**: `ExpressionId`
+  * **LocalGetId**: `ExpressionId`
+  * **LocalSetId**: `ExpressionId`
+  * **GlobalGetId**: `ExpressionId`
+  * **GlobalSetId**: `ExpressionId`
   * **LoadId**: `ExpressionId`
   * **StoreId**: `ExpressionId`
   * **ConstId**: `ExpressionId`
@@ -603,7 +603,7 @@ The API is documented in the rest of this document.
 * **getExpressionType**(expr: `Expression`): `Type`<br />
   Gets the type of the specified expression.
 
-* **getExpressionInfo**(expr: `Expression`: `ExpressionInfo`<br />
+* **getExpressionInfo**(expr: `Expression`): `ExpressionInfo`<br />
   Obtains information about an expression, always including:
 
   * Info#**id**: `ExpressionId`
@@ -639,16 +639,16 @@ The API is documented in the rest of this document.
   * CallIndirectInfo#**target**: `Expression`
   * CallIndirectInfo#**operands**: `Expression[]`
   >
-  * GetLocalInfo#**index**: `number`
+  * LocalGetInfo#**index**: `number`
   >
-  * SetLocalInfo#**isTee**: `boolean`
-  * SetLocalInfo#**index**: `number`
-  * SetLocalInfo#**value**: `Expression`
+  * LocalSetInfo#**isTee**: `boolean`
+  * LocalSetInfo#**index**: `number`
+  * LocalSetInfo#**value**: `Expression`
   >
-  * GetGlobalInfo#**name**: `string`
+  * GlobalGetInfo#**name**: `string`
   >
-  * SetGlobalInfo#**name**: `string`
-  * SetGlobalValue#**value**: `Expression`
+  * GlobalSetInfo#**name**: `string`
+  * GlobalSetInfo#**value**: `Expression`
   >
   * LoadInfo#**isAtomic**: `boolean`
   * LoadInfo#**isSigned**: `boolean`
