@@ -845,6 +845,7 @@ declare module binaryen {
     getFunction(name: string): FunctionRef;
     removeFunction(name: string): void;
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
+    getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
     addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType: FunctionTypeRef): ImportRef;
     addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
