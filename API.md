@@ -126,6 +126,12 @@ The API is documented in the rest of this document.
 * Module#**addGlobal**(name: `string`, type: `Type`, mutable: `number`, value: `Expression`): `Global`<br />
   Adds a global instance variable.
 
+* Module#**getGlobal**(name: `string`): `Global`<br />
+  Gets a global, by name,
+
+* Module#**removeGlobal**(name: `string`): `void`<br />
+  Removes a global, by name.
+
 * Module#**removeExport**(externalName: `string`): `void`<br />
   Removes an export, by external name.
 
