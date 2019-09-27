@@ -19,7 +19,6 @@
     "binaryen-opt": "bin/opt.js"
   },
   "scripts": {
-    "build": "node scripts/build",
     "readme": "doctoc API.md --github --title \"### Contents\" && node scripts/api",
     "test": "npm run test:check && npm run test:binaryen",
     "test:check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
