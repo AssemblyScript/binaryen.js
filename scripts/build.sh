@@ -1,4 +1,4 @@
 set -e
-cd emscripten/
+cd binaryen/
 bash build-js.sh
 cp out/binaryen.js ../index.js
