@@ -1,96 +1,48 @@
-language: cpp
-dist: trusty # limited to 2 cores, max. 4 gb of memory and 20 gb of hard disk space.
-compiler: clang
+dist: xenial
+notifications:
+  email: false
+language: node_js
+node_js:
+- node
 git:
   submodules: false
-cache:
-  ccache: true
 branches:
   only:
   - master
-env:
-  global:
-  - MAKEFLAGS="-j2"
-  - CFLAGS="-Qunused-arguments -fcolor-diagnostics -fuse-ld=gold"
-  - CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -fuse-ld=gold"
-  - CCACHE_SLOPPINESS="pch_defines,time_macros"
-  - CCACHE_COMPRESS=1
-  - CCACHE_HARDLINK=1
-  - CCACHE_MAXSIZE="256m"
-  - LLVM="$HOME/emscripten-fastcomp/build/bin"
-  - EMSCRIPTEN_VERSION="incoming"
-  - EMSCRIPTEN="$HOME/emscripten"
-  - PATH="$HOME/emscripten:$HOME/cmake/bin:$PATH"
-
-install: # install cmake and node.js
-- mkdir $HOME/cmake && wget -qO- https://cmake.org/files/v3.10/cmake-3.10.1-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
-- nvm install 8
-- pyenv install 2.7.12 && pyenv global 2.7.12
-
-before_script: # setup ccache, git and emscripten
-- ccache -z -M $CCACHE_MAXSIZE &&
-  ccache -s
+sudo: required
+services:
+- docker
+before_install:
+- docker run -dit --name emscripten -v $(pwd):$(pwd) trzeci/emscripten:sdk-incoming-64bit bash
+before_script:
 - git config --global user.email "travis@travis-ci.org" &&
   git config --global user.name "Travis CI" &&
   git config credential.helper "store --file=.git/credentials" &&
   echo "https://${GH_TOKEN}:@github.com" > .git/credentials &&
   echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > $HOME/.npmrc
-- export RC=1
-- git clone -b $EMSCRIPTEN_VERSION --depth 1 https://github.com/kripken/emscripten-fastcomp $HOME/emscripten-fastcomp &&
-  git clone -b $EMSCRIPTEN_VERSION --depth 1 https://github.com/kripken/emscripten-fastcomp-clang $HOME/emscripten-fastcomp/tools/clang &&
-  git clone -b $EMSCRIPTEN_VERSION --depth 1 https://github.com/kripken/emscripten $HOME/emscripten &&
-  mkdir $HOME/emscripten-fastcomp/build &&
-  export CC="ccache clang" &&
-  export CXX="ccache clang++" &&
-  export LD="ld.gold" &&
-  cmake -B$HOME/emscripten-fastcomp/build -H$HOME/emscripten-fastcomp -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD="X86;JSBackend" -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_TESTS=OFF -DCLANG_INCLUDE_EXAMPLES=OFF -DCLANG_INCLUDE_TESTS=OFF &&
-  timeout 30m make -C $HOME/emscripten-fastcomp/build $MAKEFLAGS &&
-  emcc -v &&
-  emcc -v &&
-  git checkout master &&
-  git submodule update --init --remote --merge;
-  export RC=$?;
-  $(exit 0)
-
+- git checkout master &&
+  git submodule update --init --remote --merge
 script: # build binaryen.js
-- if [ $RC -eq 0 ]; then
-    npm install &&
-    VERSION=`node scripts/version` &&
-    export VERSION &&
-    if [[ $VERSION != *nightly* ]]; then
-      export RELEASE=1 &&
-      echo "Building release v$VERSION ...";
-    else
-      unset RELEASE &&
-      echo "Building nightly v$VERSION ...";
-    fi &&
-    if [ $RELEASE ]; then
-      TAG=`node scripts/version tag` &&
-      echo "Resetting to $TAG ..." &&
-      cd ./binaryen &&
-      git reset --hard "$TAG" &&
-      git clean -f &&
-      cd ..;
-    fi &&
-    npm run build &&
-    npm test;
-    export RC=$?;
-  fi;
-  $(exit $RC)
-
-before_cache: # print ccache statistics
-- ccache -s
-
-# --- everything below happens after the cache has been updated ---
-
-after_failure: # trigger continuation if (and only if) the build timed out
-- if [ $RC -eq 124 ]; then
-    git checkout master &&
-    git pull &&
-    git commit --allow-empty -m "Build continuation notification" &&
-    git push -u origin master;
-  fi
-
+- npm install &&
+  VERSION=`node scripts/version` &&
+  export VERSION &&
+  if [[ $VERSION != *nightly* ]]; then
+    export RELEASE=1 &&
+    echo "Building release v$VERSION ...";
+  else
+    unset RELEASE &&
+    echo "Building nightly v$VERSION ...";
+  fi &&
+  if [ $RELEASE ]; then
+    TAG=`node scripts/version tag` &&
+    echo "Resetting to $TAG ..." &&
+    cd ./binaryen &&
+    git reset --hard "$TAG" &&
+    git clean -f &&
+    cd ..;
+  fi &&
+  docker exec -it -w $(pwd) emscripten bash scripts/build.sh &&
+  npm test
 after_success: # push to github and publish on npm (intentionally fails for duplicates, triggers a nightly build when publishing release)
 - git add ./binaryen &&
   git add ./index.js &&
