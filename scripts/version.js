@@ -16,7 +16,7 @@ var src = {
 var dst = {
   git: simpleGit(__dirname + "/.."),
   filter: tag => {
-    var match = /^v(\d+\.\d+\.\d+)$/.exec(tag);
+    var match = /^v(\d+\.\d+\.\d+)(?:\-|$)/.exec(tag);
     return match ? {
       tag: tag,
       version: match[1]
