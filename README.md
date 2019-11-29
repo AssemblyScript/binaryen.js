@@ -820,28 +820,3 @@ API
   Runs the module in the interpreter, calling the start function.
 
 <!-- END API.md -->
-
-Building
---------
-
-Clone the GitHub repository including submodules and install the development dependencies:
-
-```
-$> git clone --recursive https://github.com/AssemblyScript/binaryen.js.git
-$> cd binaryen.js
-$> npm install
-```
-
-Make sure [Emscripten](https://github.com/kripken/emscripten) is properly set up on your system.
-
-Afterwards, to build the `binaryen` submodule to `index.js`, run:
-
-```
-$> npm run build
-```
-
-To run the [tests](./tests), do:
-
-```
-$> npm test
-```

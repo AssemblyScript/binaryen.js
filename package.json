@@ -14,15 +14,12 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "bin": {
-    "binaryen-as": "bin/as.js",
-    "binaryen-dis": "bin/dis.js",
-    "binaryen-opt": "bin/opt.js"
+    "wasm-opt": "bin/wasm-opt"
   },
   "scripts": {
     "readme": "doctoc API.md --github --title \"### Contents\" && node scripts/api",
-    "test": "npm run test:check && npm run test:binaryen",
-    "test:check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
-    "test:binaryen": "node tests"
+    "check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
+    "test": "npm run check && node tests/sanity && node tests/example"
   },
   "files": [
     "index.js",
@@ -30,18 +27,14 @@
     "package.json",
     "package-lock.json",
     "README.md",
-    "bin/as.js",
-    "bin/dis.js",
-    "bin/opt.js"
+    "bin/wasm-opt"
   ],
   "devDependencies": {
-    "chalk": "^2.4.1",
     "dateformat": "^2.2.0",
-    "doctoc": "^1.3.1",
-    "glob": "^7.1.3",
-    "semver": "^5.5.1",
-    "simple-git": "^1.96.0",
-    "tape": "^4.9.1",
+    "doctoc": "^1.4.0",
+    "semver": "^5.7.1",
+    "simple-git": "^1.126.0",
     "typescript": "^2.9.2"
-  }
+  },
+  "dependencies": {}
 }
