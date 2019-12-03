@@ -1,36 +1,46 @@
 name: Build
 on:
+  schedule:
+  - cron: '0 0 * * *'
   push:
     branches:
     - master
-  pull_request:
 jobs:
   build:
-    name: "Build packages"
+    name: "Build with Emsdk:${{ matrix.emsdk }}"
     runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
+    strategy:
+      matrix:
+        emsdk: [ "latest-fastcomp", "latest" ]
+      fail-fast: false
     steps:
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
         git clone --depth 1 https://github.com/emscripten-core/emsdk.git $HOME/emsdk
         $HOME/emsdk/emsdk update-tags
-        $HOME/emsdk/emsdk install latest
-        $HOME/emsdk/emsdk activate latest
+        $HOME/emsdk/emsdk install ${{ matrix.emsdk }}
+        $HOME/emsdk/emsdk activate ${{ matrix.emsdk }}
         echo ::set-env name=PATH::$HOME/emsdk:$PATH
     - name: "Set up CMake"
       run: |
         mkdir $HOME/cmake
-        wget -qO- https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
+        wget -qO- https://github.com/Kitware/CMake/releases/download/v3.16.0/cmake-3.16.0-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
         echo ::set-env name=PATH::$HOME/cmake/bin:$PATH
-    - name: "Set up node.js"
-      uses: dcodeIO/setup-node-nvm@v1.0.0
-      with:
-        node-version: node
-    - uses: actions/checkout@v1
+    - name: "Check out repository"
+      uses: actions/checkout@v1
       with:
         submodules: false
-    - name: "Update Binaryen submodule"
+    - name: "Set up repository"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+        git fetch origin
+        git checkout "${GITHUB_REF:11}"
         git submodule update --init --remote --merge
         cd ./binaryen
         git log -n1
@@ -65,7 +75,8 @@ jobs:
         cp ./bin/binaryen_js.js ../../index.js
         cd ../..
     - name: "Test binaryen.js"
-      run: node tests/sanity
+      run: |
+        node ./tests/sanity
     - name: "Build wasm-opt"
       run: |
         cd ./binaryen/build
@@ -75,16 +86,13 @@ jobs:
         echo '#!/usr/bin/env node' | cat - ./bin/wasm-opt.js > ../../bin/wasm-opt
         cd ../..
     - name: "Test wasm-opt"
-      run: node bin/wasm-opt --help
-    - name: "Push changes to GitHub"
-      if: github.event_name != 'pull_request'
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-        git add ./binaryen ./index.js /bin/wasm-opt
+        node ./bin/wasm-opt --help
+    - name: "Push changes to GitHub"
+      if: github.event_name != 'pull_request' && matrix.emsdk == 'latest-fastcomp'
+      run: |
+        git add ./binaryen ./index.js ./bin/wasm-opt
+        npm version $VERSION --no-git-tag-version --force
         if [ $RELEASE ]; then
           echo "Committing release ("$VERSION") ..."
           git add ./package.json ./package-lock.json
@@ -93,12 +101,12 @@ jobs:
           echo "Committing nightly ("$VERSION") ..."
           git commit -m "Nightly v$VERSION [ci skip]"
         fi
-        # git push -u origin master
+        git push -u origin master
         echo "Creating tag v$VERSION ..."
         git tag "v$VERSION"
-        # git push -u origin "v$VERSION"
+        git push -u origin "v$VERSION"
     - name: "Publish to npm"
-      if: github.event_name != 'pull_request'
+      if: github.event_name != 'pull_request' && matrix.emsdk == 'latest-fastcomp'
       env:
         NPM_REGISTRY: "registry.npmjs.org"
         NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -106,8 +114,8 @@ jobs:
         npm config set "//${NPM_REGISTRY}/:_authToken=${NPM_AUTH_TOKEN}"
         if [ $RELEASE ]; then
           echo "Publishing release ..."
-          # npm publish
+          npm publish
         else
           echo "Publishing nightly ..."
-          # npm publish --tag nightly
+          npm publish --tag nightly
         fi
