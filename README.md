@@ -94,8 +94,10 @@ API
   - [Host operations](#host-operations)
   - [Atomic memory accesses 🦄](#atomic-memory-accesses-)
   - [Atomic read-modify-write operations 🦄](#atomic-read-modify-write-operations-)
-  - [Atomic wait and wake operations 🦄](#atomic-wait-and-wake-operations-)
+  - [Atomic wait and notify operations 🦄](#atomic-wait-and-notify-operations-)
   - [Sign extension operations 🦄](#sign-extension-operations-)
+  - [Multi-value operations 🦄](#multi-value-operations-)
+  - [Exception handling operations 🦄](#exception-handling-operations-)
 - [Expression manipulation](#expression-manipulation)
 - [Relooper](#relooper)
 - [Source maps](#source-maps)
@@ -673,7 +675,7 @@ API
 * Module#i64.**atomic.rmw32_u.xchg**(offset: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
 * Module#i64.**atomic.rmw32_u.cmpxchg**(offset: `number`, ptr: `ExpressionRef`, expected: `ExpressionRef`, replacement: `ExpressionRef`): `ExpressionRef`
 
-#### [Atomic wait and wake operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-wake-operators) 🦄
+#### [Atomic wait and notify operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators) 🦄
 
 * Module#i32.**atomic.wait**(ptr: `ExpressionRef`, expected: `ExpressionRef`, timeout: `ExpressionRef`): `ExpressionRef`
 * Module#i64.**atomic.wait**(ptr: `ExpressionRef`, expected: `ExpressionRef`, timeout: `ExpressionRef`): `ExpressionRef`
@@ -700,7 +702,7 @@ API
 * Module#anyref.**pop**(): `ExpressionRef`
 * Module#exnref.**pop**(): `ExpressionRef`
 
-### [Exception handling operations](https://github.com/WebAssembly/exception-handling/blob/master/proposals/Exceptions.md) 🦄
+#### [Exception handling operations](https://github.com/WebAssembly/exception-handling/blob/master/proposals/Exceptions.md) 🦄
 
 * Module#**try**(body: `ExpressionRef`, catchBody: `ExpressionRef`): `ExpressionRef`
 * Module#**throw**(event: `string`, operands: `ExpressionRef[]`): `ExpressionRef`
