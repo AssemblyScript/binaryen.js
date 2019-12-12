@@ -1,5 +1,3 @@
-import { Expression } from "typescript";
-
 declare module binaryen {
 
   type Type = number;
@@ -900,11 +898,11 @@ declare module binaryen {
       notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
       fence(): ExpressionRef;
     };
-    try(body: Expression, catchBody: Expression): Expression;
-    throw(event: string, operands: Expression[]): Expression;
-    rethrow(exnref: Expression): Expression;
-    br_on_exn(label: string, event: string, exnref: Expression): Expression;
-    push(value: Expression): Expression;
+    try(body: ExpressionRef, catchBody: ExpressionRef): ExpressionRef;
+    throw(event: string, operands: ExpressionRef[]): ExpressionRef;
+    rethrow(exnref: ExpressionRef): ExpressionRef;
+    br_on_exn(label: string, event: string, exnref: ExpressionRef): ExpressionRef;
+    push(value: ExpressionRef): ExpressionRef;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
