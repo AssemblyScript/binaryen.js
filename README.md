@@ -390,18 +390,6 @@ API
 * Module#**select**(condition: `ExpressionRef`, ifTrue: `ExpressionRef`, ifFalse: `ExpressionRef`): `ExpressionRef`<br />
   Creates a [select](http://webassembly.org/docs/semantics/#type-parametric-operators) of one of two values.
 
-#### [Constants](http://webassembly.org/docs/semantics/#constants)
-
-* Module#i32.**const**(value: `number`): `ExpressionRef`
->
-* Module#i64.**const**(low: `number`, high: `number`): `ExpressionRef`
->
-* Module#f32.**const**(value: `number`): `ExpressionRef`
-* Module#f32.**const_bits**(value: `number`): `ExpressionRef`
->
-* Module#f64.**const**(value: `number`): `ExpressionRef`
-* Module#f64.**const_bits**(low: `number`, high: `number`): `ExpressionRef`
-
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
 * Module#**local.get**(index: `number`, type: `Type`): `ExpressionRef`<br />
@@ -421,6 +409,7 @@ API
 
 #### [Integer operations](http://webassembly.org/docs/semantics/#32-bit-integer-operators)
 
+* Module#i32.**const**(value: `number`): `ExpressionRef`
 * Module#i32.**clz**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i32.**ctz**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i32.**popcnt**(value: `ExpressionRef`): `ExpressionRef`
@@ -451,6 +440,7 @@ API
 * Module#i32.**ge_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i32.**ge_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 >
+* Module#i64.**const**(value: `number`): `ExpressionRef`
 * Module#i64.**clz**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i64.**ctz**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i64.**popcnt**(value: `ExpressionRef`): `ExpressionRef`
@@ -483,6 +473,8 @@ API
 
 #### [Floating point operations](http://webassembly.org/docs/semantics/#floating-point-operators)
 
+* Module#f32.**const**(value: `number`): `ExpressionRef`
+* Module#f32.**const_bits**(value: `number`): `ExpressionRef`
 * Module#f32.**neg**(value: `ExpressionRef`): `ExpressionRef`
 * Module#f32.**abs**(value: `ExpressionRef`): `ExpressionRef`
 * Module#f32.**ceil**(value: `ExpressionRef`): `ExpressionRef`
@@ -504,6 +496,8 @@ API
 * Module#f32.**gt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#f32.**ge**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 >
+* Module#f64.**const**(value: `number`): `ExpressionRef`
+* Module#f64.**const_bits**(value: `number`): `ExpressionRef`
 * Module#f64.**neg**(value: `ExpressionRef`): `ExpressionRef`
 * Module#f64.**abs**(value: `ExpressionRef`): `ExpressionRef`
 * Module#f64.**ceil**(value: `ExpressionRef`): `ExpressionRef`
@@ -524,6 +518,202 @@ API
 * Module#f64.**le**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#f64.**gt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#f64.**ge**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+
+#### [Vector operations](https://github.com/WebAssembly/simd/blob/master/proposals/simd/SIMD.md) 🦄
+
+* Module#v128.**const**(bytes: `Uint8Array[16]`): `ExpressionRef`
+* Module#v128.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**not**(value: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**and**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**or**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**xor**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**andnot**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#v128.**bitselect**(left: `ExpressionRef`, right: `ExpressionRef`, cond: `ExpressionRef`): `ExpressionRef`
+>
+* Module#i8x16.**splat**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**extract_lane_s**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i8x16.**extract_lane_u**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i8x16.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**ne**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**lt_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**lt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**gt_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**gt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**le_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**lt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**ge_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**ge_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**neg**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**any_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**all_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**shl**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**shr_s**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**shr_u**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**add**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**add_saturate_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**add_saturate_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**sub**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**sub_saturate_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**sub_saturate_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**mul**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**min_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**min_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**max_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**max_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**narrow_i16x8_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**narrow_i16x8_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+>
+* Module#i16x8.**splat**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**extract_lane_s**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i16x8.**extract_lane_u**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i16x8.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**ne**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**lt_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**lt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**gt_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**gt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**le_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**lt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**ge_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**ge_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**neg**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**any_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**all_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**shl**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**shr_s**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**shr_u**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**add**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**add_saturate_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**add_saturate_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**sub**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**sub_saturate_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**sub_saturate_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**mul**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**min_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**min_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**max_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**max_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**narrow_i32x4_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**narrow_i32x4_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**widen_low_i8x16_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**widen_high_i8x16_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**widen_low_i8x16_u**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**widen_high_i8x16_u**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**load8x8_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**load8x8_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+>
+* Module#i32x4.**splat**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**extract_lane_s**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i32x4.**extract_lane_u**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i32x4.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**ne**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**lt_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**lt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**gt_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**gt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**le_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**lt_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**ge_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**ge_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**neg**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**any_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**all_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**shl**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**shr_s**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**shr_u**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**add**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**sub**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**mul**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**min_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**min_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**max_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**max_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**dot_i16x8_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**trunc_sat_f32x4_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**trunc_sat_f32x4_u**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**widen_low_i16x8_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**widen_high_i16x8_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**widen_low_i16x8_u**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**widen_high_i16x8_u**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**load16x4_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i32x4.**load16x4_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+>
+* Module#i64x2.**splat**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**extract_lane_s**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i64x2.**extract_lane_u**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i64x2.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**neg**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**any_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**all_true**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**shl**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**shr_s**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**shr_u**(vec: `ExpressionRef`, shift: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**add**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**sub**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**trunc_sat_f64x2_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**trunc_sat_f64x2_u**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**load32x2_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64x2.**load32x2_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+>
+* Module#f32x4.**splat**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**extract_lane**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#f32x4.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**ne**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**lt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**gt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**le**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**ge**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**abs**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**neg**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**sqrt**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**qfma**(a: `ExpressionRef`, b: `ExpressionRef`, c: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**qfms**(a: `ExpressionRef`, b: `ExpressionRef`, c: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**add**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**sub**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**mul**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**div**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**min**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**max**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**convert_i32x4_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32x4.**convert_i32x4_u**(value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#f64x2.**splat**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**extract_lane**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#f64x2.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**ne**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**lt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**gt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**le**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**ge**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**abs**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**neg**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**sqrt**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**qfma**(a: `ExpressionRef`, b: `ExpressionRef`, c: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**qfms**(a: `ExpressionRef`, b: `ExpressionRef`, c: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**add**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**sub**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**mul**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**div**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**min**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**max**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**convert_i64x2_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64x2.**convert_i64x2_u**(value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#v8x16.**shuffle**(left: `ExpressionRef`, right: `ExpressionRef`, mask: `Uint8Array[16]`): `ExpressionRef`
+* Module#v8x16.**swizzle**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#v8x16.**load_splat**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+>
+* Module#v16x8.**load_splat**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+>
+* Module#v32x4.**load_splat**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+>
+* Module#v64x2.**load_splat**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
 
 #### [Datatype conversions](http://webassembly.org/docs/semantics/#datatype-conversions-truncations-reinterpretations-promotions-and-demotions)
 

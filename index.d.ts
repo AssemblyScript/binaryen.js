@@ -695,6 +695,7 @@ declare module binaryen {
       le(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       gt(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     f64: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -731,11 +732,6 @@ declare module binaryen {
       le(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       gt(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-    };
-    anyref: {
-      pop(): ExpressionRef;
-    };
-    exnref: {
       pop(): ExpressionRef;
     };
     v128: {
@@ -743,13 +739,12 @@ declare module binaryen {
       store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
       const(value: number): ExpressionRef;
       not(value: ExpressionRef): ExpressionRef;
-      and(value: ExpressionRef): ExpressionRef;
-      or(value: ExpressionRef): ExpressionRef;
-      xor(value: ExpressionRef): ExpressionRef;
+      and(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      or(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      xor(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      andnot(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       bitselect(left: ExpressionRef, right: ExpressionRef, cond: ExpressionRef): ExpressionRef;
-    };
-    v8x16: {
-      shuffle(left: ExpressionRef, right: ExpressionRef, mask: number[]): ExpressionRef;
+      pop(): ExpressionRef;
     };
     i8x16: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -779,6 +774,12 @@ declare module binaryen {
       sub_saturate_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub_saturate_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i16x8_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i16x8_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
     };
     i16x8: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -808,6 +809,18 @@ declare module binaryen {
       sub_saturate_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub_saturate_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i32x4_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i32x4_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      widen_low_i8x16_s(value: ExpressionRef): ExpressionRef;
+      widen_high_i8x16_s(value: ExpressionRef): ExpressionRef;
+      widen_low_i8x16_u(value: ExpressionRef): ExpressionRef;
+      widen_high_i8x16_u(value: ExpressionRef): ExpressionRef;
+      load8x8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load8x8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
     i32x4: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -832,8 +845,14 @@ declare module binaryen {
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["trunc_s/f32x4:sat"](value: ExpressionRef): ExpressionRef;
-      ["trunc_u/f32x4:sat"](value: ExpressionRef): ExpressionRef;
+      trunc_sat_f32x4_s(value: ExpressionRef): ExpressionRef;
+      trunc_sat_f32x4_u(value: ExpressionRef): ExpressionRef;
+      widen_low_i16x8_s(value: ExpressionRef): ExpressionRef;
+      widen_high_i16x8_s(value: ExpressionRef): ExpressionRef;
+      widen_low_i16x8_u(value: ExpressionRef): ExpressionRef;
+      widen_high_i16x8_u(value: ExpressionRef): ExpressionRef;
+      load16x4_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load16x4_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
     i64x2: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -847,8 +866,10 @@ declare module binaryen {
       shr_u(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["trunc_s/f64x2:sat"](value: ExpressionRef): ExpressionRef;
-      ["trunc_u/f64x2:sat"](value: ExpressionRef): ExpressionRef;
+      trunc_sat_f64x2_s(value: ExpressionRef): ExpressionRef;
+      trunc_sat_f64x2_u(value: ExpressionRef): ExpressionRef;
+      load32x2_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load32x2_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
     f32x4: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -863,14 +884,16 @@ declare module binaryen {
       abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       sqrt(value: ExpressionRef): ExpressionRef;
+      qfma(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
+      qfms(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       div(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       min(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["convert_s/i32x4"](value: ExpressionRef): ExpressionRef;
-      ["convert_u/i32x4"](value: ExpressionRef): ExpressionRef;
+      convert_i32x4_s(value: ExpressionRef): ExpressionRef;
+      convert_i32x4_u(value: ExpressionRef): ExpressionRef;
     };
     f64x2: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -885,14 +908,36 @@ declare module binaryen {
       abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       sqrt(value: ExpressionRef): ExpressionRef;
+      qfma(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
+      qfms(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       div(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       min(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["convert_s/i64x2"](value: ExpressionRef): ExpressionRef;
-      ["convert_u/i64x2"](value: ExpressionRef): ExpressionRef;
+      convert_i64x2_s(value: ExpressionRef): ExpressionRef;
+      convert_i64x2_u(value: ExpressionRef): ExpressionRef;
+    };
+    v8x16: {
+      shuffle(left: ExpressionRef, right: ExpressionRef, mask: number[]): ExpressionRef;
+      swizzle(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    v16x8: {
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    v32x4: {
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    v64x2: {
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    anyref: {
+      pop(): ExpressionRef;
+    };
+    exnref: {
+      pop(): ExpressionRef;
     };
     atomic: {
       notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
