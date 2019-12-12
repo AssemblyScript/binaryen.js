@@ -1,3 +1,5 @@
+import { Expression } from "typescript";
+
 declare module binaryen {
 
   type Type = number;
@@ -45,15 +47,23 @@ declare module binaryen {
   const AtomicRMWId: ExpressionId;
   const AtomicWaitId: ExpressionId;
   const AtomicNotifyId: ExpressionId;
+  const AtomicFenceId: ExpressionId;
   const SIMDExtractId: ExpressionId;
   const SIMDReplaceId: ExpressionId;
   const SIMDShuffleId: ExpressionId;
-  const SIMDBitselectId: ExpressionId;
+  const SIMDTernaryId: ExpressionId;
   const SIMDShiftId: ExpressionId;
+  const SIMDLoadId: ExpressionId;
   const MemoryInitId: ExpressionId;
   const DataDropId: ExpressionId;
   const MemoryCopyId: ExpressionId;
   const MemoryFillId: ExpressionId;
+  const TryId: ExpressionId;
+  const ThrowId: ExpressionId;
+  const RethrowId: ExpressionId;
+  const BrOnExnId: ExpressionId;
+  const PushId: ExpressionId;
+  const PopId: ExpressionId;
 
   type ExternalKind = number;
 
@@ -61,6 +71,7 @@ declare module binaryen {
   const ExternalTable: ExternalKind;
   const ExternalMemory: ExternalKind;
   const ExternalGlobal: ExternalKind;
+  const ExternalEvent: ExternalKind;
 
   type FeatureFlags = number;
 
@@ -286,6 +297,8 @@ declare module binaryen {
   const AndVec128: Op;
   const OrVec128: Op;
   const XorVec128: Op;
+  const AndNotVec128: Op;
+  const BitselectVec128: Op;
   const NegVecI8x16: Op;
   const AnyTrueVecI8x16: Op;
   const AllTrueVecI8x16: Op;
@@ -299,6 +312,10 @@ declare module binaryen {
   const SubSatSVecI8x16: Op;
   const SubSatUVecI8x16: Op;
   const MulVecI8x16: Op;
+  const MinSVecI8x16: Op;
+  const MinUVecI8x16: Op;
+  const MaxSVecI8x16: Op;
+  const MaxUVecI8x16: Op;
   const NegVecI16x8: Op;
   const AnyTrueVecI16x8: Op;
   const AllTrueVecI16x8: Op;
@@ -312,6 +329,11 @@ declare module binaryen {
   const SubSatSVecI16x8: Op;
   const SubSatUVecI16x8: Op;
   const MulVecI16x8: Op;
+  const MinSVecI16x8: Op;
+  const MinUVecI16x8: Op;
+  const MaxSVecI16x8: Op;
+  const MaxUVecI16x8: Op;
+  const DotSVecI16x8ToVecI32x4: Op;
   const NegVecI32x4: Op;
   const AnyTrueVecI32x4: Op;
   const AllTrueVecI32x4: Op;
@@ -321,6 +343,10 @@ declare module binaryen {
   const AddVecI32x4: Op;
   const SubVecI32x4: Op;
   const MulVecI32x4: Op;
+  const MinSVecI32x4: Op;
+  const MinUVecI32x4: Op;
+  const MaxSVecI32x4: Op;
+  const MaxUVecI32x4: Op;
   const NegVecI64x2: Op;
   const AnyTrueVecI64x2: Op;
   const AllTrueVecI64x2: Op;
@@ -332,6 +358,8 @@ declare module binaryen {
   const AbsVecF32x4: Op;
   const NegVecF32x4: Op;
   const SqrtVecF32x4: Op;
+  const QFMAVecF32x4: Op;
+  const QFMSVecF32x4: Op;
   const AddVecF32x4: Op;
   const SubVecF32x4: Op;
   const MulVecF32x4: Op;
@@ -341,6 +369,8 @@ declare module binaryen {
   const AbsVecF64x2: Op;
   const NegVecF64x2: Op;
   const SqrtVecF64x2: Op;
+  const QFMAVecF64x2: Op;
+  const QFMSVecF64x2: Op;
   const AddVecF64x2: Op;
   const SubVecF64x2: Op;
   const MulVecF64x2: Op;
@@ -355,12 +385,35 @@ declare module binaryen {
   const ConvertUVecI32x4ToVecF32x4: Op;
   const ConvertSVecI64x2ToVecF64x2: Op;
   const ConvertUVecI64x2ToVecF64x2: Op;
+  const LoadSplatVec8x16: Op;
+  const LoadSplatVec16x8: Op;
+  const LoadSplatVec32x4: Op;
+  const LoadSplatVec64x2: Op;
+  const LoadExtSVec8x8ToVecI16x8: Op;
+  const LoadExtUVec8x8ToVecI16x8: Op;
+  const LoadExtSVec16x4ToVecI32x4: Op;
+  const LoadExtUVec16x4ToVecI32x4: Op;
+  const LoadExtSVec32x2ToVecI64x2: Op;
+  const LoadExtUVec32x2ToVecI64x2: Op;
+  const NarrowSVecI16x8ToVecI8x16: Op;
+  const NarrowUVecI16x8ToVecI8x16: Op;
+  const NarrowSVecI32x4ToVecI16x8: Op;
+  const NarrowUVecI32x4ToVecI16x8: Op;
+  const WidenLowSVecI8x16ToVecI16x8: Op;
+  const WidenHighSVecI8x16ToVecI16x8: Op;
+  const WidenLowUVecI8x16ToVecI16x8: Op;
+  const WidenHighUVecI8x16ToVecI16x8: Op;
+  const WidenLowSVecI16x8ToVecI32x4: Op;
+  const WidenHighSVecI16x8ToVecI32x4: Op;
+  const WidenLowUVecI16x8ToVecI32x4: Op;
+  const WidenHighUVecI16x8ToVecI32x4: Op;
+  const SwizzleVec8x16: Op;
 
   type ExpressionRef = number;
   type FunctionRef = number;
   type GlobalRef = number;
-  type ImportRef = number;
   type ExportRef = number;
+  type EventRef = number;
 
   interface MemorySegment {
     offset: ExpressionRef;
@@ -491,9 +544,10 @@ declare module binaryen {
           xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
-        }
+        },
+        wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       },
-      wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     i64: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -603,9 +657,10 @@ declare module binaryen {
           xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
-        }
+        },
+        wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       },
-      wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     f32: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -678,6 +733,12 @@ declare module binaryen {
       le(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       gt(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+    };
+    anyref: {
+      pop(): ExpressionRef;
+    };
+    exnref: {
+      pop(): ExpressionRef;
     };
     v128: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -835,34 +896,52 @@ declare module binaryen {
       ["convert_s/i64x2"](value: ExpressionRef): ExpressionRef;
       ["convert_u/i64x2"](value: ExpressionRef): ExpressionRef;
     };
+    atomic: {
+      notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
+      fence(): ExpressionRef;
+    };
+    try(body: Expression, catchBody: Expression): Expression;
+    throw(event: string, operands: Expression[]): Expression;
+    rethrow(exnref: Expression): Expression;
+    br_on_exn(label: string, event: string, exnref: Expression): Expression;
+    push(value: Expression): Expression;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
     host(op: Op, name: string, operands: ExpressionRef[]): ExpressionRef;
     nop(): ExpressionRef;
     unreachable(): ExpressionRef;
-    notify(ptr: ExpressionRef, wakeCount: ExpressionRef): ExpressionRef;
-
     addFunction(name: string, params: Type, results: Type, vars: Type[], body: ExpressionRef): FunctionRef;
     getFunction(name: string): FunctionRef;
     removeFunction(name: string): void;
+    getNumFunctions(): number;
+    getFunctionByIndex(index: number): FunctionRef;
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
     getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
-    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): ImportRef;
-    addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
-    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
-    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): ImportRef;
+    addEvent(name: string, attribute: number, params: Type, results: Type): EventRef;
+    getEvent(name: string): EventRef;
+    removeEvent(name: string): void;
+    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): void;
+    addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
+    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
+    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): void;
+    addEventImport(internalName: string, externalModuleName: string, externalBaseName: string, attribute: number, params: Type, results: Type): void;
     addFunctionExport(internalName: string, externalName: string): ExportRef;
     addTableExport(internalName: string, externalName: string): ExportRef;
     addMemoryExport(internalName: string, externalName: string): ExportRef;
     addGlobalExport(internalName: string, externalName: string): ExportRef;
     removeExport(externalName: string): void;
+    getNumExports(): number;
+    getExportByIndex(index: number): ExportRef;
     setFunctionTable(initial: number, maximum: number, funcs: number[]): void;
     setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, flags?: number[] | null, shared?: boolean): void;
+    getNumMemorySegments(): number;
+    getMemorySegmentInfoByIndex(index: number): MemorySegmentInfo;
     setStart(start: FunctionRef): void;
     getFeatures(): FeatureFlags;
     setFeatures(features: FeatureFlags): void;
+    addCustomSection(name: string, contents: Uint8Array): void;
     emitText(): string;
     emitStackIR(optimize?: boolean): string;
     emitAsmjs(): string;
@@ -879,6 +958,11 @@ declare module binaryen {
     addDebugInfoFileName(filename: string): number;
     getDebugInfoFileName(index: number): string | null;
     setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
+  }
+
+  interface MemorySegmentInfo {
+    byteOffset: number;
+    data: Uint8Array;
   }
 
   function wrapModule(ptr: number): Module;
