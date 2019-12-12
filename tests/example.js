@@ -3,7 +3,7 @@ var binaryen = require("..");
 // Create a module with a single function
 var myModule = new binaryen.Module();
 
-myModule.addFunction("add", myModule.addFunctionType("iii", binaryen.i32, [ binaryen.i32, binaryen.i32 ]), [ binaryen.i32 ],
+myModule.addFunction("add", binaryen.createType([ binaryen.i32, binaryen.i32 ]), binaryen.i32, [ binaryen.i32 ],
   myModule.block(null, [
     myModule.local.set(2,
       myModule.i32.add(

@@ -18,7 +18,7 @@ var binaryen = require("binaryen");
 // Create a module with a single function
 var myModule = new binaryen.Module();
 
-myModule.addFunction("add", myModule.addFunctionType("iii", binaryen.i32, [ binaryen.i32, binaryen.i32 ]), [ binaryen.i32 ],
+myModule.addFunction("add", binaryen.createType([ binaryen.i32, binaryen.i32 ]), binaryen.i32, [ binaryen.i32 ],
   myModule.block(null, [
     myModule.setLocal(2,
       myModule.i32.add(
@@ -71,7 +71,6 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
 
 API
 ---
-<!-- START API.md -->
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -132,6 +131,12 @@ API
  * **auto**: `Type`<br />
    Special type used in **Module#block** exclusively. Lets the API figure out a block's result type automatically.
 
+ * **createType**(types: `Type[]`): `Type`<br />
+   Creates a multi-value type from an array of types.
+
+ * **expandType**(type: `Type`): `Type[]`<br />
+   Expands a multi-value type to an array of types.
+
 ### Module construction
 
  * new **Module**(): `Module`<br />
@@ -145,17 +150,8 @@ API
 
 ### Module manipulation
 
-* Module#**addFunctionType**(name: `string`, resultType: `Type`, paramTypes: `Type[]`): `Signature`<br />
-  Adds a new function type.
-
-* Module#**getFunctionTypeBySignature**(resultType: `Type`, paramTypes: `Type[]`): `Signature`<br />
-  Gets an existing function type by its parametric signature. Returns `0` if there is no such function type.
-
-* Module#**removeFunctionType**(name: `string`): `void`<br />
-  Removes a function type.
-
-* Module#**addFunction**(name: `string`, functionType: `Signature`, varTypes: `Type[]`, body: `Expression`): `Function`<br />
-  Adds a function. `varTypes` indicate additional locals, in the given order.
+* Module#**addFunction**(name: `string`, params: `Type`, results: `Type`, vars: `Type[]`, body: `Expression`): `Function`<br />
+  Adds a function. `vars` indicate additional locals, in the given order.
 
 * Module#**getFunction**(name: `string`): `Function`<br />
   Gets a function, by name,
@@ -163,7 +159,7 @@ API
 * Module#**removeFunction**(name: `string`): `void`<br />
   Removes a function, by name.
 
-* Module#**addFunctionImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, functionType: `Signature`): `Import`<br />
+* Module#**addFunctionImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, params: `Type`, results: `Type`): `Import`<br />
   Adds a function import.
 
 * Module#**addTableImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`): `Import`<br />
@@ -211,22 +207,14 @@ API
 * Module#**autoDrop**(): `void`<br />
   Enables automatic insertion of `drop` operations where needed. Lets you not worry about dropping when creating your code.
 
-* **getFunctionTypeInfo**(ftype: `FunctionType`: `FunctionTypeInfo`<br />
-  Obtains information about a function type.
-
-  * FunctionTypeInfo#**name**: `string | null`
-  * FunctionTypeInfo#**params**: `Type[]`
-  * FunctionTypeInfo#**result**: `Type`
-
 * **getFunctionInfo**(ftype: `Function`: `FunctionInfo`<br />
   Obtains information about a function.
 
   * FunctionInfo#**name**: `string`
   * FunctionInfo#**module**: `string | null` (if imported)
   * FunctionInfo#**base**: `string | null` (if imported)
-  * FunctionInfo#**type**: `FunctionType`
-  * FunctionInfo#**params**: `Type[]`
-  * FunctionInfo#**result**: `Type`
+  * FunctionInfo#**params**: `Type`
+  * FunctionInfo#**results**: `Type`
   * FunctionInfo#**vars**: `Type`
   * FunctionInfo#**body**: `Expression`
 
@@ -513,11 +501,17 @@ API
 
 #### [Function calls](http://webassembly.org/docs/semantics/#calls)
 
-* Module#**call**(name: `string`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
-  Creates a call to a function. Note that we must specify the return type here as we may not have created the function being called yet.
+* Module#**call**(name: `string`, operands: `Expression[]`, params: `Type`, results: `Type`): `Expression`<br />
+  Creates a call to a function. Note that we must specify the parameter and result type here.
 
-* Module#**call_indirect/callIndirect**(target: `Expression`, operands: `Expression[]`, returnType: `Type`): `Expression`<br />
+* Module#**return_call**(name: `string`, operands: `Expression[]`, params: `Type`, results: `Type`): `Expression`<br />
+  Like **call**, but creates a tail-call. 🦄
+
+* Module#**call_indirect**(target: `Expression`, operands: `Expression[]`, params: `Type`, results: `Type`): `Expression`<br />
   Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
+
+* Module#**return_call_indirect**(target: `Expression`, operands: `Expression[]`, params: `Type`, results: `Type`): `Expression`<br />
+  Like **call_indirect**, but creates a tail-call. 🦄
 
 #### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
 
@@ -818,5 +812,3 @@ API
 
 * Module#**interpret**(): `void`<br />
   Runs the module in the interpreter, calling the start function.
-
-<!-- END API.md -->

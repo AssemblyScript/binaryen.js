@@ -8,9 +8,13 @@ declare module binaryen {
   const f32: Type;
   const f64: Type;
   const v128: Type;
-  const except_ref: Type;
+  const anyref: Type;
+  const exnref: Type;
   const unreachable: Type;
   const auto: Type;
+
+  function createType(types: Type[]): Type;
+  function expandType(type: Type): Type[];
 
   type ExpressionId = number;
 
@@ -353,7 +357,6 @@ declare module binaryen {
   const ConvertUVecI64x2ToVecF64x2: Op;
 
   type ExpressionRef = number;
-  type FunctionTypeRef = number;
   type FunctionRef = number;
   type GlobalRef = number;
   type ImportRef = number;
@@ -373,8 +376,10 @@ declare module binaryen {
     loop(label: string, body: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
-    call(name: string, operands: ExpressionRef[], type: Type): ExpressionRef;
-    call_indirect(target: ExpressionRef, operands: ExpressionRef[], type: Type): ExpressionRef;
+    call(name: string, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    return_call(name: string, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    call_indirect(target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    return_call_indirect(target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
     local: {
       get(index: number, type: Type): ExpressionRef;
       set(index: number, value: ExpressionRef): ExpressionRef;
@@ -838,16 +843,13 @@ declare module binaryen {
     unreachable(): ExpressionRef;
     notify(ptr: ExpressionRef, wakeCount: ExpressionRef): ExpressionRef;
 
-    addFunctionType(name: string, resultType: Type, paramTypes: Type[]): FunctionTypeRef;
-    getFunctionTypeBySignature(resultType: Type, paramTypes: Type[]): FunctionTypeRef;
-    removeFunctionType(name: string): void;
-    addFunction(name: string, functionType: FunctionTypeRef, varTypes: Type[], body: ExpressionRef): FunctionRef;
+    addFunction(name: string, params: Type, results: Type, vars: Type[], body: ExpressionRef): FunctionRef;
     getFunction(name: string): FunctionRef;
     removeFunction(name: string): void;
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
     getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
-    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, functionType: FunctionTypeRef): ImportRef;
+    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): ImportRef;
     addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
     addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
     addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): ImportRef;
@@ -1089,23 +1091,14 @@ declare module binaryen {
     size: ExpressionRef;
   }
 
-  function getFunctionTypeInfo(ftype: FunctionTypeRef): FunctionTypeInfo;
-
-  interface FunctionTypeInfo {
-    name: string;
-    params: Type[];
-    result: Type;
-  }
-
   function getFunctionInfo(func: FunctionRef): FunctionInfo;
 
   interface FunctionInfo {
     name: string;
     module: string | null;
     base: string | null;
-    type: FunctionTypeRef;
-    params: Type[];
-    result: Type;
+    params: Type;
+    results: Type;
     vars: Type[];
     body: ExpressionRef;
   }

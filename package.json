@@ -17,7 +17,7 @@
     "wasm-opt": "bin/wasm-opt"
   },
   "scripts": {
-    "readme": "doctoc API.md --github --title \"### Contents\" && node scripts/api",
+    "readme": "doctoc README.md --github --title \"### Contents\"",
     "check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
     "test": "npm run check && node tests/sanity && node tests/example"
   },
@@ -30,11 +30,11 @@
     "bin/wasm-opt"
   ],
   "devDependencies": {
-    "dateformat": "^2.2.0",
+    "dateformat": "^3.0.3",
     "doctoc": "^1.4.0",
-    "semver": "^5.7.1",
-    "simple-git": "^1.126.0",
-    "typescript": "^2.9.2"
+    "semver": "^6.3.0",
+    "simple-git": "^1.128.0",
+    "typescript": "^3.7.3"
   },
   "dependencies": {}
 }

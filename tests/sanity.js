@@ -11,10 +11,6 @@ console.log("constructing a module");
 var mod = new binaryen.Module();
 assert(mod);
 
-console.log("adding a function type");
-var ftype = mod.addFunctionType("i", binaryen.i32, []);
-assert(ftype);
-
 console.log("creating an expression");
 var expr = mod.i32.const(0);
 assert(expr);
@@ -24,11 +20,15 @@ var stmt = mod.return(expr);
 assert(stmt);
 
 console.log("adding a function");
-var func = mod.addFunction("main", ftype, [], stmt);
+var func = mod.addFunction("main", binaryen.none, binaryen.i32, [], stmt);
 assert(func);
 
+console.log("creating a multi-value type");
+var mvtype = binaryen.createType([ binaryen.i32, binaryen.f64 ]);
+assert(mvtype);
+
 console.log("adding a function import");
-mod.addFunctionImport("func", "env", "func", ftype);
+mod.addFunctionImport("func", "env", "func", mvtype, mvtype);
 
 console.log("adding a function export");
 mod.addFunctionExport("main", "main");
