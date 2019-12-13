@@ -434,7 +434,7 @@ declare module binaryen {
     local: {
       get(index: number, type: Type): ExpressionRef;
       set(index: number, value: ExpressionRef): ExpressionRef;
-      tee(index: number, value: ExpressionRef): ExpressionRef;
+      tee(index: number, value: ExpressionRef, type: Type): ExpressionRef;
     };
     global: {
       get(name: string, type: Type): ExpressionRef;

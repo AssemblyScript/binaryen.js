@@ -405,16 +405,16 @@ API
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
 
 * Module#**local.get**(index: `number`, type: `Type`): `ExpressionRef`<br />
-  Creates a local.get for the local at the specified index. Note that we must specify the type here as we may not have created the local being called yet.
+  Creates a local.get for the local at the specified index. Note that we must specify the type here as we may not have created the local being accessed yet.
 
 * Module#**local.set**(index: `number`, value: `ExpressionRef`): `ExpressionRef`<br />
   Creates a local.set for the local at the specified index.
 
-* Module#**local.tee**(index: `number`, value: `ExpressionRef`): `ExpressionRef`<br />
-  Creates a local.tee for the local at the specified index. A tee differs from a set in that the value remains on the stack.
+* Module#**local.tee**(index: `number`, value: `ExpressionRef`, type: `Type`): `ExpressionRef`<br />
+  Creates a local.tee for the local at the specified index. A tee differs from a set in that the value remains on the stack. Note that we must specify the type here as we may not have created the local being accessed yet.
 
 * Module#**global.get**(name: `string`, type: `Type`): `ExpressionRef`<br />
-  Creates a global.get for the global with the specified name. Note that we must specify the type here as we may not have created the global being called yet.
+  Creates a global.get for the global with the specified name. Note that we must specify the type here as we may not have created the global being accessed yet.
 
 * Module#**global.set**(name: `string`, value: `ExpressionRef`): `ExpressionRef`<br />
   Creates a global.set for the global with the specified name.
