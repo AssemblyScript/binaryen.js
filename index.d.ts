@@ -45,15 +45,23 @@ declare module binaryen {
   const AtomicRMWId: ExpressionId;
   const AtomicWaitId: ExpressionId;
   const AtomicNotifyId: ExpressionId;
+  const AtomicFenceId: ExpressionId;
   const SIMDExtractId: ExpressionId;
   const SIMDReplaceId: ExpressionId;
   const SIMDShuffleId: ExpressionId;
-  const SIMDBitselectId: ExpressionId;
+  const SIMDTernaryId: ExpressionId;
   const SIMDShiftId: ExpressionId;
+  const SIMDLoadId: ExpressionId;
   const MemoryInitId: ExpressionId;
   const DataDropId: ExpressionId;
   const MemoryCopyId: ExpressionId;
   const MemoryFillId: ExpressionId;
+  const TryId: ExpressionId;
+  const ThrowId: ExpressionId;
+  const RethrowId: ExpressionId;
+  const BrOnExnId: ExpressionId;
+  const PushId: ExpressionId;
+  const PopId: ExpressionId;
 
   type ExternalKind = number;
 
@@ -61,6 +69,7 @@ declare module binaryen {
   const ExternalTable: ExternalKind;
   const ExternalMemory: ExternalKind;
   const ExternalGlobal: ExternalKind;
+  const ExternalEvent: ExternalKind;
 
   type FeatureFlags = number;
 
@@ -286,6 +295,8 @@ declare module binaryen {
   const AndVec128: Op;
   const OrVec128: Op;
   const XorVec128: Op;
+  const AndNotVec128: Op;
+  const BitselectVec128: Op;
   const NegVecI8x16: Op;
   const AnyTrueVecI8x16: Op;
   const AllTrueVecI8x16: Op;
@@ -299,6 +310,10 @@ declare module binaryen {
   const SubSatSVecI8x16: Op;
   const SubSatUVecI8x16: Op;
   const MulVecI8x16: Op;
+  const MinSVecI8x16: Op;
+  const MinUVecI8x16: Op;
+  const MaxSVecI8x16: Op;
+  const MaxUVecI8x16: Op;
   const NegVecI16x8: Op;
   const AnyTrueVecI16x8: Op;
   const AllTrueVecI16x8: Op;
@@ -312,6 +327,11 @@ declare module binaryen {
   const SubSatSVecI16x8: Op;
   const SubSatUVecI16x8: Op;
   const MulVecI16x8: Op;
+  const MinSVecI16x8: Op;
+  const MinUVecI16x8: Op;
+  const MaxSVecI16x8: Op;
+  const MaxUVecI16x8: Op;
+  const DotSVecI16x8ToVecI32x4: Op;
   const NegVecI32x4: Op;
   const AnyTrueVecI32x4: Op;
   const AllTrueVecI32x4: Op;
@@ -321,6 +341,10 @@ declare module binaryen {
   const AddVecI32x4: Op;
   const SubVecI32x4: Op;
   const MulVecI32x4: Op;
+  const MinSVecI32x4: Op;
+  const MinUVecI32x4: Op;
+  const MaxSVecI32x4: Op;
+  const MaxUVecI32x4: Op;
   const NegVecI64x2: Op;
   const AnyTrueVecI64x2: Op;
   const AllTrueVecI64x2: Op;
@@ -332,6 +356,8 @@ declare module binaryen {
   const AbsVecF32x4: Op;
   const NegVecF32x4: Op;
   const SqrtVecF32x4: Op;
+  const QFMAVecF32x4: Op;
+  const QFMSVecF32x4: Op;
   const AddVecF32x4: Op;
   const SubVecF32x4: Op;
   const MulVecF32x4: Op;
@@ -341,6 +367,8 @@ declare module binaryen {
   const AbsVecF64x2: Op;
   const NegVecF64x2: Op;
   const SqrtVecF64x2: Op;
+  const QFMAVecF64x2: Op;
+  const QFMSVecF64x2: Op;
   const AddVecF64x2: Op;
   const SubVecF64x2: Op;
   const MulVecF64x2: Op;
@@ -355,12 +383,35 @@ declare module binaryen {
   const ConvertUVecI32x4ToVecF32x4: Op;
   const ConvertSVecI64x2ToVecF64x2: Op;
   const ConvertUVecI64x2ToVecF64x2: Op;
+  const LoadSplatVec8x16: Op;
+  const LoadSplatVec16x8: Op;
+  const LoadSplatVec32x4: Op;
+  const LoadSplatVec64x2: Op;
+  const LoadExtSVec8x8ToVecI16x8: Op;
+  const LoadExtUVec8x8ToVecI16x8: Op;
+  const LoadExtSVec16x4ToVecI32x4: Op;
+  const LoadExtUVec16x4ToVecI32x4: Op;
+  const LoadExtSVec32x2ToVecI64x2: Op;
+  const LoadExtUVec32x2ToVecI64x2: Op;
+  const NarrowSVecI16x8ToVecI8x16: Op;
+  const NarrowUVecI16x8ToVecI8x16: Op;
+  const NarrowSVecI32x4ToVecI16x8: Op;
+  const NarrowUVecI32x4ToVecI16x8: Op;
+  const WidenLowSVecI8x16ToVecI16x8: Op;
+  const WidenHighSVecI8x16ToVecI16x8: Op;
+  const WidenLowUVecI8x16ToVecI16x8: Op;
+  const WidenHighUVecI8x16ToVecI16x8: Op;
+  const WidenLowSVecI16x8ToVecI32x4: Op;
+  const WidenHighSVecI16x8ToVecI32x4: Op;
+  const WidenLowUVecI16x8ToVecI32x4: Op;
+  const WidenHighUVecI16x8ToVecI32x4: Op;
+  const SwizzleVec8x16: Op;
 
   type ExpressionRef = number;
   type FunctionRef = number;
   type GlobalRef = number;
-  type ImportRef = number;
   type ExportRef = number;
+  type EventRef = number;
 
   interface MemorySegment {
     offset: ExpressionRef;
@@ -383,7 +434,7 @@ declare module binaryen {
     local: {
       get(index: number, type: Type): ExpressionRef;
       set(index: number, value: ExpressionRef): ExpressionRef;
-      tee(index: number, value: ExpressionRef): ExpressionRef;
+      tee(index: number, value: ExpressionRef, type: Type): ExpressionRef;
     };
     global: {
       get(name: string, type: Type): ExpressionRef;
@@ -491,9 +542,10 @@ declare module binaryen {
           xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
-        }
+        },
+        wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       },
-      wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     i64: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -603,9 +655,10 @@ declare module binaryen {
           xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
-        }
+        },
+        wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       },
-      wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     f32: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -642,6 +695,7 @@ declare module binaryen {
       le(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       gt(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     f64: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
@@ -678,19 +732,19 @@ declare module binaryen {
       le(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       gt(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      pop(): ExpressionRef;
     };
     v128: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
       store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
       const(value: number): ExpressionRef;
       not(value: ExpressionRef): ExpressionRef;
-      and(value: ExpressionRef): ExpressionRef;
-      or(value: ExpressionRef): ExpressionRef;
-      xor(value: ExpressionRef): ExpressionRef;
+      and(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      or(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      xor(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      andnot(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       bitselect(left: ExpressionRef, right: ExpressionRef, cond: ExpressionRef): ExpressionRef;
-    };
-    v8x16: {
-      shuffle(left: ExpressionRef, right: ExpressionRef, mask: number[]): ExpressionRef;
+      pop(): ExpressionRef;
     };
     i8x16: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -720,6 +774,12 @@ declare module binaryen {
       sub_saturate_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub_saturate_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i16x8_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i16x8_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
     };
     i16x8: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -749,6 +809,18 @@ declare module binaryen {
       sub_saturate_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub_saturate_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i32x4_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      narrow_i32x4_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      widen_low_i8x16_s(value: ExpressionRef): ExpressionRef;
+      widen_high_i8x16_s(value: ExpressionRef): ExpressionRef;
+      widen_low_i8x16_u(value: ExpressionRef): ExpressionRef;
+      widen_high_i8x16_u(value: ExpressionRef): ExpressionRef;
+      load8x8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load8x8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
     i32x4: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -773,8 +845,14 @@ declare module binaryen {
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["trunc_s/f32x4:sat"](value: ExpressionRef): ExpressionRef;
-      ["trunc_u/f32x4:sat"](value: ExpressionRef): ExpressionRef;
+      trunc_sat_f32x4_s(value: ExpressionRef): ExpressionRef;
+      trunc_sat_f32x4_u(value: ExpressionRef): ExpressionRef;
+      widen_low_i16x8_s(value: ExpressionRef): ExpressionRef;
+      widen_high_i16x8_s(value: ExpressionRef): ExpressionRef;
+      widen_low_i16x8_u(value: ExpressionRef): ExpressionRef;
+      widen_high_i16x8_u(value: ExpressionRef): ExpressionRef;
+      load16x4_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load16x4_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
     i64x2: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -788,8 +866,10 @@ declare module binaryen {
       shr_u(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["trunc_s/f64x2:sat"](value: ExpressionRef): ExpressionRef;
-      ["trunc_u/f64x2:sat"](value: ExpressionRef): ExpressionRef;
+      trunc_sat_f64x2_s(value: ExpressionRef): ExpressionRef;
+      trunc_sat_f64x2_u(value: ExpressionRef): ExpressionRef;
+      load32x2_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load32x2_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
     f32x4: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -804,14 +884,16 @@ declare module binaryen {
       abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       sqrt(value: ExpressionRef): ExpressionRef;
+      qfma(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
+      qfms(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       div(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       min(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["convert_s/i32x4"](value: ExpressionRef): ExpressionRef;
-      ["convert_u/i32x4"](value: ExpressionRef): ExpressionRef;
+      convert_i32x4_s(value: ExpressionRef): ExpressionRef;
+      convert_i32x4_u(value: ExpressionRef): ExpressionRef;
     };
     f64x2: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -826,43 +908,83 @@ declare module binaryen {
       abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       sqrt(value: ExpressionRef): ExpressionRef;
+      qfma(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
+      qfms(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       div(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       min(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      ["convert_s/i64x2"](value: ExpressionRef): ExpressionRef;
-      ["convert_u/i64x2"](value: ExpressionRef): ExpressionRef;
+      convert_i64x2_s(value: ExpressionRef): ExpressionRef;
+      convert_i64x2_u(value: ExpressionRef): ExpressionRef;
     };
+    v8x16: {
+      shuffle(left: ExpressionRef, right: ExpressionRef, mask: number[]): ExpressionRef;
+      swizzle(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    v16x8: {
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    v32x4: {
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    v64x2: {
+      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+    };
+    anyref: {
+      pop(): ExpressionRef;
+    };
+    exnref: {
+      pop(): ExpressionRef;
+    };
+    atomic: {
+      notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
+      fence(): ExpressionRef;
+    };
+    try(body: ExpressionRef, catchBody: ExpressionRef): ExpressionRef;
+    throw(event: string, operands: ExpressionRef[]): ExpressionRef;
+    rethrow(exnref: ExpressionRef): ExpressionRef;
+    br_on_exn(label: string, event: string, exnref: ExpressionRef): ExpressionRef;
+    push(value: ExpressionRef): ExpressionRef;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
     host(op: Op, name: string, operands: ExpressionRef[]): ExpressionRef;
     nop(): ExpressionRef;
     unreachable(): ExpressionRef;
-    notify(ptr: ExpressionRef, wakeCount: ExpressionRef): ExpressionRef;
-
     addFunction(name: string, params: Type, results: Type, vars: Type[], body: ExpressionRef): FunctionRef;
     getFunction(name: string): FunctionRef;
     removeFunction(name: string): void;
+    getNumFunctions(): number;
+    getFunctionByIndex(index: number): FunctionRef;
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
     getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
-    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): ImportRef;
-    addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
-    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): ImportRef;
-    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): ImportRef;
+    addEvent(name: string, attribute: number, params: Type, results: Type): EventRef;
+    getEvent(name: string): EventRef;
+    removeEvent(name: string): void;
+    addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): void;
+    addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
+    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
+    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): void;
+    addEventImport(internalName: string, externalModuleName: string, externalBaseName: string, attribute: number, params: Type, results: Type): void;
     addFunctionExport(internalName: string, externalName: string): ExportRef;
     addTableExport(internalName: string, externalName: string): ExportRef;
     addMemoryExport(internalName: string, externalName: string): ExportRef;
     addGlobalExport(internalName: string, externalName: string): ExportRef;
     removeExport(externalName: string): void;
+    getNumExports(): number;
+    getExportByIndex(index: number): ExportRef;
     setFunctionTable(initial: number, maximum: number, funcs: number[]): void;
     setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, flags?: number[] | null, shared?: boolean): void;
+    getNumMemorySegments(): number;
+    getMemorySegmentInfoByIndex(index: number): MemorySegmentInfo;
     setStart(start: FunctionRef): void;
     getFeatures(): FeatureFlags;
     setFeatures(features: FeatureFlags): void;
+    addCustomSection(name: string, contents: Uint8Array): void;
     emitText(): string;
     emitStackIR(optimize?: boolean): string;
     emitAsmjs(): string;
@@ -879,6 +1001,11 @@ declare module binaryen {
     addDebugInfoFileName(filename: string): number;
     getDebugInfoFileName(index: number): string | null;
     setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
+  }
+
+  interface MemorySegmentInfo {
+    byteOffset: number;
+    data: Uint8Array;
   }
 
   function wrapModule(ptr: number): Module;
@@ -1037,6 +1164,10 @@ declare module binaryen {
     notifyCount: ExpressionRef;
   }
 
+  interface AtomicFenceInfo extends ExpressionInfo {
+    order: number;
+  }
+
   interface SIMDExtractInfo extends ExpressionInfo {
     op: Op;
     vec: ExpressionRef;
@@ -1056,16 +1187,24 @@ declare module binaryen {
     mask: number[];
   }
 
-  interface SIMDBitselectInfo extends ExpressionInfo {
-    left: ExpressionRef;
-    right: ExpressionRef;
-    cond: ExpressionRef;
+  interface SIMDTernaryInfo extends ExpressionInfo {
+    op: Op;
+    a: ExpressionRef;
+    b: ExpressionRef;
+    c: ExpressionRef;
   }
 
   interface SIMDShiftInfo extends ExpressionInfo {
     op: Op;
     vec: ExpressionRef;
     shift: ExpressionRef;
+  }
+
+  interface SIMDLoadInfo extends ExpressionInfo {
+    op: Op;
+    offset: number;
+    align: number;
+    ptr: ExpressionRef;
   }
 
   interface MemoryInitInfo extends ExpressionInfo {
@@ -1089,6 +1228,34 @@ declare module binaryen {
     dest: ExpressionRef;
     value: ExpressionRef;
     size: ExpressionRef;
+  }
+
+  interface TryInfo extends ExpressionInfo {
+    body: ExpressionRef;
+    catchBody: ExpressionRef;
+  }
+
+  interface ThrowInfo extends ExpressionInfo {
+    event: string;
+    operands: ExpressionRef[];
+  }
+
+  interface RethrowInfo extends ExpressionInfo {
+    exnref: ExpressionRef;
+  }
+
+  interface BrOnExnInfo extends ExpressionInfo {
+    name: string;
+    event: string;
+    exnref: ExpressionRef;
+  }
+
+  interface PopInfo extends ExpressionInfo {
+  }
+
+  interface PushInfo extends ExpressionInfo {
+    type: never; // ?
+    value: ExpressionRef;
   }
 
   function getFunctionInfo(func: FunctionRef): FunctionInfo;
@@ -1122,7 +1289,18 @@ declare module binaryen {
     value: string;
   }
 
-  function emitText(expression: ExpressionRef): string;
+  function getEventInfo(event: EventRef): EventInfo;
+
+  interface EventInfo {
+    name: string;
+    module: string | null;
+    base: string | null;
+    attribute: number;
+    params: Type;
+    results: Type;
+  }
+
+  function emitText(expression: ExpressionRef | Module): string;
   function readBinary(data: Uint8Array): Module;
   function parseText(text: string): Module;
   function getOptimizeLevel(): number;
