@@ -299,6 +299,16 @@ API
   * **ExternalGlobal**: `ExternalKind`
   * **ExternalEvent**: `ExternalKind`
 
+* **getEventInfo**(event: `EventRef`): `EventInfo`<br />
+  Obtains information about an event.
+
+  * EventInfo#**name**: `string`
+  * EventInfo#**module**: `string | null` (if imported)
+  * EventInfo#**base**: `string | null` (if imported)
+  * EventInfo#**attribute**: `number`
+  * EventInfo#**params**: `Type`
+  * EventInfo#**results**: `Type`
+
 ### Module validation
 
 * Module#**validate**(): `boolean`<br />
@@ -521,7 +531,7 @@ API
 
 #### [Vector operations](https://github.com/WebAssembly/simd/blob/master/proposals/simd/SIMD.md) 🦄
 
-* Module#v128.**const**(bytes: `Uint8Array[16]`): `ExpressionRef`
+* Module#v128.**const**(bytes: `Uint8Array`): `ExpressionRef`
 * Module#v128.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
 * Module#v128.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
 * Module#v128.**not**(value: `ExpressionRef`): `ExpressionRef`
@@ -705,7 +715,7 @@ API
 * Module#f64x2.**convert_i64x2_s**(value: `ExpressionRef`): `ExpressionRef`
 * Module#f64x2.**convert_i64x2_u**(value: `ExpressionRef`): `ExpressionRef`
 >
-* Module#v8x16.**shuffle**(left: `ExpressionRef`, right: `ExpressionRef`, mask: `Uint8Array[16]`): `ExpressionRef`
+* Module#v8x16.**shuffle**(left: `ExpressionRef`, right: `ExpressionRef`, mask: `Uint8Array`): `ExpressionRef`
 * Module#v8x16.**swizzle**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#v8x16.**load_splat**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
 >
@@ -1036,6 +1046,10 @@ API
   >
   * ReturnInfo#**value**: `ExpressionRef | null`
   >
+  * NopInfo
+  >
+  * UnreachableInfo
+  >
   * HostInfo#**op**: `number`
   * HostInfo#**nameOperand**: `string | null`
   * HostInfo#**operands**: `ExpressionRef[]`
@@ -1057,10 +1071,68 @@ API
   * AtomicWaitInfo#**timeout**: `ExpressionRef`
   * AtomicWaitInfo#**expectedType**: `Type`
   >
-  * AtomicWakeInfo#**ptr**: `ExpressionRef`
-  * AtomicWakeInfo#**wakeCount**: `ExpressionRef`
-
-  NopInfo and UnreachableInfo do not include any additional properties.
+  * AtomicNotifyInfo#**ptr**: `ExpressionRef`
+  * AtomicNotifyInfo#**notifyCount**: `ExpressionRef`
+  >
+  * AtomicFenceInfo
+  >
+  * SIMDExtractInfo#**op**: `Op`
+  * SIMDExtractInfo#**vec**: `ExpressionRef`
+  * SIMDExtractInfo#**index**: `ExpressionRef`
+  >
+  * SIMDReplaceInfo#**op**: `Op`
+  * SIMDReplaceInfo#**vec**: `ExpressionRef`
+  * SIMDReplaceInfo#**index**: `ExpressionRef`
+  * SIMDReplaceInfo#**value**: `ExpressionRef`
+  >
+  * SIMDShuffleInfo#**left**: `ExpressionRef`
+  * SIMDShuffleInfo#**right**: `ExpressionRef`
+  * SIMDShuffleInfo#**mask**: `Uint8Array`
+  > 
+  * SIMDTernaryInfo#**op**: `Op`
+  * SIMDTernaryInfo#**a**: `ExpressionRef`
+  * SIMDTernaryInfo#**b**: `ExpressionRef`
+  * SIMDTernaryInfo#**c**: `ExpressionRef`
+  >
+  * SIMDShiftInfo#**op**: `Op`
+  * SIMDShiftInfo#**vec**: `ExpressionRef`
+  * SIMDShiftInfo#**shift**: `ExpressionRef`
+  >
+  * SIMDLoadInfo#**op**: `Op`
+  * SIMDLoadInfo#**offset**: `number`
+  * SIMDLoadInfo#**align**: `number`
+  * SIMDLoadInfo#**ptr**: `ExpressionRef`
+  >
+  * MemoryInitInfo#**segment**: `number`
+  * MemoryInitInfo#**dest**: `ExpressionRef`
+  * MemoryInitInfo#**offset**: `ExpressionRef`
+  * MemoryInitInfo#**size**: `ExpressionRef`
+  >
+  * MemoryDropInfo#**segment**: `number`
+  >
+  * MemoryCopyInfo#**dest**: `ExpressionRef`
+  * MemoryCopyInfo#**source**: `ExpressionRef`
+  * MemoryCopyInfo#**size**: `ExpressionRef`
+  >
+  * MemoryFillInfo#**dest**: `ExpressionRef`
+  * MemoryFillInfo#**value**: `ExpressionRef`
+  * MemoryFillInfo#**size**: `ExpressionRef`
+  >
+  * TryInfo#**body**: `ExpressionRef`
+  * TryInfo#**catchBody**: `ExpressionRef`
+  >
+  * ThrowInfo#**event**: `string`
+  * ThrowInfo#**operands**: `ExpressionRef[]`
+  >
+  * RethrowInfo#**exnref**: `ExpressionRef`
+  >
+  * BrOnExnInfo#**name**: `string`
+  * BrOnExnInfo#**event**: `string`
+  * BrOnExnInfo#**exnref**: `ExpressionRef`
+  >
+  * PopInfo
+  >
+  * PushInfo#**value**: `ExpressionRef`
 
 ### Relooper
 

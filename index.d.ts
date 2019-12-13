@@ -1164,6 +1164,10 @@ declare module binaryen {
     notifyCount: ExpressionRef;
   }
 
+  interface AtomicFenceInfo extends ExpressionInfo {
+    order: number;
+  }
+
   interface SIMDExtractInfo extends ExpressionInfo {
     op: Op;
     vec: ExpressionRef;
@@ -1183,16 +1187,24 @@ declare module binaryen {
     mask: number[];
   }
 
-  interface SIMDBitselectInfo extends ExpressionInfo {
-    left: ExpressionRef;
-    right: ExpressionRef;
-    cond: ExpressionRef;
+  interface SIMDTernaryInfo extends ExpressionInfo {
+    op: Op;
+    a: ExpressionRef;
+    b: ExpressionRef;
+    c: ExpressionRef;
   }
 
   interface SIMDShiftInfo extends ExpressionInfo {
     op: Op;
     vec: ExpressionRef;
     shift: ExpressionRef;
+  }
+
+  interface SIMDLoadInfo extends ExpressionInfo {
+    op: Op;
+    offset: number;
+    align: number;
+    ptr: ExpressionRef;
   }
 
   interface MemoryInitInfo extends ExpressionInfo {
@@ -1216,6 +1228,34 @@ declare module binaryen {
     dest: ExpressionRef;
     value: ExpressionRef;
     size: ExpressionRef;
+  }
+
+  interface TryInfo extends ExpressionInfo {
+    body: ExpressionRef;
+    catchBody: ExpressionRef;
+  }
+
+  interface ThrowInfo extends ExpressionInfo {
+    event: string;
+    operands: ExpressionRef[];
+  }
+
+  interface RethrowInfo extends ExpressionInfo {
+    exnref: ExpressionRef;
+  }
+
+  interface BrOnExnInfo extends ExpressionInfo {
+    name: string;
+    event: string;
+    exnref: ExpressionRef;
+  }
+
+  interface PopInfo extends ExpressionInfo {
+  }
+
+  interface PushInfo extends ExpressionInfo {
+    type: never; // ?
+    value: ExpressionRef;
   }
 
   function getFunctionInfo(func: FunctionRef): FunctionInfo;
@@ -1247,6 +1287,17 @@ declare module binaryen {
     kind: ExternalKind;
     name: string;
     value: string;
+  }
+
+  function getEventInfo(event: EventRef): EventInfo;
+
+  interface EventInfo {
+    name: string;
+    module: string | null;
+    base: string | null;
+    attribute: number;
+    params: Type;
+    results: Type;
   }
 
   function emitText(expression: ExpressionRef): string;
