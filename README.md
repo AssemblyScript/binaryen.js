@@ -84,10 +84,10 @@ API
 - [Module creation](#module-creation)
 - [Expression construction](#expression-construction)
   - [Control flow](#control-flow)
-  - [Constants](#constants)
   - [Variable accesses](#variable-accesses)
   - [Integer operations](#integer-operations)
   - [Floating point operations](#floating-point-operations)
+  - [Vector operations 🦄](#vector-operations-)
   - [Datatype conversions](#datatype-conversions)
   - [Function calls](#function-calls)
   - [Linear memory accesses](#linear-memory-accesses)
@@ -1133,6 +1133,9 @@ API
   * PopInfo
   >
   * PushInfo#**value**: `ExpressionRef`
+
+* **emitText**(expression: `ExpressionRef`): `string`<br />
+  Emits the expression in Binaryen's s-expression text format (not official stack-style text format).
 
 ### Relooper
 

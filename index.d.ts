@@ -1300,7 +1300,7 @@ declare module binaryen {
     results: Type;
   }
 
-  function emitText(expression: ExpressionRef): string;
+  function emitText(expression: ExpressionRef | Module): string;
   function readBinary(data: Uint8Array): Module;
   function parseText(text: string): Module;
   function getOptimizeLevel(): number;
