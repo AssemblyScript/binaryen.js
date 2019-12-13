@@ -1,7 +1,7 @@
 binaryen.js
 ===========
 
-**binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate WebAssembly using a JavaScript API.
+**binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate [WebAssembly](https://webassembly.org) using a JavaScript API.
 
 [![Actions Status](https://github.com/AssemblyScript/binaryen.js/workflows/Build/badge.svg)](https://github.com/AssemblyScript/binaryen.js/actions) [![npm](https://img.shields.io/npm/v/binaryen.svg)](https://www.npmjs.com/package/binaryen) [![npm (tag)](https://img.shields.io/npm/v/binaryen/nightly.svg)](https://www.npmjs.com/package/binaryen)
 
@@ -71,6 +71,8 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
 
 API
 ---
+
+**Please note** that the Binaryen API is evolving fast and that definitions and documentation provided by the package tend to get out of sync despite our best efforts. It's a bot after all. If you rely on binaryen.js and spot an issue, please consider sending a PR our way by updating [index.d.ts](./index.d.ts) and [README.md](./README.md) to reflect the [current API](https://github.com/WebAssembly/binaryen/blob/master/src/js/binaryen.js-post.js).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
