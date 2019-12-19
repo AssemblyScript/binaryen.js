@@ -1,5 +1,8 @@
 declare module binaryen {
 
+  const isReady: boolean;
+  const ready: Promise<typeof binaryen>;
+
   type Type = number;
 
   const none: Type;
@@ -17,6 +20,53 @@ declare module binaryen {
   function expandType(type: Type): Type[];
 
   type ExpressionId = number;
+
+  const enum ExpressionIds {
+    Invalid,
+    Block,
+    If,
+    Loop,
+    Break,
+    Switch,
+    Call,
+    CallIndirect,
+    LocalGet,
+    LocalSet,
+    GlobalGet,
+    GlobalSet,
+    Load,
+    Store,
+    Const,
+    Unary,
+    Binary,
+    Select,
+    Drop,
+    Return,
+    Host,
+    Nop,
+    Unreachable,
+    AtomicCmpxchg,
+    AtomicRMW,
+    AtomicWait,
+    AtomicNotify,
+    AtomicFence,
+    SIMDExtract,
+    SIMDReplace,
+    SIMDShuffle,
+    SIMDTernary,
+    SIMDShift,
+    SIMDLoad,
+    MemoryInit,
+    DataDrop,
+    MemoryCopy,
+    MemoryFill,
+    Try,
+    Throw,
+    Rethrow,
+    BrOnExn,
+    Push,
+    Pop
+  }
 
   const InvalidId: ExpressionId;
   const BlockId: ExpressionId;
@@ -65,6 +115,14 @@ declare module binaryen {
 
   type ExternalKind = number;
 
+  const enum ExternalKinds {
+    Function,
+    Table,
+    Memory,
+    Global,
+    Event
+  }
+
   const ExternalFunction: ExternalKind;
   const ExternalTable: ExternalKind;
   const ExternalMemory: ExternalKind;
@@ -73,351 +131,669 @@ declare module binaryen {
 
   type FeatureFlags = number;
 
-  const Features: {
-    Atomics: FeatureFlags;
-    BulkMemory: FeatureFlags;
-    MutableGlobals: FeatureFlags;
-    NontrappingFPToInt: FeatureFlags;
-    SignExt: FeatureFlags;
-    SIMD128: FeatureFlags;
-    ExceptionHandling: FeatureFlags;
-  };
+  const enum Features {
+    Atomics,
+    BulkMemory,
+    MutableGlobals,
+    NontrappingFPToInt,
+    SignExt,
+    SIMD128,
+    ExceptionHandling
+  }
 
-  type Op = number;
+  type Operation = number;
 
-  const ClzInt32: Op;
-  const CtzInt32: Op;
-  const PopcntInt32: Op;
-  const NegFloat32: Op;
-  const AbsFloat32: Op;
-  const CeilFloat32: Op;
-  const FloorFloat32: Op;
-  const TruncFloat32: Op;
-  const NearestFloat32: Op;
-  const SqrtFloat32: Op;
-  const EqZInt32: Op;
-  const ClzInt64: Op;
-  const CtzInt64: Op;
-  const PopcntInt64: Op;
-  const NegFloat64: Op;
-  const AbsFloat64: Op;
-  const CeilFloat64: Op;
-  const FloorFloat64: Op;
-  const TruncFloat64: Op;
-  const NearestFloat64: Op;
-  const SqrtFloat64: Op;
-  const EqZInt64: Op;
-  const ExtendSInt32: Op;
-  const ExtendUInt32: Op;
-  const WrapInt64: Op;
-  const TruncSFloat32ToInt32: Op;
-  const TruncSFloat32ToInt64: Op;
-  const TruncUFloat32ToInt32: Op;
-  const TruncUFloat32ToInt64: Op;
-  const TruncSFloat64ToInt32: Op;
-  const TruncSFloat64ToInt64: Op;
-  const TruncUFloat64ToInt32: Op;
-  const TruncUFloat64ToInt64: Op;
-  const TruncSatSFloat32ToInt32: Op;
-  const TruncSatSFloat32ToInt64: Op;
-  const TruncSatUFloat32ToInt32: Op;
-  const TruncSatUFloat32ToInt64: Op;
-  const TruncSatSFloat64ToInt32: Op;
-  const TruncSatSFloat64ToInt64: Op;
-  const TruncSatUFloat64ToInt32: Op;
-  const TruncSatUFloat64ToInt64: Op;
-  const ReinterpretFloat32: Op;
-  const ReinterpretFloat64: Op;
-  const ConvertSInt32ToFloat32: Op;
-  const ConvertSInt32ToFloat64: Op;
-  const ConvertUInt32ToFloat32: Op;
-  const ConvertUInt32ToFloat64: Op;
-  const ConvertSInt64ToFloat32: Op;
-  const ConvertSInt64ToFloat64: Op;
-  const ConvertUInt64ToFloat32: Op;
-  const ConvertUInt64ToFloat64: Op;
-  const PromoteFloat32: Op;
-  const DemoteFloat64: Op;
-  const ReinterpretInt32: Op;
-  const ReinterpretInt64: Op;
-  const ExtendS8Int32: Op;
-  const ExtendS16Int32: Op;
-  const ExtendS8Int64: Op;
-  const ExtendS16Int64: Op;
-  const ExtendS32Int64: Op;
-  const AddInt32: Op;
-  const SubInt32: Op;
-  const MulInt32: Op;
-  const DivSInt32: Op;
-  const DivUInt32: Op;
-  const RemSInt32: Op;
-  const RemUInt32: Op;
-  const AndInt32: Op;
-  const OrInt32: Op;
-  const XorInt32: Op;
-  const ShlInt32: Op;
-  const ShrUInt32: Op;
-  const ShrSInt32: Op;
-  const RotLInt32: Op;
-  const RotRInt32: Op;
-  const EqInt32: Op;
-  const NeInt32: Op;
-  const LtSInt32: Op;
-  const LtUInt32: Op;
-  const LeSInt32: Op;
-  const LeUInt32: Op;
-  const GtSInt32: Op;
-  const GtUInt32: Op;
-  const GeSInt32: Op;
-  const GeUInt32: Op;
-  const AddInt64: Op;
-  const SubInt64: Op;
-  const MulInt64: Op;
-  const DivSInt64: Op;
-  const DivUInt64: Op;
-  const RemSInt64: Op;
-  const RemUInt64: Op;
-  const AndInt64: Op;
-  const OrInt64: Op;
-  const XorInt64: Op;
-  const ShlInt64: Op;
-  const ShrUInt64: Op;
-  const ShrSInt64: Op;
-  const RotLInt64: Op;
-  const RotRInt64: Op;
-  const EqInt64: Op;
-  const NeInt64: Op;
-  const LtSInt64: Op;
-  const LtUInt64: Op;
-  const LeSInt64: Op;
-  const LeUInt64: Op;
-  const GtSInt64: Op;
-  const GtUInt64: Op;
-  const GeSInt64: Op;
-  const GeUInt64: Op;
-  const AddFloat32: Op;
-  const SubFloat32: Op;
-  const MulFloat32: Op;
-  const DivFloat32: Op;
-  const CopySignFloat32: Op;
-  const MinFloat32: Op;
-  const MaxFloat32: Op;
-  const EqFloat32: Op;
-  const NeFloat32: Op;
-  const LtFloat32: Op;
-  const LeFloat32: Op;
-  const GtFloat32: Op;
-  const GeFloat32: Op;
-  const AddFloat64: Op;
-  const SubFloat64: Op;
-  const MulFloat64: Op;
-  const DivFloat64: Op;
-  const CopySignFloat64: Op;
-  const MinFloat64: Op;
-  const MaxFloat64: Op;
-  const EqFloat64: Op;
-  const NeFloat64: Op;
-  const LtFloat64: Op;
-  const LeFloat64: Op;
-  const GtFloat64: Op;
-  const GeFloat64: Op;
-  const MemorySize: Op;
-  const MemoryGrow: Op;
-  const AtomicRMWAdd: Op;
-  const AtomicRMWSub: Op;
-  const AtomicRMWAnd: Op;
-  const AtomicRMWOr: Op;
-  const AtomicRMWXor: Op;
-  const AtomicRMWXchg: Op;
-  const SplatVecI8x16: Op;
-  const ExtractLaneSVecI8x16: Op;
-  const ExtractLaneUVecI8x16: Op;
-  const ReplaceLaneVecI8x16: Op;
-  const SplatVecI16x8: Op;
-  const ExtractLaneSVecI16x8: Op;
-  const ExtractLaneUVecI16x8: Op;
-  const ReplaceLaneVecI16x8: Op;
-  const SplatVecI32x4: Op;
-  const ExtractLaneVecI32x4: Op;
-  const ReplaceLaneVecI32x4: Op;
-  const SplatVecI64x2: Op;
-  const ExtractLaneVecI64x2: Op;
-  const ReplaceLaneVecI64x2: Op;
-  const SplatVecF32x4: Op;
-  const ExtractLaneVecF32x4: Op;
-  const ReplaceLaneVecF32x4: Op;
-  const SplatVecF64x2: Op;
-  const ExtractLaneVecF64x2: Op;
-  const ReplaceLaneVecF64x2: Op;
-  const EqVecI8x16: Op;
-  const NeVecI8x16: Op;
-  const LtSVecI8x16: Op;
-  const LtUVecI8x16: Op;
-  const GtSVecI8x16: Op;
-  const GtUVecI8x16: Op;
-  const LeSVecI8x16: Op;
-  const LeUVecI8x16: Op;
-  const GeSVecI8x16: Op;
-  const GeUVecI8x16: Op;
-  const EqVecI16x8: Op;
-  const NeVecI16x8: Op;
-  const LtSVecI16x8: Op;
-  const LtUVecI16x8: Op;
-  const GtSVecI16x8: Op;
-  const GtUVecI16x8: Op;
-  const LeSVecI16x8: Op;
-  const LeUVecI16x8: Op;
-  const GeSVecI16x8: Op;
-  const GeUVecI16x8: Op;
-  const EqVecI32x4: Op;
-  const NeVecI32x4: Op;
-  const LtSVecI32x4: Op;
-  const LtUVecI32x4: Op;
-  const GtSVecI32x4: Op;
-  const GtUVecI32x4: Op;
-  const LeSVecI32x4: Op;
-  const LeUVecI32x4: Op;
-  const GeSVecI32x4: Op;
-  const GeUVecI32x4: Op;
-  const EqVecF32x4: Op;
-  const NeVecF32x4: Op;
-  const LtVecF32x4: Op;
-  const GtVecF32x4: Op;
-  const LeVecF32x4: Op;
-  const GeVecF32x4: Op;
-  const EqVecF64x2: Op;
-  const NeVecF64x2: Op;
-  const LtVecF64x2: Op;
-  const GtVecF64x2: Op;
-  const LeVecF64x2: Op;
-  const GeVecF64x2: Op;
-  const NotVec128: Op;
-  const AndVec128: Op;
-  const OrVec128: Op;
-  const XorVec128: Op;
-  const AndNotVec128: Op;
-  const BitselectVec128: Op;
-  const NegVecI8x16: Op;
-  const AnyTrueVecI8x16: Op;
-  const AllTrueVecI8x16: Op;
-  const ShlVecI8x16: Op;
-  const ShrSVecI8x16: Op;
-  const ShrUVecI8x16: Op;
-  const AddVecI8x16: Op;
-  const AddSatSVecI8x16: Op;
-  const AddSatUVecI8x16: Op;
-  const SubVecI8x16: Op;
-  const SubSatSVecI8x16: Op;
-  const SubSatUVecI8x16: Op;
-  const MulVecI8x16: Op;
-  const MinSVecI8x16: Op;
-  const MinUVecI8x16: Op;
-  const MaxSVecI8x16: Op;
-  const MaxUVecI8x16: Op;
-  const NegVecI16x8: Op;
-  const AnyTrueVecI16x8: Op;
-  const AllTrueVecI16x8: Op;
-  const ShlVecI16x8: Op;
-  const ShrSVecI16x8: Op;
-  const ShrUVecI16x8: Op;
-  const AddVecI16x8: Op;
-  const AddSatSVecI16x8: Op;
-  const AddSatUVecI16x8: Op;
-  const SubVecI16x8: Op;
-  const SubSatSVecI16x8: Op;
-  const SubSatUVecI16x8: Op;
-  const MulVecI16x8: Op;
-  const MinSVecI16x8: Op;
-  const MinUVecI16x8: Op;
-  const MaxSVecI16x8: Op;
-  const MaxUVecI16x8: Op;
-  const DotSVecI16x8ToVecI32x4: Op;
-  const NegVecI32x4: Op;
-  const AnyTrueVecI32x4: Op;
-  const AllTrueVecI32x4: Op;
-  const ShlVecI32x4: Op;
-  const ShrSVecI32x4: Op;
-  const ShrUVecI32x4: Op;
-  const AddVecI32x4: Op;
-  const SubVecI32x4: Op;
-  const MulVecI32x4: Op;
-  const MinSVecI32x4: Op;
-  const MinUVecI32x4: Op;
-  const MaxSVecI32x4: Op;
-  const MaxUVecI32x4: Op;
-  const NegVecI64x2: Op;
-  const AnyTrueVecI64x2: Op;
-  const AllTrueVecI64x2: Op;
-  const ShlVecI64x2: Op;
-  const ShrSVecI64x2: Op;
-  const ShrUVecI64x2: Op;
-  const AddVecI64x2: Op;
-  const SubVecI64x2: Op;
-  const AbsVecF32x4: Op;
-  const NegVecF32x4: Op;
-  const SqrtVecF32x4: Op;
-  const QFMAVecF32x4: Op;
-  const QFMSVecF32x4: Op;
-  const AddVecF32x4: Op;
-  const SubVecF32x4: Op;
-  const MulVecF32x4: Op;
-  const DivVecF32x4: Op;
-  const MinVecF32x4: Op;
-  const MaxVecF32x4: Op;
-  const AbsVecF64x2: Op;
-  const NegVecF64x2: Op;
-  const SqrtVecF64x2: Op;
-  const QFMAVecF64x2: Op;
-  const QFMSVecF64x2: Op;
-  const AddVecF64x2: Op;
-  const SubVecF64x2: Op;
-  const MulVecF64x2: Op;
-  const DivVecF64x2: Op;
-  const MinVecF64x2: Op;
-  const MaxVecF64x2: Op;
-  const TruncSatSVecF32x4ToVecI32x4: Op;
-  const TruncSatUVecF32x4ToVecI32x4: Op;
-  const TruncSatSVecF64x2ToVecI64x2: Op;
-  const TruncSatUVecF64x2ToVecI64x2: Op;
-  const ConvertSVecI32x4ToVecF32x4: Op;
-  const ConvertUVecI32x4ToVecF32x4: Op;
-  const ConvertSVecI64x2ToVecF64x2: Op;
-  const ConvertUVecI64x2ToVecF64x2: Op;
-  const LoadSplatVec8x16: Op;
-  const LoadSplatVec16x8: Op;
-  const LoadSplatVec32x4: Op;
-  const LoadSplatVec64x2: Op;
-  const LoadExtSVec8x8ToVecI16x8: Op;
-  const LoadExtUVec8x8ToVecI16x8: Op;
-  const LoadExtSVec16x4ToVecI32x4: Op;
-  const LoadExtUVec16x4ToVecI32x4: Op;
-  const LoadExtSVec32x2ToVecI64x2: Op;
-  const LoadExtUVec32x2ToVecI64x2: Op;
-  const NarrowSVecI16x8ToVecI8x16: Op;
-  const NarrowUVecI16x8ToVecI8x16: Op;
-  const NarrowSVecI32x4ToVecI16x8: Op;
-  const NarrowUVecI32x4ToVecI16x8: Op;
-  const WidenLowSVecI8x16ToVecI16x8: Op;
-  const WidenHighSVecI8x16ToVecI16x8: Op;
-  const WidenLowUVecI8x16ToVecI16x8: Op;
-  const WidenHighUVecI8x16ToVecI16x8: Op;
-  const WidenLowSVecI16x8ToVecI32x4: Op;
-  const WidenHighSVecI16x8ToVecI32x4: Op;
-  const WidenLowUVecI16x8ToVecI32x4: Op;
-  const WidenHighUVecI16x8ToVecI32x4: Op;
-  const SwizzleVec8x16: Op;
+  const enum Operations {
+    ClzInt32,
+    CtzInt32,
+    PopcntInt32,
+    NegFloat32,
+    AbsFloat32,
+    CeilFloat32,
+    FloorFloat32,
+    TruncFloat32,
+    NearestFloat32,
+    SqrtFloat32,
+    EqZInt32,
+    ClzInt64,
+    CtzInt64,
+    PopcntInt64,
+    NegFloat64,
+    AbsFloat64,
+    CeilFloat64,
+    FloorFloat64,
+    TruncFloat64,
+    NearestFloat64,
+    SqrtFloat64,
+    EqZInt64,
+    ExtendSInt32,
+    ExtendUInt32,
+    WrapInt64,
+    TruncSFloat32ToInt32,
+    TruncSFloat32ToInt64,
+    TruncUFloat32ToInt32,
+    TruncUFloat32ToInt64,
+    TruncSFloat64ToInt32,
+    TruncSFloat64ToInt64,
+    TruncUFloat64ToInt32,
+    TruncUFloat64ToInt64,
+    TruncSatSFloat32ToInt32,
+    TruncSatSFloat32ToInt64,
+    TruncSatUFloat32ToInt32,
+    TruncSatUFloat32ToInt64,
+    TruncSatSFloat64ToInt32,
+    TruncSatSFloat64ToInt64,
+    TruncSatUFloat64ToInt32,
+    TruncSatUFloat64ToInt64,
+    ReinterpretFloat32,
+    ReinterpretFloat64,
+    ConvertSInt32ToFloat32,
+    ConvertSInt32ToFloat64,
+    ConvertUInt32ToFloat32,
+    ConvertUInt32ToFloat64,
+    ConvertSInt64ToFloat32,
+    ConvertSInt64ToFloat64,
+    ConvertUInt64ToFloat32,
+    ConvertUInt64ToFloat64,
+    PromoteFloat32,
+    DemoteFloat64,
+    ReinterpretInt32,
+    ReinterpretInt64,
+    ExtendS8Int32,
+    ExtendS16Int32,
+    ExtendS8Int64,
+    ExtendS16Int64,
+    ExtendS32Int64,
+    AddInt32,
+    SubInt32,
+    MulInt32,
+    DivSInt32,
+    DivUInt32,
+    RemSInt32,
+    RemUInt32,
+    AndInt32,
+    OrInt32,
+    XorInt32,
+    ShlInt32,
+    ShrUInt32,
+    ShrSInt32,
+    RotLInt32,
+    RotRInt32,
+    EqInt32,
+    NeInt32,
+    LtSInt32,
+    LtUInt32,
+    LeSInt32,
+    LeUInt32,
+    GtSInt32,
+    GtUInt32,
+    GeSInt32,
+    GeUInt32,
+    AddInt64,
+    SubInt64,
+    MulInt64,
+    DivSInt64,
+    DivUInt64,
+    RemSInt64,
+    RemUInt64,
+    AndInt64,
+    OrInt64,
+    XorInt64,
+    ShlInt64,
+    ShrUInt64,
+    ShrSInt64,
+    RotLInt64,
+    RotRInt64,
+    EqInt64,
+    NeInt64,
+    LtSInt64,
+    LtUInt64,
+    LeSInt64,
+    LeUInt64,
+    GtSInt64,
+    GtUInt64,
+    GeSInt64,
+    GeUInt64,
+    AddFloat32,
+    SubFloat32,
+    MulFloat32,
+    DivFloat32,
+    CopySignFloat32,
+    MinFloat32,
+    MaxFloat32,
+    EqFloat32,
+    NeFloat32,
+    LtFloat32,
+    LeFloat32,
+    GtFloat32,
+    GeFloat32,
+    AddFloat64,
+    SubFloat64,
+    MulFloat64,
+    DivFloat64,
+    CopySignFloat64,
+    MinFloat64,
+    MaxFloat64,
+    EqFloat64,
+    NeFloat64,
+    LtFloat64,
+    LeFloat64,
+    GtFloat64,
+    GeFloat64,
+    MemorySize,
+    MemoryGrow,
+    AtomicRMWAdd,
+    AtomicRMWSub,
+    AtomicRMWAnd,
+    AtomicRMWOr,
+    AtomicRMWXor,
+    AtomicRMWXchg,
+    SplatVecI8x16,
+    ExtractLaneSVecI8x16,
+    ExtractLaneUVecI8x16,
+    ReplaceLaneVecI8x16,
+    SplatVecI16x8,
+    ExtractLaneSVecI16x8,
+    ExtractLaneUVecI16x8,
+    ReplaceLaneVecI16x8,
+    SplatVecI32x4,
+    ExtractLaneVecI32x4,
+    ReplaceLaneVecI32x4,
+    SplatVecI64x2,
+    ExtractLaneVecI64x2,
+    ReplaceLaneVecI64x2,
+    SplatVecF32x4,
+    ExtractLaneVecF32x4,
+    ReplaceLaneVecF32x4,
+    SplatVecF64x2,
+    ExtractLaneVecF64x2,
+    ReplaceLaneVecF64x2,
+    EqVecI8x16,
+    NeVecI8x16,
+    LtSVecI8x16,
+    LtUVecI8x16,
+    GtSVecI8x16,
+    GtUVecI8x16,
+    LeSVecI8x16,
+    LeUVecI8x16,
+    GeSVecI8x16,
+    GeUVecI8x16,
+    EqVecI16x8,
+    NeVecI16x8,
+    LtSVecI16x8,
+    LtUVecI16x8,
+    GtSVecI16x8,
+    GtUVecI16x8,
+    LeSVecI16x8,
+    LeUVecI16x8,
+    GeSVecI16x8,
+    GeUVecI16x8,
+    EqVecI32x4,
+    NeVecI32x4,
+    LtSVecI32x4,
+    LtUVecI32x4,
+    GtSVecI32x4,
+    GtUVecI32x4,
+    LeSVecI32x4,
+    LeUVecI32x4,
+    GeSVecI32x4,
+    GeUVecI32x4,
+    EqVecF32x4,
+    NeVecF32x4,
+    LtVecF32x4,
+    GtVecF32x4,
+    LeVecF32x4,
+    GeVecF32x4,
+    EqVecF64x2,
+    NeVecF64x2,
+    LtVecF64x2,
+    GtVecF64x2,
+    LeVecF64x2,
+    GeVecF64x2,
+    NotVec128,
+    AndVec128,
+    OrVec128,
+    XorVec128,
+    AndNotVec128,
+    BitselectVec128,
+    NegVecI8x16,
+    AnyTrueVecI8x16,
+    AllTrueVecI8x16,
+    ShlVecI8x16,
+    ShrSVecI8x16,
+    ShrUVecI8x16,
+    AddVecI8x16,
+    AddSatSVecI8x16,
+    AddSatUVecI8x16,
+    SubVecI8x16,
+    SubSatSVecI8x16,
+    SubSatUVecI8x16,
+    MulVecI8x16,
+    MinSVecI8x16,
+    MinUVecI8x16,
+    MaxSVecI8x16,
+    MaxUVecI8x16,
+    NegVecI16x8,
+    AnyTrueVecI16x8,
+    AllTrueVecI16x8,
+    ShlVecI16x8,
+    ShrSVecI16x8,
+    ShrUVecI16x8,
+    AddVecI16x8,
+    AddSatSVecI16x8,
+    AddSatUVecI16x8,
+    SubVecI16x8,
+    SubSatSVecI16x8,
+    SubSatUVecI16x8,
+    MulVecI16x8,
+    MinSVecI16x8,
+    MinUVecI16x8,
+    MaxSVecI16x8,
+    MaxUVecI16x8,
+    DotSVecI16x8ToVecI32x4,
+    NegVecI32x4,
+    AnyTrueVecI32x4,
+    AllTrueVecI32x4,
+    ShlVecI32x4,
+    ShrSVecI32x4,
+    ShrUVecI32x4,
+    AddVecI32x4,
+    SubVecI32x4,
+    MulVecI32x4,
+    MinSVecI32x4,
+    MinUVecI32x4,
+    MaxSVecI32x4,
+    MaxUVecI32x4,
+    NegVecI64x2,
+    AnyTrueVecI64x2,
+    AllTrueVecI64x2,
+    ShlVecI64x2,
+    ShrSVecI64x2,
+    ShrUVecI64x2,
+    AddVecI64x2,
+    SubVecI64x2,
+    AbsVecF32x4,
+    NegVecF32x4,
+    SqrtVecF32x4,
+    QFMAVecF32x4,
+    QFMSVecF32x4,
+    AddVecF32x4,
+    SubVecF32x4,
+    MulVecF32x4,
+    DivVecF32x4,
+    MinVecF32x4,
+    MaxVecF32x4,
+    AbsVecF64x2,
+    NegVecF64x2,
+    SqrtVecF64x2,
+    QFMAVecF64x2,
+    QFMSVecF64x2,
+    AddVecF64x2,
+    SubVecF64x2,
+    MulVecF64x2,
+    DivVecF64x2,
+    MinVecF64x2,
+    MaxVecF64x2,
+    TruncSatSVecF32x4ToVecI32x4,
+    TruncSatUVecF32x4ToVecI32x4,
+    TruncSatSVecF64x2ToVecI64x2,
+    TruncSatUVecF64x2ToVecI64x2,
+    ConvertSVecI32x4ToVecF32x4,
+    ConvertUVecI32x4ToVecF32x4,
+    ConvertSVecI64x2ToVecF64x2,
+    ConvertUVecI64x2ToVecF64x2,
+    LoadSplatVec8x16,
+    LoadSplatVec16x8,
+    LoadSplatVec32x4,
+    LoadSplatVec64x2,
+    LoadExtSVec8x8ToVecI16x8,
+    LoadExtUVec8x8ToVecI16x8,
+    LoadExtSVec16x4ToVecI32x4,
+    LoadExtUVec16x4ToVecI32x4,
+    LoadExtSVec32x2ToVecI64x2,
+    LoadExtUVec32x2ToVecI64x2,
+    NarrowSVecI16x8ToVecI8x16,
+    NarrowUVecI16x8ToVecI8x16,
+    NarrowSVecI32x4ToVecI16x8,
+    NarrowUVecI32x4ToVecI16x8,
+    WidenLowSVecI8x16ToVecI16x8,
+    WidenHighSVecI8x16ToVecI16x8,
+    WidenLowUVecI8x16ToVecI16x8,
+    WidenHighUVecI8x16ToVecI16x8,
+    WidenLowSVecI16x8ToVecI32x4,
+    WidenHighSVecI16x8ToVecI32x4,
+    WidenLowUVecI16x8ToVecI32x4,
+    WidenHighUVecI16x8ToVecI32x4,
+    SwizzleVec8x16
+  }
+
+  const ClzInt32: Operation;
+  const CtzInt32: Operation;
+  const PopcntInt32: Operation;
+  const NegFloat32: Operation;
+  const AbsFloat32: Operation;
+  const CeilFloat32: Operation;
+  const FloorFloat32: Operation;
+  const TruncFloat32: Operation;
+  const NearestFloat32: Operation;
+  const SqrtFloat32: Operation;
+  const EqZInt32: Operation;
+  const ClzInt64: Operation;
+  const CtzInt64: Operation;
+  const PopcntInt64: Operation;
+  const NegFloat64: Operation;
+  const AbsFloat64: Operation;
+  const CeilFloat64: Operation;
+  const FloorFloat64: Operation;
+  const TruncFloat64: Operation;
+  const NearestFloat64: Operation;
+  const SqrtFloat64: Operation;
+  const EqZInt64: Operation;
+  const ExtendSInt32: Operation;
+  const ExtendUInt32: Operation;
+  const WrapInt64: Operation;
+  const TruncSFloat32ToInt32: Operation;
+  const TruncSFloat32ToInt64: Operation;
+  const TruncUFloat32ToInt32: Operation;
+  const TruncUFloat32ToInt64: Operation;
+  const TruncSFloat64ToInt32: Operation;
+  const TruncSFloat64ToInt64: Operation;
+  const TruncUFloat64ToInt32: Operation;
+  const TruncUFloat64ToInt64: Operation;
+  const TruncSatSFloat32ToInt32: Operation;
+  const TruncSatSFloat32ToInt64: Operation;
+  const TruncSatUFloat32ToInt32: Operation;
+  const TruncSatUFloat32ToInt64: Operation;
+  const TruncSatSFloat64ToInt32: Operation;
+  const TruncSatSFloat64ToInt64: Operation;
+  const TruncSatUFloat64ToInt32: Operation;
+  const TruncSatUFloat64ToInt64: Operation;
+  const ReinterpretFloat32: Operation;
+  const ReinterpretFloat64: Operation;
+  const ConvertSInt32ToFloat32: Operation;
+  const ConvertSInt32ToFloat64: Operation;
+  const ConvertUInt32ToFloat32: Operation;
+  const ConvertUInt32ToFloat64: Operation;
+  const ConvertSInt64ToFloat32: Operation;
+  const ConvertSInt64ToFloat64: Operation;
+  const ConvertUInt64ToFloat32: Operation;
+  const ConvertUInt64ToFloat64: Operation;
+  const PromoteFloat32: Operation;
+  const DemoteFloat64: Operation;
+  const ReinterpretInt32: Operation;
+  const ReinterpretInt64: Operation;
+  const ExtendS8Int32: Operation;
+  const ExtendS16Int32: Operation;
+  const ExtendS8Int64: Operation;
+  const ExtendS16Int64: Operation;
+  const ExtendS32Int64: Operation;
+  const AddInt32: Operation;
+  const SubInt32: Operation;
+  const MulInt32: Operation;
+  const DivSInt32: Operation;
+  const DivUInt32: Operation;
+  const RemSInt32: Operation;
+  const RemUInt32: Operation;
+  const AndInt32: Operation;
+  const OrInt32: Operation;
+  const XorInt32: Operation;
+  const ShlInt32: Operation;
+  const ShrUInt32: Operation;
+  const ShrSInt32: Operation;
+  const RotLInt32: Operation;
+  const RotRInt32: Operation;
+  const EqInt32: Operation;
+  const NeInt32: Operation;
+  const LtSInt32: Operation;
+  const LtUInt32: Operation;
+  const LeSInt32: Operation;
+  const LeUInt32: Operation;
+  const GtSInt32: Operation;
+  const GtUInt32: Operation;
+  const GeSInt32: Operation;
+  const GeUInt32: Operation;
+  const AddInt64: Operation;
+  const SubInt64: Operation;
+  const MulInt64: Operation;
+  const DivSInt64: Operation;
+  const DivUInt64: Operation;
+  const RemSInt64: Operation;
+  const RemUInt64: Operation;
+  const AndInt64: Operation;
+  const OrInt64: Operation;
+  const XorInt64: Operation;
+  const ShlInt64: Operation;
+  const ShrUInt64: Operation;
+  const ShrSInt64: Operation;
+  const RotLInt64: Operation;
+  const RotRInt64: Operation;
+  const EqInt64: Operation;
+  const NeInt64: Operation;
+  const LtSInt64: Operation;
+  const LtUInt64: Operation;
+  const LeSInt64: Operation;
+  const LeUInt64: Operation;
+  const GtSInt64: Operation;
+  const GtUInt64: Operation;
+  const GeSInt64: Operation;
+  const GeUInt64: Operation;
+  const AddFloat32: Operation;
+  const SubFloat32: Operation;
+  const MulFloat32: Operation;
+  const DivFloat32: Operation;
+  const CopySignFloat32: Operation;
+  const MinFloat32: Operation;
+  const MaxFloat32: Operation;
+  const EqFloat32: Operation;
+  const NeFloat32: Operation;
+  const LtFloat32: Operation;
+  const LeFloat32: Operation;
+  const GtFloat32: Operation;
+  const GeFloat32: Operation;
+  const AddFloat64: Operation;
+  const SubFloat64: Operation;
+  const MulFloat64: Operation;
+  const DivFloat64: Operation;
+  const CopySignFloat64: Operation;
+  const MinFloat64: Operation;
+  const MaxFloat64: Operation;
+  const EqFloat64: Operation;
+  const NeFloat64: Operation;
+  const LtFloat64: Operation;
+  const LeFloat64: Operation;
+  const GtFloat64: Operation;
+  const GeFloat64: Operation;
+  const MemorySize: Operation;
+  const MemoryGrow: Operation;
+  const AtomicRMWAdd: Operation;
+  const AtomicRMWSub: Operation;
+  const AtomicRMWAnd: Operation;
+  const AtomicRMWOr: Operation;
+  const AtomicRMWXor: Operation;
+  const AtomicRMWXchg: Operation;
+  const SplatVecI8x16: Operation;
+  const ExtractLaneSVecI8x16: Operation;
+  const ExtractLaneUVecI8x16: Operation;
+  const ReplaceLaneVecI8x16: Operation;
+  const SplatVecI16x8: Operation;
+  const ExtractLaneSVecI16x8: Operation;
+  const ExtractLaneUVecI16x8: Operation;
+  const ReplaceLaneVecI16x8: Operation;
+  const SplatVecI32x4: Operation;
+  const ExtractLaneVecI32x4: Operation;
+  const ReplaceLaneVecI32x4: Operation;
+  const SplatVecI64x2: Operation;
+  const ExtractLaneVecI64x2: Operation;
+  const ReplaceLaneVecI64x2: Operation;
+  const SplatVecF32x4: Operation;
+  const ExtractLaneVecF32x4: Operation;
+  const ReplaceLaneVecF32x4: Operation;
+  const SplatVecF64x2: Operation;
+  const ExtractLaneVecF64x2: Operation;
+  const ReplaceLaneVecF64x2: Operation;
+  const EqVecI8x16: Operation;
+  const NeVecI8x16: Operation;
+  const LtSVecI8x16: Operation;
+  const LtUVecI8x16: Operation;
+  const GtSVecI8x16: Operation;
+  const GtUVecI8x16: Operation;
+  const LeSVecI8x16: Operation;
+  const LeUVecI8x16: Operation;
+  const GeSVecI8x16: Operation;
+  const GeUVecI8x16: Operation;
+  const EqVecI16x8: Operation;
+  const NeVecI16x8: Operation;
+  const LtSVecI16x8: Operation;
+  const LtUVecI16x8: Operation;
+  const GtSVecI16x8: Operation;
+  const GtUVecI16x8: Operation;
+  const LeSVecI16x8: Operation;
+  const LeUVecI16x8: Operation;
+  const GeSVecI16x8: Operation;
+  const GeUVecI16x8: Operation;
+  const EqVecI32x4: Operation;
+  const NeVecI32x4: Operation;
+  const LtSVecI32x4: Operation;
+  const LtUVecI32x4: Operation;
+  const GtSVecI32x4: Operation;
+  const GtUVecI32x4: Operation;
+  const LeSVecI32x4: Operation;
+  const LeUVecI32x4: Operation;
+  const GeSVecI32x4: Operation;
+  const GeUVecI32x4: Operation;
+  const EqVecF32x4: Operation;
+  const NeVecF32x4: Operation;
+  const LtVecF32x4: Operation;
+  const GtVecF32x4: Operation;
+  const LeVecF32x4: Operation;
+  const GeVecF32x4: Operation;
+  const EqVecF64x2: Operation;
+  const NeVecF64x2: Operation;
+  const LtVecF64x2: Operation;
+  const GtVecF64x2: Operation;
+  const LeVecF64x2: Operation;
+  const GeVecF64x2: Operation;
+  const NotVec128: Operation;
+  const AndVec128: Operation;
+  const OrVec128: Operation;
+  const XorVec128: Operation;
+  const AndNotVec128: Operation;
+  const BitselectVec128: Operation;
+  const NegVecI8x16: Operation;
+  const AnyTrueVecI8x16: Operation;
+  const AllTrueVecI8x16: Operation;
+  const ShlVecI8x16: Operation;
+  const ShrSVecI8x16: Operation;
+  const ShrUVecI8x16: Operation;
+  const AddVecI8x16: Operation;
+  const AddSatSVecI8x16: Operation;
+  const AddSatUVecI8x16: Operation;
+  const SubVecI8x16: Operation;
+  const SubSatSVecI8x16: Operation;
+  const SubSatUVecI8x16: Operation;
+  const MulVecI8x16: Operation;
+  const MinSVecI8x16: Operation;
+  const MinUVecI8x16: Operation;
+  const MaxSVecI8x16: Operation;
+  const MaxUVecI8x16: Operation;
+  const NegVecI16x8: Operation;
+  const AnyTrueVecI16x8: Operation;
+  const AllTrueVecI16x8: Operation;
+  const ShlVecI16x8: Operation;
+  const ShrSVecI16x8: Operation;
+  const ShrUVecI16x8: Operation;
+  const AddVecI16x8: Operation;
+  const AddSatSVecI16x8: Operation;
+  const AddSatUVecI16x8: Operation;
+  const SubVecI16x8: Operation;
+  const SubSatSVecI16x8: Operation;
+  const SubSatUVecI16x8: Operation;
+  const MulVecI16x8: Operation;
+  const MinSVecI16x8: Operation;
+  const MinUVecI16x8: Operation;
+  const MaxSVecI16x8: Operation;
+  const MaxUVecI16x8: Operation;
+  const DotSVecI16x8ToVecI32x4: Operation;
+  const NegVecI32x4: Operation;
+  const AnyTrueVecI32x4: Operation;
+  const AllTrueVecI32x4: Operation;
+  const ShlVecI32x4: Operation;
+  const ShrSVecI32x4: Operation;
+  const ShrUVecI32x4: Operation;
+  const AddVecI32x4: Operation;
+  const SubVecI32x4: Operation;
+  const MulVecI32x4: Operation;
+  const MinSVecI32x4: Operation;
+  const MinUVecI32x4: Operation;
+  const MaxSVecI32x4: Operation;
+  const MaxUVecI32x4: Operation;
+  const NegVecI64x2: Operation;
+  const AnyTrueVecI64x2: Operation;
+  const AllTrueVecI64x2: Operation;
+  const ShlVecI64x2: Operation;
+  const ShrSVecI64x2: Operation;
+  const ShrUVecI64x2: Operation;
+  const AddVecI64x2: Operation;
+  const SubVecI64x2: Operation;
+  const AbsVecF32x4: Operation;
+  const NegVecF32x4: Operation;
+  const SqrtVecF32x4: Operation;
+  const QFMAVecF32x4: Operation;
+  const QFMSVecF32x4: Operation;
+  const AddVecF32x4: Operation;
+  const SubVecF32x4: Operation;
+  const MulVecF32x4: Operation;
+  const DivVecF32x4: Operation;
+  const MinVecF32x4: Operation;
+  const MaxVecF32x4: Operation;
+  const AbsVecF64x2: Operation;
+  const NegVecF64x2: Operation;
+  const SqrtVecF64x2: Operation;
+  const QFMAVecF64x2: Operation;
+  const QFMSVecF64x2: Operation;
+  const AddVecF64x2: Operation;
+  const SubVecF64x2: Operation;
+  const MulVecF64x2: Operation;
+  const DivVecF64x2: Operation;
+  const MinVecF64x2: Operation;
+  const MaxVecF64x2: Operation;
+  const TruncSatSVecF32x4ToVecI32x4: Operation;
+  const TruncSatUVecF32x4ToVecI32x4: Operation;
+  const TruncSatSVecF64x2ToVecI64x2: Operation;
+  const TruncSatUVecF64x2ToVecI64x2: Operation;
+  const ConvertSVecI32x4ToVecF32x4: Operation;
+  const ConvertUVecI32x4ToVecF32x4: Operation;
+  const ConvertSVecI64x2ToVecF64x2: Operation;
+  const ConvertUVecI64x2ToVecF64x2: Operation;
+  const LoadSplatVec8x16: Operation;
+  const LoadSplatVec16x8: Operation;
+  const LoadSplatVec32x4: Operation;
+  const LoadSplatVec64x2: Operation;
+  const LoadExtSVec8x8ToVecI16x8: Operation;
+  const LoadExtUVec8x8ToVecI16x8: Operation;
+  const LoadExtSVec16x4ToVecI32x4: Operation;
+  const LoadExtUVec16x4ToVecI32x4: Operation;
+  const LoadExtSVec32x2ToVecI64x2: Operation;
+  const LoadExtUVec32x2ToVecI64x2: Operation;
+  const NarrowSVecI16x8ToVecI8x16: Operation;
+  const NarrowUVecI16x8ToVecI8x16: Operation;
+  const NarrowSVecI32x4ToVecI16x8: Operation;
+  const NarrowUVecI32x4ToVecI16x8: Operation;
+  const WidenLowSVecI8x16ToVecI16x8: Operation;
+  const WidenHighSVecI8x16ToVecI16x8: Operation;
+  const WidenLowUVecI8x16ToVecI16x8: Operation;
+  const WidenHighUVecI8x16ToVecI16x8: Operation;
+  const WidenLowSVecI16x8ToVecI32x4: Operation;
+  const WidenHighSVecI16x8ToVecI32x4: Operation;
+  const WidenLowUVecI16x8ToVecI32x4: Operation;
+  const WidenHighUVecI16x8ToVecI32x4: Operation;
+  const SwizzleVec8x16: Operation;
 
   type ExpressionRef = number;
   type FunctionRef = number;
   type GlobalRef = number;
   type ExportRef = number;
   type EventRef = number;
-
-  interface MemorySegment {
-    offset: ExpressionRef;
-    data: Uint8Array;
-    passive?: boolean;
-  }
 
   class Module {
     constructor();
@@ -778,6 +1154,7 @@ declare module binaryen {
       min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      avgr_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       narrow_i16x8_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       narrow_i16x8_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
     };
@@ -813,6 +1190,7 @@ declare module binaryen {
       min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      avgr_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       narrow_i32x4_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       narrow_i32x4_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       widen_low_i8x16_s(value: ExpressionRef): ExpressionRef;
@@ -951,7 +1329,7 @@ declare module binaryen {
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
-    host(op: Op, name: string, operands: ExpressionRef[]): ExpressionRef;
+    host(op: Operation, name: string, operands: ExpressionRef[]): ExpressionRef;
     nop(): ExpressionRef;
     unreachable(): ExpressionRef;
     addFunction(name: string, params: Type, results: Type, vars: Type[], body: ExpressionRef): FunctionRef;
@@ -1003,9 +1381,10 @@ declare module binaryen {
     setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
   }
 
-  interface MemorySegmentInfo {
-    byteOffset: number;
+  interface MemorySegment {
+    offset: ExpressionRef;
     data: Uint8Array;
+    passive?: boolean;
   }
 
   function wrapModule(ptr: number): Module;
@@ -1013,6 +1392,12 @@ declare module binaryen {
   function getExpressionId(expression: ExpressionRef): number;
   function getExpressionType(expression: ExpressionRef): Type;
   function getExpressionInfo(expression: ExpressionRef): ExpressionInfo;
+
+  interface MemorySegmentInfo {
+    offset: ExpressionRef;
+    data: Uint8Array;
+    passive: boolean;
+  }
 
   interface ExpressionInfo {
     id: ExpressionId;
@@ -1100,12 +1485,12 @@ declare module binaryen {
   }
 
   interface UnaryInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     value: ExpressionRef;
   }
 
   interface BinaryInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     left: ExpressionRef;
     right: ExpressionRef;
   }
@@ -1131,13 +1516,13 @@ declare module binaryen {
   }
 
   interface HostInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     nameOperand: string | null;
     operands: ExpressionRef[];
   }
 
   interface AtomicRMWInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     bytes: number;
     offset: number;
     ptr: ExpressionRef;
@@ -1169,13 +1554,13 @@ declare module binaryen {
   }
 
   interface SIMDExtractInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     vec: ExpressionRef;
     index: ExpressionRef;
   }
 
   interface SIMDReplaceInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     vec: ExpressionRef;
     index: ExpressionRef;
     value: ExpressionRef;
@@ -1188,20 +1573,20 @@ declare module binaryen {
   }
 
   interface SIMDTernaryInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     a: ExpressionRef;
     b: ExpressionRef;
     c: ExpressionRef;
   }
 
   interface SIMDShiftInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     vec: ExpressionRef;
     shift: ExpressionRef;
   }
 
   interface SIMDLoadInfo extends ExpressionInfo {
-    op: Op;
+    op: Operation;
     offset: number;
     align: number;
     ptr: ExpressionRef;

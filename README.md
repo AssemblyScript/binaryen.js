@@ -574,6 +574,7 @@ API
 * Module#i8x16.**min_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i8x16.**max_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i8x16.**max_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i8x16.**avgr_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i8x16.**narrow_i16x8_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i8x16.**narrow_i16x8_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 >
@@ -608,6 +609,7 @@ API
 * Module#i16x8.**min_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i16x8.**max_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i16x8.**max_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
+* Module#i16x8.**avgr_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i16x8.**narrow_i32x4_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i16x8.**narrow_i32x4_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i16x8.**widen_low_i8x16_s**(value: `ExpressionRef`): `ExpressionRef`
