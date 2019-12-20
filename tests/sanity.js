@@ -1,10 +1,11 @@
 const assert = require("assert");
+const isWasm = process.argv[2] == "--wasm";
 
 // Basic tests to make sure that we do not push something obviously broken
 
 console.log("requiring binaryen");
 var binaryen;
-assert.doesNotThrow(() => binaryen = require(".."));
+assert.doesNotThrow(() => binaryen = require(isWasm ? "../wasm" : ".."));
 assert(binaryen);
 
 console.log("constructing a module");

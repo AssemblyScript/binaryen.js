@@ -1394,9 +1394,9 @@ declare module binaryen {
   function getExpressionInfo(expression: ExpressionRef): ExpressionInfo;
 
   interface MemorySegmentInfo {
-    offset: ExpressionRef;
+    byteOffset: ExpressionRef;
     data: Uint8Array;
-    passive: boolean;
+    // passive: boolean;
   }
 
   interface ExpressionInfo {
