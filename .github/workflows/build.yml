@@ -41,7 +41,10 @@ jobs:
         git config user.email "actions@github.com"
         git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
         git fetch origin
-        git checkout "${GITHUB_REF:11}"
+        if [ -z "$GITHUB_HEAD_REF"]; then
+          # If not a PR, undo detached head
+          git checkout "${GITHUB_REF:11}"
+        fi
         git submodule update --init --remote --merge
         cd ./binaryen
         git log -n1
