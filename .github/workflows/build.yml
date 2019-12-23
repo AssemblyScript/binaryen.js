@@ -5,6 +5,7 @@ on:
   push:
     branches:
     - master
+  pull_request:
 jobs:
   build:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
@@ -40,7 +41,10 @@ jobs:
         git config user.email "actions@github.com"
         git remote set-url origin "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
         git fetch origin
-        git checkout "${GITHUB_REF:11}"
+        if [ -z "$GITHUB_HEAD_REF" ]; then
+          # If not a PR, undo detached head
+          git checkout "${GITHUB_REF:11}"
+        fi
         git submodule update --init --remote --merge
         cd ./binaryen
         git log -n1
@@ -72,11 +76,23 @@ jobs:
         emcc --version
         emconfigure cmake .. -DCMAKE_BUILD_TYPE=Release
         emmake make -j2 binaryen_js
-        cp ./bin/binaryen_js.js ../../index.js
+        cp ./bin/binaryen.js ../../index.js
         cd ../..
     - name: "Test binaryen.js"
       run: |
         node ./tests/sanity
+    - name: "Build binaryen.wasm"
+      run: |
+        cd ./binaryen/build
+        source $HOME/emsdk/emsdk_env.sh
+        emcc --version
+        emconfigure cmake .. -DCMAKE_BUILD_TYPE=Release
+        emmake make -j2 binaryen_wasm
+        cp ./bin/binaryen.js ../../wasm.js
+        cd ../..
+    - name: "Test binaryen.wasm"
+      run: |
+        node ./tests/sanity --wasm
     - name: "Build wasm-opt"
       run: |
         cd ./binaryen/build
@@ -91,7 +107,7 @@ jobs:
     - name: "Push changes to GitHub"
       if: github.event_name != 'pull_request' && matrix.emsdk == 'latest-fastcomp'
       run: |
-        git add ./binaryen ./index.js ./bin/wasm-opt
+        git add ./binaryen ./index.js ./wasm.js ./bin/wasm-opt
         npm version $VERSION --no-git-tag-version --force
         if [ $RELEASE ]; then
           echo "Committing release ("$VERSION") ..."
