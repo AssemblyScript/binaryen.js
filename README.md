@@ -233,8 +233,9 @@ API
 * Module#**getMemorySegmentInfoByIndex**(index: `number`): `MemorySegmentInfo`<br />
   Gets information about the memory segment at the specified index.
 
-  * MemorySegmentInfo#**byteOffset**: `number`
+  * MemorySegmentInfo#**offset**: `number`
   * MemorySegmentInfo#**data**: `Uint8Array`
+  * MemorySegmentInfo#**passive**: `boolean`
 
 * Module#**setStart**(start: `FunctionRef`): `void`<br />
   Sets the start function.
@@ -310,6 +311,22 @@ API
   * EventInfo#**attribute**: `number`
   * EventInfo#**params**: `Type`
   * EventInfo#**results**: `Type`
+
+* **getSideEffects**(expr: `ExpressionRef`): `SideEffects`<br />
+  Gets the side effects of the specified expression.
+
+  * SideEffects#**None**: `SideEffects`
+  * SideEffects#**Branches**: `SideEffects`
+  * SideEffects#**Calls**: `SideEffects`
+  * SideEffects#**ReadsLocal**: `SideEffects`
+  * SideEffects#**WritesLocal**: `SideEffects`
+  * SideEffects#**ReadsGlobal**: `SideEffects`
+  * SideEffects#**WritesGlobal**: `SideEffects`
+  * SideEffects#**ReadsMemory**: `SideEffects`
+  * SideEffects#**WritesMemory**: `SideEffects`
+  * SideEffects#**ImplicitTrap**: `SideEffects`
+  * SideEffects#**IsAtomic**: `SideEffects`
+  * SideEffects#**Any**: `SideEffects`
 
 ### Module validation
 

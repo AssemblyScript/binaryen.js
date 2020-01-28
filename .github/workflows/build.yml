@@ -74,9 +74,9 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emconfigure cmake .. -DCMAKE_BUILD_TYPE=Release
+        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
         emmake make -j2 binaryen_js
-        cp ./bin/binaryen.js ../../index.js
+        cp ./bin/binaryen_js.js ../../index.js
         cd ../..
     - name: "Test binaryen.js"
       run: |
@@ -88,7 +88,7 @@ jobs:
         emcc --version
         emconfigure cmake .. -DCMAKE_BUILD_TYPE=Release
         emmake make -j2 binaryen_wasm
-        cp ./bin/binaryen.js ../../wasm.js
+        cp ./bin/binaryen_wasm.js ../../wasm.js
         cd ../..
     - name: "Test binaryen.wasm"
       run: |
