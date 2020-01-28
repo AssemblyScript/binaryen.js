@@ -920,7 +920,7 @@ API
 
 #### [Multi-value operations](https://github.com/WebAssembly/multi-value/blob/master/proposals/multi-value/Overview.md) 🦄
 
-Note that these are pseudo instructions introduced to allow Binaryen to reason about multiple values on the stack.
+Note that these are pseudo instructions enabling Binaryen to reason about multiple values on the stack.
 
 * Module#**push**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i32.**pop**(): `ExpressionRef`
