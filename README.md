@@ -64,7 +64,7 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
     `https://cdn.jsdelivr.net/gh/AssemblyScript/binaryen.js@VERSION/index.js`
   * From npm via [jsDelivr](https://www.jsdelivr.com):<br />
     `https://cdn.jsdelivr.net/npm/binaryen@VERSION/index.js`
-  * From npm via [UNPKG](https://unpkg.com):<br />
+  * From npm via [unpkg](https://unpkg.com):<br />
     `https://unpkg.com/binaryen@VERSION/index.js`
 
   Replace `VERSION` with a [specific version](https://github.com/AssemblyScript/binaryen.js/releases) or omit it (not recommended in production) to use master/latest.
@@ -89,17 +89,18 @@ API
   - [Variable accesses](#variable-accesses)
   - [Integer operations](#integer-operations)
   - [Floating point operations](#floating-point-operations)
-  - [Vector operations 🦄](#vector-operations-)
   - [Datatype conversions](#datatype-conversions)
   - [Function calls](#function-calls)
   - [Linear memory accesses](#linear-memory-accesses)
   - [Host operations](#host-operations)
+  - [Vector operations 🦄](#vector-operations-)
   - [Atomic memory accesses 🦄](#atomic-memory-accesses-)
   - [Atomic read-modify-write operations 🦄](#atomic-read-modify-write-operations-)
   - [Atomic wait and notify operations 🦄](#atomic-wait-and-notify-operations-)
   - [Sign extension operations 🦄](#sign-extension-operations-)
   - [Multi-value operations 🦄](#multi-value-operations-)
   - [Exception handling operations 🦄](#exception-handling-operations-)
+  - [Reference types operations 🦄](#reference-types-operations-)
 - [Expression manipulation](#expression-manipulation)
 - [Relooper](#relooper)
 - [Source maps](#source-maps)
@@ -554,6 +555,85 @@ API
 * Module#f64.**gt**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#f64.**ge**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 
+#### [Datatype conversions](http://webassembly.org/docs/semantics/#datatype-conversions-truncations-reinterpretations-promotions-and-demotions)
+
+* Module#i32.**trunc_s.f32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32.**trunc_s.f64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32.**trunc_u.f32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32.**trunc_u.f64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i32.**wrap**(value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#i64.**trunc_s.f32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**trunc_s.f64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**trunc_u.f32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**trunc_u.f64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**extend_s**(value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**extend_u**(value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#f32.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32.**convert_s.i32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32.**convert_s.i64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32.**convert_u.i32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32.**convert_u.i64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f32.**demote**(value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#f64.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64.**convert_s.i32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64.**convert_s.i64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64.**convert_u.i32**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64.**convert_u.i64**(value: `ExpressionRef`): `ExpressionRef`
+* Module#f64.**promote**(value: `ExpressionRef`): `ExpressionRef`
+
+#### [Function calls](http://webassembly.org/docs/semantics/#calls)
+
+* Module#**call**(name: `string`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
+  Creates a call to a function. Note that we must specify the parameter and result type here.
+
+* Module#**return_call**(name: `string`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
+  Like **call**, but creates a tail-call. 🦄
+
+* Module#**call_indirect**(target: `ExpressionRef`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
+  Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
+
+* Module#**return_call_indirect**(target: `ExpressionRef`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
+  Like **call_indirect**, but creates a tail-call. 🦄
+
+#### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
+
+* Module#i32.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**load8_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**load8_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**load16_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**load16_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**store8**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`<br />
+* Module#i32.**store16**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`<br />
+>
+* Module#i64.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**load8_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**load8_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**load16_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**load16_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**load32_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**load32_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**store8**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**store16**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+* Module#i64.**store32**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#f32.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#f32.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+>
+* Module#f64.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
+* Module#f64.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
+
+#### [Host operations](http://webassembly.org/docs/semantics/#resizing)
+
+* Module#**memory.size**(): `ExpressionRef`
+* Module#**memory.grow**(value: `number`): `ExpressionRef`
+
 #### [Vector operations](https://github.com/WebAssembly/simd/blob/master/proposals/simd/SIMD.md) 🦄
 
 * Module#v128.**const**(bytes: `Uint8Array`): `ExpressionRef`
@@ -752,85 +832,6 @@ API
 >
 * Module#v64x2.**load_splat**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
 
-#### [Datatype conversions](http://webassembly.org/docs/semantics/#datatype-conversions-truncations-reinterpretations-promotions-and-demotions)
-
-* Module#i32.**trunc_s.f32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i32.**trunc_s.f64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i32.**trunc_u.f32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i32.**trunc_u.f64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i32.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i32.**wrap**(value: `ExpressionRef`): `ExpressionRef`
->
-* Module#i64.**trunc_s.f32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**trunc_s.f64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**trunc_u.f32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**trunc_u.f64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**extend_s**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**extend_u**(value: `ExpressionRef`): `ExpressionRef`
->
-* Module#f32.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f32.**convert_s.i32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f32.**convert_s.i64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f32.**convert_u.i32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f32.**convert_u.i64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f32.**demote**(value: `ExpressionRef`): `ExpressionRef`
->
-* Module#f64.**reinterpret**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f64.**convert_s.i32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f64.**convert_s.i64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f64.**convert_u.i32**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f64.**convert_u.i64**(value: `ExpressionRef`): `ExpressionRef`
-* Module#f64.**promote**(value: `ExpressionRef`): `ExpressionRef`
-
-#### [Function calls](http://webassembly.org/docs/semantics/#calls)
-
-* Module#**call**(name: `string`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
-  Creates a call to a function. Note that we must specify the parameter and result type here.
-
-* Module#**return_call**(name: `string`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
-  Like **call**, but creates a tail-call. 🦄
-
-* Module#**call_indirect**(target: `ExpressionRef`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
-  Similar to **call**, but calls indirectly, i.e., via a function pointer, so an expression replaces the name as the called value.
-
-* Module#**return_call_indirect**(target: `ExpressionRef`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
-  Like **call_indirect**, but creates a tail-call. 🦄
-
-#### [Linear memory accesses](http://webassembly.org/docs/semantics/#linear-memory-accesses)
-
-* Module#i32.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**load8_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**load8_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**load16_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**load16_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**store8**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`<br />
-* Module#i32.**store16**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`<br />
->
-* Module#i64.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**load8_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**load8_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**load16_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**load16_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**load32_s**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**load32_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**store8**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**store16**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**store32**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
->
-* Module#f32.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#f32.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
->
-* Module#f64.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
-* Module#f64.**store**(offset: `number`, align: `number`, ptr: `ExpressionRef`, value: `ExpressionRef`): `ExpressionRef`
-
-#### [Host operations](http://webassembly.org/docs/semantics/#resizing)
-
-* Module#**memory.size**(): `ExpressionRef`
-* Module#**memory.grow**(value: `number`): `ExpressionRef`
-
 #### [Atomic memory accesses](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#atomic-memory-accesses) 🦄
 
 * Module#i32.**atomic.load**(offset: `number`, ptr: `ExpressionRef`): `ExpressionRef`
@@ -995,6 +996,9 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * **DataDropId**: `ExpressionId`
   * **MemoryCopyId**: `ExpressionId`
   * **MemoryFillId**: `ExpressionId`
+  * **RefNullId**: `ExpressionId`
+  * **RefIsNullId**: `ExpressionId`
+  * **RefFuncId**: `ExpressionId`
   * **TryId**: `ExpressionId`
   * **ThrowId**: `ExpressionId`
   * **RethrowId**: `ExpressionId`
