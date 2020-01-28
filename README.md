@@ -322,18 +322,18 @@ API
 * **getSideEffects**(expr: `ExpressionRef`): `SideEffects`<br />
   Gets the side effects of the specified expression.
 
-  * SideEffects#**None**: `SideEffects`
-  * SideEffects#**Branches**: `SideEffects`
-  * SideEffects#**Calls**: `SideEffects`
-  * SideEffects#**ReadsLocal**: `SideEffects`
-  * SideEffects#**WritesLocal**: `SideEffects`
-  * SideEffects#**ReadsGlobal**: `SideEffects`
-  * SideEffects#**WritesGlobal**: `SideEffects`
-  * SideEffects#**ReadsMemory**: `SideEffects`
-  * SideEffects#**WritesMemory**: `SideEffects`
-  * SideEffects#**ImplicitTrap**: `SideEffects`
-  * SideEffects#**IsAtomic**: `SideEffects`
-  * SideEffects#**Any**: `SideEffects`
+  * SideEffects.**None**: `SideEffects`
+  * SideEffects.**Branches**: `SideEffects`
+  * SideEffects.**Calls**: `SideEffects`
+  * SideEffects.**ReadsLocal**: `SideEffects`
+  * SideEffects.**WritesLocal**: `SideEffects`
+  * SideEffects.**ReadsGlobal**: `SideEffects`
+  * SideEffects.**WritesGlobal**: `SideEffects`
+  * SideEffects.**ReadsMemory**: `SideEffects`
+  * SideEffects.**WritesMemory**: `SideEffects`
+  * SideEffects.**ImplicitTrap**: `SideEffects`
+  * SideEffects.**IsAtomic**: `SideEffects`
+  * SideEffects.**Any**: `SideEffects`
 
 ### Module validation
 
