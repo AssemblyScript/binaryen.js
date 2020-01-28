@@ -129,8 +129,14 @@ API
  * **v128**: `Type`<br />
    128-bit vector type. 🦄
 
+ * **funcref**: `Type`<br />
+   A function reference. 🦄
+
  * **anyref**: `Type`<br />
-   A host reference. 🦄
+   Any host reference. 🦄
+
+ * **nullref**: `Type`<br />
+   A null reference. 🦄
 
  * **exnref**: `Type`<br />
    An exception reference. 🦄
@@ -233,8 +239,9 @@ API
 * Module#**getMemorySegmentInfoByIndex**(index: `number`): `MemorySegmentInfo`<br />
   Gets information about the memory segment at the specified index.
 
-  * MemorySegmentInfo#**byteOffset**: `number`
+  * MemorySegmentInfo#**offset**: `number`
   * MemorySegmentInfo#**data**: `Uint8Array`
+  * MemorySegmentInfo#**passive**: `boolean`
 
 * Module#**setStart**(start: `FunctionRef`): `void`<br />
   Sets the start function.
@@ -310,6 +317,22 @@ API
   * EventInfo#**attribute**: `number`
   * EventInfo#**params**: `Type`
   * EventInfo#**results**: `Type`
+
+* **getSideEffects**(expr: `ExpressionRef`): `SideEffects`<br />
+  Gets the side effects of the specified expression.
+
+  * SideEffects#**None**: `SideEffects`
+  * SideEffects#**Branches**: `SideEffects`
+  * SideEffects#**Calls**: `SideEffects`
+  * SideEffects#**ReadsLocal**: `SideEffects`
+  * SideEffects#**WritesLocal**: `SideEffects`
+  * SideEffects#**ReadsGlobal**: `SideEffects`
+  * SideEffects#**WritesGlobal**: `SideEffects`
+  * SideEffects#**ReadsMemory**: `SideEffects`
+  * SideEffects#**WritesMemory**: `SideEffects`
+  * SideEffects#**ImplicitTrap**: `SideEffects`
+  * SideEffects#**IsAtomic**: `SideEffects`
+  * SideEffects#**Any**: `SideEffects`
 
 ### Module validation
 
@@ -399,7 +422,7 @@ API
 * Module#**drop**(value: `ExpressionRef`): `ExpressionRef`<br />
   Creates a [drop](http://webassembly.org/docs/semantics/#type-parametric-operators) of a value.
 
-* Module#**select**(condition: `ExpressionRef`, ifTrue: `ExpressionRef`, ifFalse: `ExpressionRef`): `ExpressionRef`<br />
+* Module#**select**(condition: `ExpressionRef`, ifTrue: `ExpressionRef`, ifFalse: `ExpressionRef`, type?: `Type`): `ExpressionRef`<br />
   Creates a [select](http://webassembly.org/docs/semantics/#type-parametric-operators) of one of two values.
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
@@ -897,13 +920,17 @@ API
 
 #### [Multi-value operations](https://github.com/WebAssembly/multi-value/blob/master/proposals/multi-value/Overview.md) 🦄
 
+Note that these are pseudo instructions enabling Binaryen to reason about multiple values on the stack.
+
 * Module#**push**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i32.**pop**(): `ExpressionRef`
 * Module#i64.**pop**(): `ExpressionRef`
 * Module#f32.**pop**(): `ExpressionRef`
 * Module#f64.**pop**(): `ExpressionRef`
 * Module#v128.**pop**(): `ExpressionRef`
+* Module#funcref.**pop**(): `ExpressionRef`
 * Module#anyref.**pop**(): `ExpressionRef`
+* Module#nullref.**pop**(): `ExpressionRef`
 * Module#exnref.**pop**(): `ExpressionRef`
 
 #### [Exception handling operations](https://github.com/WebAssembly/exception-handling/blob/master/proposals/Exceptions.md) 🦄
@@ -918,6 +945,12 @@ API
 * Module#**removeEvent**(name: `stirng`): `void`
 * Module#**addEventImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, attribute: `number`, params: `Type`, results: `Type`): `void`
 * Module#**addEventExport**(internalName: `string`, externalName: `string`): `ExportRef`
+
+#### [Reference types operations](https://github.com/WebAssembly/reference-types/blob/master/proposals/reference-types/Overview.md) 🦄
+
+* Module#ref.**null**(): `ExpressionRef`
+* Module#ref.**is_null**(value: `ExpressionRef`): `ExpressionRef`
+* Module#ref.**func**(name: `string`): `ExpressionRef`
 
 ### Expression manipulation
 

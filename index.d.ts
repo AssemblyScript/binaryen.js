@@ -11,7 +11,9 @@ declare module binaryen {
   const f32: Type;
   const f64: Type;
   const v128: Type;
+  const funcref: Type;
   const anyref: Type;
+  const nullref: Type;
   const exnref: Type;
   const unreachable: Type;
   const auto: Type;
@@ -60,6 +62,9 @@ declare module binaryen {
     DataDrop,
     MemoryCopy,
     MemoryFill,
+    RefNull,
+    RefIsNull,
+    RefFunc,
     Try,
     Throw,
     Rethrow,
@@ -106,6 +111,9 @@ declare module binaryen {
   const DataDropId: ExpressionId;
   const MemoryCopyId: ExpressionId;
   const MemoryFillId: ExpressionId;
+  const RefNullId: ExpressionId;
+  const RefIsNullId: ExpressionId;
+  const RefFuncId: ExpressionId;
   const TryId: ExpressionId;
   const ThrowId: ExpressionId;
   const RethrowId: ExpressionId;
@@ -132,13 +140,17 @@ declare module binaryen {
   type FeatureFlags = number;
 
   const enum Features {
+    MVP,
     Atomics,
     BulkMemory,
     MutableGlobals,
     NontrappingFPToInt,
     SignExt,
     SIMD128,
-    ExceptionHandling
+    ExceptionHandling,
+    TailCall,
+    ReferenceTypes,
+    All
   }
 
   type Operation = number;
@@ -1311,11 +1323,22 @@ declare module binaryen {
     v64x2: {
       load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
     };
+    funcref: {
+      pop(): ExpressionRef;
+    };
     anyref: {
+      pop(): ExpressionRef;
+    };
+    nullref: {
       pop(): ExpressionRef;
     };
     exnref: {
       pop(): ExpressionRef;
+    };
+    ref: {
+      null(): ExpressionRef;
+      is_null(value: ExpressionRef): ExpressionRef;
+      func(name: string): ExpressionRef;
     };
     atomic: {
       notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
@@ -1326,7 +1349,7 @@ declare module binaryen {
     rethrow(exnref: ExpressionRef): ExpressionRef;
     br_on_exn(label: string, event: string, exnref: ExpressionRef): ExpressionRef;
     push(value: ExpressionRef): ExpressionRef;
-    select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
+    select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef, type?: Type): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
     host(op: Operation, name: string, operands: ExpressionRef[]): ExpressionRef;
@@ -1394,9 +1417,9 @@ declare module binaryen {
   function getExpressionInfo(expression: ExpressionRef): ExpressionInfo;
 
   interface MemorySegmentInfo {
-    byteOffset: ExpressionRef;
+    offset: ExpressionRef;
     data: Uint8Array;
-    // passive: boolean;
+    passive: boolean;
   }
 
   interface ExpressionInfo {
@@ -1683,6 +1706,23 @@ declare module binaryen {
     attribute: number;
     params: Type;
     results: Type;
+  }
+
+  function getSideEffects(expr: ExpressionRef): SideEffects;
+
+  const enum SideEffects {
+    None,
+    Branches,
+    Calls,
+    ReadsLocal,
+    WritesLocal,
+    ReadsGlobal,
+    WritesGlobal,
+    ReadsMemory,
+    WritesMemory,
+    ImplicitTrap,
+    IsAtomic,
+    Any
   }
 
   function emitText(expression: ExpressionRef | Module): string;
