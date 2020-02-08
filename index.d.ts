@@ -1708,7 +1708,7 @@ declare module binaryen {
     results: Type;
   }
 
-  function getSideEffects(expr: ExpressionRef): SideEffects;
+  function getSideEffects(expr: ExpressionRef, features: FeatureFlags): SideEffects;
 
   const enum SideEffects {
     None,
@@ -1722,6 +1722,7 @@ declare module binaryen {
     WritesMemory,
     ImplicitTrap,
     IsAtomic,
+    Throws,
     Any
   }
 
@@ -1734,6 +1735,11 @@ declare module binaryen {
   function setShrinkLevel(level: number): number;
   function getDebugInfo(): boolean;
   function setDebugInfo(on: boolean): void;
+  function getLowMemoryUnused(): boolean;
+  function setLowMemoryUnused(on: boolean): void;
+  function getPassArgument(key: string): string | null;
+  function setPassArgument(key: string, value: string | null): void;
+  function clearPassArguments(): void;
   function setAPITracing(on: boolean): void;
   function exit(status: number): void;
 
