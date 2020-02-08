@@ -319,7 +319,7 @@ API
   * EventInfo#**params**: `Type`
   * EventInfo#**results**: `Type`
 
-* **getSideEffects**(expr: `ExpressionRef`): `SideEffects`<br />
+* **getSideEffects**(expr: `ExpressionRef`, features: `FeatureFlags`): `SideEffects`<br />
   Gets the side effects of the specified expression.
 
   * SideEffects.**None**: `SideEffects`
@@ -333,6 +333,7 @@ API
   * SideEffects.**WritesMemory**: `SideEffects`
   * SideEffects.**ImplicitTrap**: `SideEffects`
   * SideEffects.**IsAtomic**: `SideEffects`
+  * SideEffects.**Throws**: `SideEffects`
   * SideEffects.**Any**: `SideEffects`
 
 ### Module validation
@@ -371,6 +372,21 @@ API
 
 * **setDebugInfo**(on: `boolean`): `void`<br />
   Enables or disables debug information in emitted binaries.
+
+* **getLowMemoryUnused**(): `boolean`<br />
+  Gets whether the low 1K of memory can be considered unused when optimizing.
+
+* **setLowMemoryUnused**(on: `boolean`): `void`<br />
+  Enables or disables whether the low 1K of memory can be considered unused when optimizing.
+
+* **getPassArgument**(key: `string`): `string | null`<br />
+  Gets the value of the specified arbitrary pass argument.
+
+* **setPassArgument**(key: `string`, value: `string | null`): `void`<br />
+  Sets the value of the specified arbitrary pass argument. Removes the respective argument if `value` is `null`.
+
+* **clearPassArguments**(): `void`<br />
+  Clears all arbitrary pass arguments.
 
 ### Module creation
 
