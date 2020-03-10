@@ -227,6 +227,12 @@ API
 * Module#**setFunctionTable**(initial: `number`, maximum: `number`, funcs: `string[]`, offset?: `ExpressionRef`): `void`<br />
   Sets the contents of the function table. There's just one table for now, using name `"0"`.
 
+* Module#**getFunctionTable**(): `{ imported: boolean, segments: TableElement[] }`<br />
+  Gets the contents of the function table.
+
+  * TableElement#**offset**: `ExpressionRef`
+  * TableElement#**names**: `string[]`
+
 * Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`, flags?: `number[]`, shared?: `boolean`): `void`<br />
   Sets the memory. There's just one memory for now, using name `"0"`. Providing `exportName` also creates a memory export.
 
@@ -247,24 +253,25 @@ API
 * Module#**setStart**(start: `FunctionRef`): `void`<br />
   Sets the start function.
 
-* Module#**getFeatures**(): `FeatureFlags`<br />
+* Module#**getFeatures**(): `Features`<br />
   Gets the WebAssembly features enabled for this module.
 
-  Possible `FeatureFlags` values are:
+  Note that the return value may be a bitmask indicating multiple features. Possible feature flags are:
 
-  * Features.**MVP**: `FeatureFlags`
-  * Features.**Atomics**: `FeatureFlags`
-  * Features.**BulkMemory**: `FeatureFlags`
-  * Features.**MutableGlobals**: `FeatureFlags`
-  * Features.**NontrappingFPToInt**: `FeatureFlags`
-  * Features.**SignExt**: `FeatureFlags`
-  * Features.**SIMD128**: `FeatureFlags`
-  * Features.**ExceptionHandling**: `FeatureFlags`
-  * Features.**TailCall**: `FeatureFlags`
-  * Features.**ReferenceTypes**: `FeatureFlags`
-  * Features.**All**: `FeatureFlags`
+  * Features.**MVP**: `Features`
+  * Features.**Atomics**: `Features`
+  * Features.**BulkMemory**: `Features`
+  * Features.**MutableGlobals**: `Features`
+  * Features.**NontrappingFPToInt**: `Features`
+  * Features.**SignExt**: `Features`
+  * Features.**SIMD128**: `Features`
+  * Features.**ExceptionHandling**: `Features`
+  * Features.**TailCall**: `Features`
+  * Features.**ReferenceTypes**: `Features`
+  * Features.**Multivalue**: `Features`
+  * Features.**All**: `Features`
 
-* Module#**setFeatures**(features: `FeatureFlags`): `void`<br />
+* Module#**setFeatures**(features: `Features`): `void`<br />
   Sets the WebAssembly features enabled for this module.
 
 * Module#**addCustomSection**(name: `string`, contents: `Uint8Array`): `void`<br />
@@ -387,6 +394,24 @@ API
 
 * **clearPassArguments**(): `void`<br />
   Clears all arbitrary pass arguments.
+
+* **getAlwaysInlineMaxSize**(): `number`<br />
+  Gets the function size at which we always inline.
+
+* **setAlwaysInlineMaxSize**(size: `number`): `void`<br />
+  Sets the function size at which we always inline.
+
+* **getFlexibleInlineMaxSize**(): `number`<br />
+  Gets the function size which we inline when functions are lightweight.
+
+* **setFlexibleInlineMaxSize**(size: `number`): `void`<br />
+  Sets the function size which we inline when functions are lightweight.
+
+* **getOneCallerInlineMaxSize**(): `number`<br />
+  Gets the function size which we inline when there is only one caller.
+
+* **setOneCallerInlineMaxSize**(size: `number`): `void`<br />
+  Sets the function size which we inline when there is only one caller.
 
 ### Module creation
 

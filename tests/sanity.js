@@ -4,8 +4,7 @@ const isWasm = process.argv[2] == "--wasm";
 // Basic tests to make sure that we do not push something obviously broken
 
 console.log("requiring binaryen");
-var binaryen;
-assert.doesNotThrow(() => binaryen = require(isWasm ? "../wasm" : ".."));
+var binaryen = isWasm ? require("../wasm") : require("..");
 assert(binaryen);
 
 console.log("awaiting ready");
@@ -34,7 +33,7 @@ function test() {
   assert(mvtype);
 
   console.log("adding a function import");
-  mod.addFunctionImport("func", "env", "func", mvtype, mvtype);
+  mod.addFunctionImport("func", "env", "func", mvtype, binaryen.i32);
 
   console.log("adding a function export");
   mod.addFunctionExport("main", "main");
