@@ -86,7 +86,7 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emconfigure cmake .. -DCMAKE_BUILD_TYPE=Release
+        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
         emmake make -j2 binaryen_wasm
         cp ./bin/binaryen_wasm.js ../../wasm.js
         cd ../..
