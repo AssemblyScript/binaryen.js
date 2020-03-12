@@ -13,7 +13,7 @@ jobs:
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
     strategy:
       matrix:
-        emsdk: [ "latest-fastcomp", "latest" ]
+        emsdk: [ "tot", "latest", "latest-fastcomp" ]
       fail-fast: false
     steps:
     - name: "Set up Emsdk"
@@ -105,7 +105,7 @@ jobs:
       run: |
         node ./bin/wasm-opt --help
     - name: "Push changes to GitHub"
-      if: github.event_name != 'pull_request' && matrix.emsdk == 'latest-fastcomp'
+      if: github.event_name != 'pull_request' && matrix.emsdk == 'tot'
       run: |
         git add ./binaryen ./index.js ./wasm.js ./bin/wasm-opt
         npm version $VERSION --no-git-tag-version --force
@@ -122,7 +122,7 @@ jobs:
         git tag "v$VERSION"
         git push -u origin "v$VERSION"
     - name: "Publish to npm"
-      if: github.event_name != 'pull_request' && matrix.emsdk == 'latest-fastcomp'
+      if: github.event_name != 'pull_request' && matrix.emsdk == 'tot'
       env:
         NPM_REGISTRY: "registry.npmjs.org"
         NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
