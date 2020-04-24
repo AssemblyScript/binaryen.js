@@ -1456,11 +1456,13 @@ declare module binaryen {
   }
 
   interface CallInfo extends ExpressionInfo {
+    isReturn: boolean;
     target: string;
     operands: ExpressionRef[];
   }
 
   interface CallIndirectInfo extends ExpressionInfo {
+    isReturn: boolean;
     target: ExpressionRef;
     operands: ExpressionRef[];
   }
