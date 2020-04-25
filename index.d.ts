@@ -809,7 +809,7 @@ declare module binaryen {
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
-    return_call(name: string, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    return_call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
     call_indirect(target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
     return_call_indirect(target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
     local: {
