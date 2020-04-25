@@ -632,7 +632,7 @@ API
 * Module#**call**(name: `string`, operands: `ExpressionRef[]`, returnType: `Type`): `ExpressionRef`
 Creates a call to a function. Note that we must specify the return type here as we may not have created the function being called yet.
 
-* Module#**return_call**(name: `string`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
+* Module#**return_call**(name: `string`, operands: `ExpressionRef[]`, returnType: `Type`): `ExpressionRef`<br />
   Like **call**, but creates a tail-call. 🦄
 
 * Module#**call_indirect**(target: `ExpressionRef`, operands: `ExpressionRef[]`, params: `Type`, results: `Type`): `ExpressionRef`<br />
