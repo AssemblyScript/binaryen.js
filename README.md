@@ -447,10 +447,10 @@ API
   Creates a loop.
   
 * Module#**br**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
-  Creates a branch to a label.
+  Creates a branch (br) to a label.
 
 * Module#**break**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
-  Alias for br.
+  Alias for Module#br.
 
 * Module#**switch**(labels: `string[]`, defaultLabel: `string`, condition: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
   Creates a switch (br_table).
