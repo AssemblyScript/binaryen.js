@@ -449,9 +449,6 @@ API
 * Module#**br**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
   Creates a branch (br) to a label.
 
-* Module#**break**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
-  Alias for Module#br.
-
 * Module#**switch**(labels: `string[]`, defaultLabel: `string`, condition: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
   Creates a switch (br_table).
 
