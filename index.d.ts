@@ -806,7 +806,6 @@ declare module binaryen {
     block(label: string, children: ExpressionRef[], resultType?: Type): ExpressionRef;
     if(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse?: ExpressionRef): ExpressionRef;
     loop(label: string, body: ExpressionRef): ExpressionRef;
-    break(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
