@@ -445,9 +445,9 @@ API
 
 * Module#**loop**(label: `string | null`, body: `ExpressionRef`): `ExpressionRef`<br />
   Creates a loop.
-
-* Module#**break**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
-  Creates a break (br) to a label.
+  
+* Module#**br**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
+  Creates a branch (br) to a label.
 
 * Module#**switch**(labels: `string[]`, defaultLabel: `string`, condition: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
   Creates a switch (br_table).
