@@ -445,7 +445,7 @@ API
 
 * Module#**loop**(label: `string | null`, body: `ExpressionRef`): `ExpressionRef`<br />
   Creates a loop.
-  
+
 * Module#**br**(label: `string`, condition?: `ExpressionRef`, value?: `ExpressionRef`): `ExpressionRef`<br />
   Creates a branch (br) to a label.
 
@@ -974,6 +974,8 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 * Module#anyref.**pop**(): `ExpressionRef`
 * Module#nullref.**pop**(): `ExpressionRef`
 * Module#exnref.**pop**(): `ExpressionRef`
+* Module#tuple.**make**(elements: `ExpressionRef[]`): `ExpressionRef`
+* Module#tuple.**extract**(tuple: `ExpressionRef`, index: `number`): `ExpressionRef`
 
 #### [Exception handling operations](https://github.com/WebAssembly/exception-handling/blob/master/proposals/Exceptions.md) 🦄
 
@@ -1170,7 +1172,7 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * SIMDShuffleInfo#**left**: `ExpressionRef`
   * SIMDShuffleInfo#**right**: `ExpressionRef`
   * SIMDShuffleInfo#**mask**: `Uint8Array`
-  > 
+  >
   * SIMDTernaryInfo#**op**: `Op`
   * SIMDTernaryInfo#**a**: `ExpressionRef`
   * SIMDTernaryInfo#**b**: `ExpressionRef`
