@@ -1648,6 +1648,17 @@ declare module binaryen {
     size: ExpressionRef;
   }
 
+  interface RefNullInfo extends ExpressionInfo {
+  }
+
+  interface RefIsNullInfo extends ExpressionInfo {
+    value: ExpressionRef;
+  }
+
+  interface RefFuncInfo extends ExpressionInfo {
+    func: string;
+  }
+
   interface TryInfo extends ExpressionInfo {
     body: ExpressionRef;
     catchBody: ExpressionRef;
