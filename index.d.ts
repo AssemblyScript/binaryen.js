@@ -67,6 +67,8 @@ declare module binaryen {
     Throw,
     Rethrow,
     BrOnExn,
+    TupleMake,
+    TupleExtract,
     Push,
     Pop
   }
@@ -116,6 +118,8 @@ declare module binaryen {
   const ThrowId: ExpressionIds;
   const RethrowId: ExpressionIds;
   const BrOnExnId: ExpressionIds;
+  const TupleMakeId: ExpressionIds;
+  const TupleExtractId: ExpressionIds;
   const PushId: ExpressionIds;
   const PopId: ExpressionIds;
 
@@ -1337,6 +1341,10 @@ declare module binaryen {
     atomic: {
       notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
       fence(): ExpressionRef;
+    };
+    tuple: {
+      make(elements: ExportRef[]): ExpressionRef;
+      extract(tuple: ExpressionRef, index: number): ExpressionRef;
     };
     try(body: ExpressionRef, catchBody: ExpressionRef): ExpressionRef;
     throw(event: string, operands: ExpressionRef[]): ExpressionRef;
