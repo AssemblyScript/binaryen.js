@@ -1203,6 +1203,12 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * TryInfo#**body**: `ExpressionRef`
   * TryInfo#**catchBody**: `ExpressionRef`
   >
+  * RefNullInfo
+  >
+  * RefIsNullInfo#**value**: `ExpressionRef`
+  >
+  * RefFuncInfo#**func**: `string`
+  >
   * ThrowInfo#**event**: `string`
   * ThrowInfo#**operands**: `ExpressionRef[]`
   >
