@@ -1405,6 +1405,7 @@ declare module binaryen {
     addDebugInfoFileName(filename: string): number;
     getDebugInfoFileName(index: number): string | null;
     setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
+    copyExpression(expr: ExpressionRef): ExpressionRef;
   }
 
   interface MemorySegment {
@@ -1767,7 +1768,6 @@ declare module binaryen {
   function setFlexibleInlineMaxSize(size: number): void;
   function getOneCallerInlineMaxSize(): number;
   function setOneCallerInlineMaxSize(size: number): void;
-  function setAPITracing(on: boolean): void;
   function exit(status: number): void;
 
   type RelooperBlockRef = number;
