@@ -1227,6 +1227,9 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 * **emitText**(expression: `ExpressionRef`): `string`<br />
   Emits the expression in Binaryen's s-expression text format (not official stack-style text format).
 
+* **copyExpression**(expression: `ExpressionRef`): `ExpressionRef`<br />
+  Creates a deep copy of an expression.
+
 ### Relooper
 
 * new **Relooper**()<br />
@@ -1259,9 +1262,6 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   Sets the debug location of the specified `ExpressionRef` within the specified `FunctionRef`.
 
 ### Debugging
-
-* Module#**setAPITracing**(on: `boolean`): `void`<br />
-  Enables tracing of the C-API in the console. Can be very useful when filing bug reports.
 
 * Module#**interpret**(): `void`<br />
   Runs the module in the interpreter, calling the start function.
