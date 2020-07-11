@@ -13,7 +13,7 @@ jobs:
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
     strategy:
       matrix:
-        emsdk: [ "tot", "latest", "latest-fastcomp" ]
+        emsdk: [ "tot", "latest" ]
       fail-fast: false
     steps:
     - name: "Set up Emsdk"

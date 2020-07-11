@@ -3,7 +3,9 @@ binaryen.js
 
 **binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate [WebAssembly](https://webassembly.org) using a JavaScript API.
 
-[![Actions Status](https://github.com/AssemblyScript/binaryen.js/workflows/Build/badge.svg)](https://github.com/AssemblyScript/binaryen.js/actions) [![npm](https://img.shields.io/npm/v/binaryen.svg)](https://www.npmjs.com/package/binaryen) [![npm (tag)](https://img.shields.io/npm/v/binaryen/nightly.svg)](https://www.npmjs.com/package/binaryen)
+<a href="https://github.com/AssemblyScript/binaryen.js/actions?query=workflow%3ABuild"><img src="https://img.shields.io/github/workflow/status/AssemblyScript/binaryen.js/Build/master?label=build&logo=github" alt="Build status" /></a>
+<a href="https://www.npmjs.com/package/binaryen"><img src="https://img.shields.io/npm/v/binaryen.svg?label=latest&color=007acc&logo=npm" alt="npm version" /></a>
+<a href="https://www.npmjs.com/package/binaryen"><img src="https://img.shields.io/npm/v/binaryen/nightly.svg?label=nightly&color=007acc&logo=npm" alt="npm nightly version" /></a>
 
 Usage
 -----
