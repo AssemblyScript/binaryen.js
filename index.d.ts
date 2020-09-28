@@ -138,18 +138,20 @@ declare module binaryen {
   const ExternalEvent: ExternalKinds;
 
   const enum Features {
-    MVP,
-    Atomics,
-    BulkMemory,
-    MutableGlobals,
-    NontrappingFPToInt,
-    SignExt,
-    SIMD128,
-    ExceptionHandling,
-    TailCall,
-    ReferenceTypes,
-    Multivalue,
-    All
+    MVP = 0,
+    Atomics = 1 << 0,
+    MutableGlobals = 1 << 1,
+    TruncSat = 1 << 2,
+    SIMD = 1 << 3,
+    BulkMemory = 1 << 4,
+    SignExt = 1 << 5,
+    ExceptionHandling = 1 << 6,
+    TailCall = 1 << 7,
+    ReferenceTypes = 1 << 8,
+    Multivalue = 1 << 9,
+    GC = 1 << 10,
+    Memory64 = 1 << 11,
+    All = (1 << 12) - 1
   }
 
   const enum Operations {
