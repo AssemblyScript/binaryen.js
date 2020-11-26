@@ -12,9 +12,11 @@ declare module binaryen {
   const f64: Type;
   const v128: Type;
   const funcref: Type;
-  const anyref: Type;
-  const nullref: Type;
+  const externref: Type;
   const exnref: Type;
+  const anyref: Type;
+  const eqref: Type;
+  const i31ref: Type;
   const unreachable: Type;
   const auto: Type;
 
@@ -42,7 +44,8 @@ declare module binaryen {
     Select,
     Drop,
     Return,
-    Host,
+    MemorySize,
+    MemoryGrow,
     Nop,
     Unreachable,
     AtomicCmpxchg,
@@ -63,14 +66,29 @@ declare module binaryen {
     RefNull,
     RefIsNull,
     RefFunc,
+    RefEq,
     Try,
     Throw,
     Rethrow,
     BrOnExn,
     TupleMake,
     TupleExtract,
-    Push,
-    Pop
+    Pop,
+    I31New,
+    I31Get,
+    CallRef,
+    RefTest,
+    RefCast,
+    BrOnCast,
+    RttCanon,
+    RttSub,
+    StructNew,
+    StructGet,
+    StructSet,
+    ArrayNew,
+    ArrayGet,
+    ArraySet,
+    ArrayLen
   }
 
   const InvalidId: ExpressionIds;
@@ -93,7 +111,8 @@ declare module binaryen {
   const SelectId: ExpressionIds;
   const DropId: ExpressionIds;
   const ReturnId: ExpressionIds;
-  const HostId: ExpressionIds;
+  const MemorySizeId: ExpressionIds;
+  const MemoryGrowId: ExpressionIds;
   const NopId: ExpressionIds;
   const UnreachableId: ExpressionIds;
   const AtomicCmpxchgId: ExpressionIds;
@@ -114,14 +133,29 @@ declare module binaryen {
   const RefNullId: ExpressionIds;
   const RefIsNullId: ExpressionIds;
   const RefFuncId: ExpressionIds;
+  const RefEqId: ExpressionIds;
   const TryId: ExpressionIds;
   const ThrowId: ExpressionIds;
   const RethrowId: ExpressionIds;
   const BrOnExnId: ExpressionIds;
   const TupleMakeId: ExpressionIds;
   const TupleExtractId: ExpressionIds;
-  const PushId: ExpressionIds;
   const PopId: ExpressionIds;
+  const I31NewId: ExpressionIds;
+  const I31GetId: ExpressionIds;
+  const CallRefId: ExpressionIds;
+  const RefTestId: ExpressionIds;
+  const RefCastId: ExpressionIds;
+  const BrOnCastId: ExpressionIds;
+  const RttCanonId: ExpressionIds;
+  const RttSubId: ExpressionIds;
+  const StructNewId: ExpressionIds;
+  const StructGetId: ExpressionIds;
+  const StructSetId: ExpressionIds;
+  const ArrayNewId: ExpressionIds;
+  const ArrayGetId: ExpressionIds;
+  const ArraySetId: ExpressionIds;
+  const ArrayLenId: ExpressionIds;
 
   const enum ExternalKinds {
     Function,
@@ -140,11 +174,11 @@ declare module binaryen {
   enum Features {
     MVP,
     Atomics,
-    MutableGlobals,
-    TruncSat,
-    SIMD,
     BulkMemory,
+    MutableGlobals,
+    NontrappingFPToInt,
     SignExt,
+    SIMD128,
     ExceptionHandling,
     TailCall,
     ReferenceTypes,
@@ -291,8 +325,6 @@ declare module binaryen {
     LeFloat64,
     GtFloat64,
     GeFloat64,
-    MemorySize,
-    MemoryGrow,
     AtomicRMWAdd,
     AtomicRMWSub,
     AtomicRMWAnd,
@@ -614,8 +646,6 @@ declare module binaryen {
   const LeFloat64: Operations;
   const GtFloat64: Operations;
   const GeFloat64: Operations;
-  const MemorySize: Operations;
-  const MemoryGrow: Operations;
   const AtomicRMWAdd: Operations;
   const AtomicRMWSub: Operations;
   const AtomicRMWAnd: Operations;
@@ -834,6 +864,11 @@ declare module binaryen {
       init(segment: number, dest: ExpressionRef, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
       copy(dest: ExpressionRef, source: ExpressionRef, size: ExpressionRef): ExpressionRef;
       fill(dest: ExpressionRef, value: ExpressionRef, size: ExpressionRef): ExpressionRef;
+      atomic: {
+        notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
+        wait32(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+        wait64(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+      }
     };
     data: {
       drop(segment: number): ExpressionRef;
@@ -931,7 +966,6 @@ declare module binaryen {
           xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
         },
-        wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       },
       pop(): ExpressionRef;
     };
@@ -1044,7 +1078,6 @@ declare module binaryen {
           xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
           cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
         },
-        wait(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       },
       pop(): ExpressionRef;
     };
@@ -1326,22 +1359,33 @@ declare module binaryen {
     funcref: {
       pop(): ExpressionRef;
     };
-    anyref: {
-      pop(): ExpressionRef;
-    };
-    nullref: {
+    externref: {
       pop(): ExpressionRef;
     };
     exnref: {
       pop(): ExpressionRef;
     };
-    ref: {
-      null(): ExpressionRef;
-      is_null(value: ExpressionRef): ExpressionRef;
-      func(name: string): ExpressionRef;
+    anyref: {
+      pop(): ExpressionRef;
     };
+    eqref: {
+      pop(): ExpressionRef;
+    };
+    i31ref: {
+      pop(): ExpressionRef;
+    };
+    ref: {
+      null(type: Type): ExpressionRef;
+      is_null(value: ExpressionRef): ExpressionRef;
+      func(name: string, type: Type): ExpressionRef;
+      eq(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+    };
+    i31: {
+      'new'(value: ExpressionRef): ExpressionRef;
+      get_s(i31: ExpressionRef): ExpressionRef;
+      get_u(i31: ExpressionRef): ExpressionRef;
+    }
     atomic: {
-      notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
       fence(): ExpressionRef;
     };
     tuple: {
@@ -1352,11 +1396,9 @@ declare module binaryen {
     throw(event: string, operands: ExpressionRef[]): ExpressionRef;
     rethrow(exnref: ExpressionRef): ExpressionRef;
     br_on_exn(label: string, event: string, exnref: ExpressionRef): ExpressionRef;
-    push(value: ExpressionRef): ExpressionRef;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef, type?: Type): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
-    host(op: Operations, name: string, operands: ExpressionRef[]): ExpressionRef;
     nop(): ExpressionRef;
     unreachable(): ExpressionRef;
     addFunction(name: string, params: Type, results: Type, vars: Type[], body: ExpressionRef): FunctionRef;
@@ -1747,6 +1789,7 @@ declare module binaryen {
     ImplicitTrap,
     IsAtomic,
     Throws,
+    DanglingPop,
     Any
   }
 
@@ -1761,6 +1804,8 @@ declare module binaryen {
   function setDebugInfo(on: boolean): void;
   function getLowMemoryUnused(): boolean;
   function setLowMemoryUnused(on: boolean): void;
+  function getFastMath(): boolean;
+  function setFastMath(on: boolean): void;
   function getPassArgument(key: string): string | null;
   function setPassArgument(key: string, value: string | null): void;
   function clearPassArguments(): void;
