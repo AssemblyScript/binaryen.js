@@ -23,12 +23,12 @@ jobs:
         $HOME/emsdk/emsdk update-tags
         $HOME/emsdk/emsdk install ${{ matrix.emsdk }}
         $HOME/emsdk/emsdk activate ${{ matrix.emsdk }}
-        echo ::set-env name=PATH::$HOME/emsdk:$PATH
+        echo "$HOME/emsdk" >> $GITHUB_PATH
     - name: "Set up CMake"
       run: |
         mkdir $HOME/cmake
         wget -qO- https://github.com/Kitware/CMake/releases/download/v3.16.0/cmake-3.16.0-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
-        echo ::set-env name=PATH::$HOME/cmake/bin:$PATH
+        echo "$HOME/cmake/bin" >> $GITHUB_PATH
     - name: "Check out repository"
       uses: actions/checkout@v1
       with:
@@ -53,7 +53,7 @@ jobs:
       run: |
         npm install
         VERSION=`node scripts/version`
-        echo ::set-env name=VERSION::$VERSION
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
         if [[ $VERSION != *nightly* ]]; then
           echo "Building release v$VERSION ...";
           TAG=`node scripts/version tag`
@@ -63,10 +63,10 @@ jobs:
           git clean -f
           git log -n1
           cd ..
-          echo ::set-env name=RELEASE::1
+          echo "RELEASE=1" >> $GITHUB_ENV
         else
           echo "Building nightly v$VERSION ...";
-          echo ::set-env name=RELEASE::
+          echo "RELEASE=" >> $GITHUB_ENV
         fi
     - name: "Build binaryen.js"
       run: |
