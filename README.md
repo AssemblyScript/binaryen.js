@@ -519,7 +519,7 @@ API
 * Module#i32.**ge_s**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i32.**ge_u**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 >
-* Module#i64.**const**(value: `number`): `ExpressionRef`
+* Module#i64.**const**(low: `number`, high: `number`): `ExpressionRef`
 * Module#i64.**clz**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i64.**ctz**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i64.**popcnt**(value: `ExpressionRef`): `ExpressionRef`
