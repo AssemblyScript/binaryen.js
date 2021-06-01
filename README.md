@@ -3,7 +3,7 @@ binaryen.js
 
 **binaryen.js** is a port of [Binaryen](https://github.com/WebAssembly/binaryen) to the Web, allowing you to generate [WebAssembly](https://webassembly.org) using a JavaScript API.
 
-<a href="https://github.com/AssemblyScript/binaryen.js/actions?query=workflow%3ABuild"><img src="https://img.shields.io/github/workflow/status/AssemblyScript/binaryen.js/Build/master?label=build&logo=github" alt="Build status" /></a>
+<a href="https://github.com/AssemblyScript/binaryen.js/actions?query=workflow%3ABuild"><img src="https://img.shields.io/github/workflow/status/AssemblyScript/binaryen.js/Build/main?label=build&logo=github" alt="Build status" /></a>
 <a href="https://www.npmjs.com/package/binaryen"><img src="https://img.shields.io/npm/v/binaryen.svg?label=latest&color=007acc&logo=npm" alt="npm version" /></a>
 <a href="https://www.npmjs.com/package/binaryen"><img src="https://img.shields.io/npm/v/binaryen/nightly.svg?label=nightly&color=007acc&logo=npm" alt="npm nightly version" /></a>
 
@@ -69,12 +69,12 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
   * From npm via [unpkg](https://unpkg.com):<br />
     `https://unpkg.com/binaryen@VERSION/index.js`
 
-  Replace `VERSION` with a [specific version](https://github.com/AssemblyScript/binaryen.js/releases) or omit it (not recommended in production) to use master/latest.
+  Replace `VERSION` with a [specific version](https://github.com/AssemblyScript/binaryen.js/releases) or omit it (not recommended in production) to use main/latest.
 
 API
 ---
 
-**Please note** that the Binaryen API is evolving fast and that definitions and documentation provided by the package tend to get out of sync despite our best efforts. It's a bot after all. If you rely on binaryen.js and spot an issue, please consider sending a PR our way by updating [index.d.ts](./index.d.ts) and [README.md](./README.md) to reflect the [current API](https://github.com/WebAssembly/binaryen/blob/master/src/js/binaryen.js-post.js).
+**Please note** that the Binaryen API is evolving fast and that definitions and documentation provided by the package tend to get out of sync despite our best efforts. It's a bot after all. If you rely on binaryen.js and spot an issue, please consider sending a PR our way by updating [index.d.ts](./index.d.ts) and [README.md](./README.md) to reflect the [current API](https://github.com/WebAssembly/binaryen/blob/main/src/js/binaryen.js-post.js).
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -677,7 +677,7 @@ Creates a call to a function. Note that we must specify the return type here as 
 * Module#**memory.size**(): `ExpressionRef`
 * Module#**memory.grow**(value: `number`): `ExpressionRef`
 
-#### [Vector operations](https://github.com/WebAssembly/simd/blob/master/proposals/simd/SIMD.md) 🦄
+#### [Vector operations](https://github.com/WebAssembly/simd/blob/main/proposals/simd/SIMD.md) 🦄
 
 * Module#v128.**const**(bytes: `Uint8Array`): `ExpressionRef`
 * Module#v128.**load**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
