@@ -839,9 +839,9 @@ declare module binaryen {
   class Module {
     constructor();
     readonly ptr: number;
-    block(label: string, children: ExpressionRef[], resultType?: Type): ExpressionRef;
+    block(label: string | null, children: ExpressionRef[], resultType?: Type): ExpressionRef;
     if(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse?: ExpressionRef): ExpressionRef;
-    loop(label: string, body: ExpressionRef): ExpressionRef;
+    loop(label: string | null, body: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
@@ -1488,7 +1488,7 @@ declare module binaryen {
   interface IfInfo extends ExpressionInfo {
     condition: ExpressionRef;
     ifTrue: ExpressionRef;
-    ifFalse: ExpressionRef;
+    ifFalse: ExpressionRef | null;
   }
 
   interface LoopInfo extends ExpressionInfo {
@@ -1498,15 +1498,15 @@ declare module binaryen {
 
   interface BreakInfo extends ExpressionInfo {
     name: string;
-    condition: ExpressionRef;
-    value: ExpressionRef;
+    condition: ExpressionRef | null;
+    value: ExpressionRef | null;
   }
 
   interface SwitchInfo extends ExpressionInfo {
     names: string[];
     defaultName: string | null;
     condition: ExpressionRef;
-    value: ExpressionRef;
+    value: ExpressionRef | null;
   }
 
   interface CallInfo extends ExpressionInfo {
@@ -1584,7 +1584,7 @@ declare module binaryen {
   }
 
   interface ReturnInfo extends ExpressionInfo {
-    value: ExpressionRef;
+    value: ExpressionRef | null;
   }
 
   interface NopInfo extends ExpressionInfo {
