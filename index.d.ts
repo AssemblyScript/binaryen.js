@@ -1488,7 +1488,7 @@ declare module binaryen {
   interface IfInfo extends ExpressionInfo {
     condition: ExpressionRef;
     ifTrue: ExpressionRef;
-    ifFalse: ExpressionRef | null;
+    ifFalse: ExpressionRef;
   }
 
   interface LoopInfo extends ExpressionInfo {
@@ -1498,15 +1498,15 @@ declare module binaryen {
 
   interface BreakInfo extends ExpressionInfo {
     name: string;
-    condition: ExpressionRef | null;
-    value: ExpressionRef | null;
+    condition: ExpressionRef;
+    value: ExpressionRef;
   }
 
   interface SwitchInfo extends ExpressionInfo {
     names: string[];
     defaultName: string | null;
     condition: ExpressionRef;
-    value: ExpressionRef | null;
+    value: ExpressionRef;
   }
 
   interface CallInfo extends ExpressionInfo {
@@ -1584,7 +1584,7 @@ declare module binaryen {
   }
 
   interface ReturnInfo extends ExpressionInfo {
-    value: ExpressionRef | null;
+    value: ExpressionRef;
   }
 
   interface NopInfo extends ExpressionInfo {
