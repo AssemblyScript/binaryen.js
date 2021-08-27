@@ -1,6 +1,5 @@
 var binaryen = {};
 (function() {
-
 var aa="function"==typeof Object.defineProperties?Object.defineProperty:function(b,d,f){if(b==Array.prototype||b==Object.prototype)return b;b[d]=f.value;return b};function ba(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var f=b[d];if(f&&f.Math==Math)return f}throw Error("Cannot find global object");}var da=ba(this);
 function ea(b,d){if(d)a:{var f=da;b=b.split(".");for(var c=0;c<b.length-1;c++){var e=b[c];if(!(e in f))break a;f=f[e]}b=b[b.length-1];c=f[b];d=d(c);d!=c&&null!=d&&aa(f,b,{configurable:!0,writable:!0,value:d})}}ea("Array.prototype.includes",function(b){return b?b:function(d,f){var c=this;c instanceof String&&(c=String(c));var e=c.length;f=f||0;for(0>f&&(f=Math.max(f+e,0));f<e;f++){var g=c[f];if(g===d||Object.is(g,d))return!0}return!1}});var a;a||(a=typeof binaryen !== 'undefined' ? binaryen : {});
 var fa={},m;for(m in a)a.hasOwnProperty(m)&&(fa[m]=a[m]);var ha="./this.program";function ia(b,d){throw d;}var ja="object"===typeof window,ka="function"===typeof importScripts,la="object"===typeof process&&"object"===typeof process.versions&&"string"===typeof process.versions.node,n="",ma,na,oa,p,pa;
