@@ -1,2 +1,2 @@
-import * as binaryen from "./index";
-export = binaryen;
+import Binaryen from "./index.js";
+export default Binaryen;

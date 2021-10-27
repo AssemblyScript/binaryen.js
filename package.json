@@ -11,8 +11,14 @@
     "webassembly",
     "wasm"
   ],
+  "type": "module",
   "main": "index.js",
   "typings": "index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./js": "./index.js",
+    "./wasm": "./wasm.js"
+  },
   "bin": {
     "wasm-opt": "bin/wasm-opt"
   },
