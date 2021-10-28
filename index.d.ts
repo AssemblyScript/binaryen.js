@@ -836,9 +836,9 @@ declare module binaryen {
   class Module {
     constructor();
     readonly ptr: number;
-    block(label: string, children: ExpressionRef[], resultType?: Type): ExpressionRef;
+    block(label: string | null, children: ExpressionRef[], resultType?: Type): ExpressionRef;
     if(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse?: ExpressionRef): ExpressionRef;
-    loop(label: string, body: ExpressionRef): ExpressionRef;
+    loop(label: string | null, body: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
