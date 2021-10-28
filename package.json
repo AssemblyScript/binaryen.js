@@ -38,6 +38,7 @@
     "package.json",
     "package-lock.json",
     "README.md",
+    "bin/package.json",
     "bin/wasm-opt",
     "bin/wasm2js"
   ],
