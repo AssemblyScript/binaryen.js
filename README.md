@@ -108,6 +108,7 @@ API
   - [Multi-value operations 🦄](#multi-value-operations-)
   - [Exception handling operations 🦄](#exception-handling-operations-)
   - [Reference types operations 🦄](#reference-types-operations-)
+  - [Bulk memory operations 🦄](#bulk-memory-operations-)
 - [Expression manipulation](#expression-manipulation)
 - [Relooper](#relooper)
 - [Source maps](#source-maps)
