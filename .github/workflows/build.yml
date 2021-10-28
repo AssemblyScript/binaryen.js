@@ -16,6 +16,9 @@ jobs:
         emsdk: [ "tot", "latest" ]
       fail-fast: false
     steps:
+    - uses: actions/setup-node@v2
+      with:
+        node-version: 'lts/*'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
