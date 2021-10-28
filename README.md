@@ -15,7 +15,8 @@ $> npm install binaryen
 ```
 
 ```js
-var binaryen = require("binaryen");
+import Binaryen from "binaryen";
+const binaryen = await Binaryen();
 
 // Create a module with a single function
 var myModule = new binaryen.Module();
@@ -70,6 +71,10 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
     `https://unpkg.com/binaryen@VERSION/index.js`
 
   Replace `VERSION` with a [specific version](https://github.com/AssemblyScript/binaryen.js/releases) or omit it (not recommended in production) to use main/latest.
+
+### Command line
+
+The package includes Node.js builds of [wasm-opt](https://github.com/WebAssembly/binaryen#wasm-opt) and [wasm2js](https://github.com/WebAssembly/binaryen#wasm2js).
 
 API
 ---

@@ -16,6 +16,9 @@ jobs:
         emsdk: [ "tot", "latest" ]
       fail-fast: false
     steps:
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
@@ -75,24 +78,12 @@ jobs:
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
         emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
-        emmake make -j2 binaryen_js
-        cp ./bin/binaryen_js.js ../../index.js
+        emmake make -j2 binaryen_wasm
+        cp ./bin/binaryen_wasm.js ../../index.js
         cd ../..
     - name: "Test binaryen.js"
       run: |
         node ./tests/sanity
-    - name: "Build binaryen.wasm"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
-        emmake make -j2 binaryen_wasm
-        cp ./bin/binaryen_wasm.js ../../wasm.js
-        cd ../..
-    - name: "Test binaryen.wasm"
-      run: |
-        node ./tests/sanity --wasm
     - name: "Build wasm-opt"
       run: |
         cd ./binaryen/build
@@ -104,10 +95,21 @@ jobs:
     - name: "Test wasm-opt"
       run: |
         node ./bin/wasm-opt --help
+    - name: "Build wasm2js"
+      run: |
+        cd ./binaryen/build
+        source $HOME/emsdk/emsdk_env.sh
+        emcc --version
+        emmake make -j2 wasm2js
+        echo '#!/usr/bin/env node' | cat - ./bin/wasm2js.js > ../../bin/wasm2js
+        cd ../..
+    - name: "Test wasm2js"
+      run: |
+        node ./bin/wasm2js --help
     - name: "Push changes to GitHub"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
-        git add ./binaryen ./index.js ./wasm.js ./bin/wasm-opt
+        git add ./binaryen ./index.js ./bin/wasm-opt ./bin/wasm2js
         npm version $VERSION --no-git-tag-version --force
         if [ $RELEASE ]; then
           echo "Committing release ("$VERSION") ..."

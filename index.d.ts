@@ -1,8 +1,5 @@
 declare module binaryen {
 
-  const isReady: boolean;
-  const ready: Promise<typeof binaryen>;
-
   type Type = number;
 
   const none: Type;
@@ -1829,4 +1826,6 @@ declare module binaryen {
   }
 }
 
-export = binaryen;
+declare function Binaryen(): Promise<typeof binaryen>;
+
+export default Binaryen;

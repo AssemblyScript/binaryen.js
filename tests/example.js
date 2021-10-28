@@ -1,4 +1,5 @@
-var binaryen = require("..");
+import Binaryen from "../index.js";
+const binaryen = await Binaryen();
 
 // Create a module with a single function
 var myModule = new binaryen.Module();
