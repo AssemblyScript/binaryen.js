@@ -25,7 +25,9 @@
   "scripts": {
     "readme": "doctoc README.md --github --title \"### Contents\"",
     "check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
-    "test": "npm run check && node tests/sanity && node tests/example"
+    "test:js": "node tests/sanity && node tests/example",
+    "test:wasm": "node tests/sanity --wasm",
+    "test": "npm run check && npm run test:js && npm run test:wasm"
   },
   "files": [
     "index.js",
