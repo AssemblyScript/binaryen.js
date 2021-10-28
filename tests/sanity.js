@@ -1,11 +1,9 @@
 import assert from "assert";
 
-const isWasm = process.argv[2] == "--wasm";
-
 // Basic tests to make sure that we do not push something obviously broken
 
 console.log("importing binaryen");
-const Binaryen = await (isWasm ? import("../wasm.js") : import("../index.js"));
+const Binaryen = await import("../index.js");
 assert(Binaryen);
 
 console.log("instantiating binaryen");

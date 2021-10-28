@@ -1,6 +1,6 @@
 {
   "name": "binaryen",
-  "description": "JavaScript version of Binaryen, a compiler infrastructure and toolchain library for WebAssembly.",
+  "description": "Browser & Node.js builds of Binaryen, a compiler infrastructure and toolchain library for WebAssembly.",
   "version": "102.0.0",
   "license": "Apache-2.0",
   "repository": {
@@ -14,11 +14,6 @@
   "type": "module",
   "main": "index.js",
   "typings": "index.d.ts",
-  "exports": {
-    ".": "./index.js",
-    "./js": "./index.js",
-    "./wasm": "./wasm.js"
-  },
   "bin": {
     "wasm-opt": "bin/wasm-opt",
     "wasm2js": "bin/wasm2js"
@@ -26,15 +21,11 @@
   "scripts": {
     "readme": "doctoc README.md --github --title \"### Contents\"",
     "check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
-    "test:js": "node tests/sanity && node tests/example",
-    "test:wasm": "node tests/sanity --wasm",
-    "test": "npm run check && npm run test:js && npm run test:wasm"
+    "test": "npm run check && node tests/sanity && node tests/example"
   },
   "files": [
     "index.js",
     "index.d.ts",
-    "wasm.js",
-    "wasm.d.ts",
     "package.json",
     "package-lock.json",
     "README.md",

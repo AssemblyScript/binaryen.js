@@ -70,29 +70,16 @@ jobs:
         fi
     - name: "Build binaryen.js"
       run: |
-        mkdir ./binaryen/build
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
-        emmake make -j2 binaryen_js
-        cp ./bin/binaryen_js.js ../../index.js
-        cd ../..
-    - name: "Test binaryen.js"
-      run: |
-        node ./tests/sanity
-    - name: "Build binaryen.wasm"
-      run: |
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
         emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
         emmake make -j2 binaryen_wasm
-        cp ./bin/binaryen_wasm.js ../../wasm.js
+        cp ./bin/binaryen_wasm.js ../../index.js
         cd ../..
-    - name: "Test binaryen.wasm"
+    - name: "Test binaryen.js"
       run: |
-        node ./tests/sanity --wasm
+        node ./tests/sanity
     - name: "Build wasm-opt"
       run: |
         cd ./binaryen/build
@@ -118,7 +105,7 @@ jobs:
     - name: "Push changes to GitHub"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
-        git add ./binaryen ./index.js ./wasm.js ./bin/wasm-opt ./bin/wasm2js
+        git add ./binaryen ./index.js ./bin/wasm-opt ./bin/wasm2js
         npm version $VERSION --no-git-tag-version --force
         if [ $RELEASE ]; then
           echo "Committing release ("$VERSION") ..."
