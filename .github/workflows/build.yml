@@ -19,6 +19,7 @@ jobs:
     - uses: actions/setup-node@v2
       with:
         node-version: 'lts/*'
+        check-latest: true
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
