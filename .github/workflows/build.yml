@@ -104,10 +104,21 @@ jobs:
     - name: "Test wasm-opt"
       run: |
         node ./bin/wasm-opt --help
+    - name: "Build wasm2js"
+      run: |
+        cd ./binaryen/build
+        source $HOME/emsdk/emsdk_env.sh
+        emcc --version
+        emmake make -j2 wasm2js
+        echo '#!/usr/bin/env node' | cat - ./bin/wasm2js.js > ../../bin/wasm2js
+        cd ../..
+    - name: "Test wasm2js"
+      run: |
+        node ./bin/wasm2js --help
     - name: "Push changes to GitHub"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
-        git add ./binaryen ./index.js ./wasm.js ./bin/wasm-opt
+        git add ./binaryen ./index.js ./wasm.js ./bin/wasm-opt ./bin/wasm2js
         npm version $VERSION --no-git-tag-version --force
         if [ $RELEASE ]; then
           echo "Committing release ("$VERSION") ..."

@@ -72,6 +72,10 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
 
   Replace `VERSION` with a [specific version](https://github.com/AssemblyScript/binaryen.js/releases) or omit it (not recommended in production) to use main/latest.
 
+### Command line
+
+The package includes Node.js builds of [wasm-opt](https://github.com/WebAssembly/binaryen#wasm-opt) and [wasm2js](https://github.com/WebAssembly/binaryen#wasm2js).
+
 API
 ---
 
