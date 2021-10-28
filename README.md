@@ -108,6 +108,7 @@ API
   - [Multi-value operations 🦄](#multi-value-operations-)
   - [Exception handling operations 🦄](#exception-handling-operations-)
   - [Reference types operations 🦄](#reference-types-operations-)
+  - [Bulk memory operations 🦄](#bulk-memory-operations-)
 - [Expression manipulation](#expression-manipulation)
 - [Relooper](#relooper)
 - [Source maps](#source-maps)
@@ -1002,6 +1003,12 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 * Module#ref.**null**(): `ExpressionRef`
 * Module#ref.**is_null**(value: `ExpressionRef`): `ExpressionRef`
 * Module#ref.**func**(name: `string`): `ExpressionRef`
+
+#### [Bulk memory operations](https://github.com/WebAssembly/bulk-memory-operations/blob/master/proposals/bulk-memory-operations/Overview.md) 🦄
+
+* Module#memory.**init**(segment: `number`, dest: `ExpressionRef`, offset: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`;
+* Module#memory.**copy**(dest: `ExpressionRef`, source: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`
+* Module#memory.**fill**(dest: `ExpressionRef`, value: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`
 
 ### Expression manipulation
 
