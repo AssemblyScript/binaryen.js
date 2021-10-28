@@ -953,9 +953,9 @@ Creates a call to a function. Note that we must specify the return type here as 
 
 #### [Atomic wait and notify operations](https://github.com/WebAssembly/threads/blob/master/proposals/threads/Overview.md#wait-and-notify-operators) 🦄
 
-* Module#i32.**atomic.wait**(ptr: `ExpressionRef`, expected: `ExpressionRef`, timeout: `ExpressionRef`): `ExpressionRef`
-* Module#i64.**atomic.wait**(ptr: `ExpressionRef`, expected: `ExpressionRef`, timeout: `ExpressionRef`): `ExpressionRef`
-* Module#**atomic.notify**(ptr: `ExpressionRef`, notifyCount: `ExpressionRef`): `ExpressionRef`
+* Module#memory.**atomic.wait32**(ptr: `ExpressionRef`, expected: `ExpressionRef`, timeout: `ExpressionRef`): `ExpressionRef`
+* Module#memory.**atomic.wait64**(ptr: `ExpressionRef`, expected: `ExpressionRef`, timeout: `ExpressionRef`): `ExpressionRef`
+* Module#memory**atomic.notify**(ptr: `ExpressionRef`, notifyCount: `ExpressionRef`): `ExpressionRef`
 * Module#**atomic.fence**(): `ExpressionRef`
 
 #### [Sign extension operations](https://github.com/WebAssembly/sign-extension-ops/blob/master/proposals/sign-extension-ops/Overview.md) 🦄
