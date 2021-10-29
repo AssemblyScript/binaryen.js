@@ -987,7 +987,7 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 
 #### [Exception handling operations](https://github.com/WebAssembly/exception-handling/blob/master/proposals/Exceptions.md) 🦄
 
-* Module#**try**(body: `ExpressionRef`, catchBody: `ExpressionRef`): `ExpressionRef`
+* Module#**try**(name: `string~, body: `ExpressionRef`, catchTags: `string[]`, catchBodies: `ExpressionRef[]`, delegateTarget: `string`): ExpressionRef;
 * Module#**throw**(event: `string`, operands: `ExpressionRef[]`): `ExpressionRef`
 * Module#**rethrow**(exnref: `ExpressionRef`): `ExpressionRef`
 * Module#**br_on_exn**(label: `string`, event: `string`, exnref: `ExpressionRef`): `ExpressionRef`
