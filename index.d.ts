@@ -1389,7 +1389,7 @@ declare module binaryen {
       make(elements: ExportRef[]): ExpressionRef;
       extract(tuple: ExpressionRef, index: number): ExpressionRef;
     };
-    try(body: ExpressionRef, catchBody: ExpressionRef): ExpressionRef;
+    try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget: string): ExpressionRef;
     throw(event: string, operands: ExpressionRef[]): ExpressionRef;
     rethrow(exnref: ExpressionRef): ExpressionRef;
     br_on_exn(label: string, event: string, exnref: ExpressionRef): ExpressionRef;
