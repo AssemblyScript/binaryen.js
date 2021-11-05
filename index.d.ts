@@ -959,7 +959,7 @@ declare module binaryen {
   const RefAsData: Operations;
   const RefAsI31: Operations;
 
-  const enum RunnerFlags {
+  const enum ExpressionRunnerFlags {
     Default,
     PreserveSideeffects,
     TraverseCalls
@@ -2066,7 +2066,7 @@ declare module binaryen {
   }
 
   class ExpressionRunner {
-    constructor(module: Module, flags: RunnerFlags, maxDepth: number, maxLoopIterations: number);
+    constructor(module: Module, flags: ExpressionRunnerFlags, maxDepth: number, maxLoopIterations: number);
     setLocalValue(index: number, valueExpr: ExpressionRef): boolean;
     setGlobalValue(name: string, valueExpr: ExpressionRef): boolean;
     runAndDispose(expr: ExpressionRef): ExpressionRef;
