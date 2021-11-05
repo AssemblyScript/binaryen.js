@@ -1606,6 +1606,27 @@ declare module binaryen {
     value: ExpressionRef;
   }
 
+  interface TableGetInfo extends ExpressionInfo {
+    table: string;
+    index: ExpressionRef;
+  }
+
+  interface TableSetInfo extends ExpressionInfo {
+    table: string;
+    index: ExpressionRef;
+    value: ExpressionRef;
+  }
+
+  interface TableSizeInfo extends ExpressionInfo {
+    table: string;
+  }
+
+  interface TableGrowInfo extends ExpressionInfo {
+    table: string;
+    value: ExpressionRef;
+    delta: ExpressionRef;
+  }
+
   interface LoadInfo extends ExpressionInfo {
     isAtomic: boolean;
     isSigned: boolean;
