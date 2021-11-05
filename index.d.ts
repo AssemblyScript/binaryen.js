@@ -1956,6 +1956,8 @@ declare module binaryen {
   function setDebugInfo(on: boolean): void;
   function getLowMemoryUnused(): boolean;
   function setLowMemoryUnused(on: boolean): void;
+  function getZeroFilledMemory(): boolean;
+  function setZeroFilledMemory(on: boolean): void;
   function getFastMath(): boolean;
   function setFastMath(on: boolean): void;
   function getPassArgument(key: string): string | null;
@@ -1967,6 +1969,8 @@ declare module binaryen {
   function setFlexibleInlineMaxSize(size: number): void;
   function getOneCallerInlineMaxSize(): number;
   function setOneCallerInlineMaxSize(size: number): void;
+  function getAllowInliningFunctionsWithLoops(): boolean;
+  function setAllowInliningFunctionsWithLoops(on: boolean): void;
   function exit(status: number): void;
 
   type RelooperBlockRef = number;
