@@ -134,6 +134,7 @@ declare module binaryen {
   const MemoryFillId: ExpressionIds;
   const RefNullId: ExpressionIds;
   const RefIsId: ExpressionIds;
+  const RefAsId: ExpressionIds;
   const RefFuncId: ExpressionIds;
   const RefEqId: ExpressionIds;
   const TryId: ExpressionIds;
