@@ -1625,7 +1625,7 @@ declare module binaryen {
   }
 
   interface ConstInfo extends ExpressionInfo {
-    value: number | { low: number, high: number };
+    value: number | { low: number, high: number } | Array<number>;
   }
 
   interface UnaryInfo extends ExpressionInfo {
@@ -1659,10 +1659,14 @@ declare module binaryen {
   interface UnreachableInfo extends ExpressionInfo {
   }
 
-  interface HostInfo extends ExpressionInfo {
-    op: Operations;
-    nameOperand: string | null;
-    operands: ExpressionRef[];
+  interface PopInfo extends ExpressionInfo {
+  }
+
+  interface MemorySizeInfo extends ExpressionInfo {
+  }
+
+  interface MemoryGrowInfo extends ExpressionInfo {
+    delta: ExpressionRef;
   }
 
   interface AtomicRMWInfo extends ExpressionInfo {
@@ -1736,6 +1740,15 @@ declare module binaryen {
     ptr: ExpressionRef;
   }
 
+  interface SIMDLoadStoreLaneInfo extends ExpressionInfo {
+    op: Operations;
+    offset: number;
+    align: number;
+    index: number;
+    ptr: ExpressionRef;
+    vec: ExpressionRef;
+  }
+
   interface MemoryInitInfo extends ExpressionInfo {
     segment: number;
     dest: ExpressionRef;
@@ -1743,7 +1756,7 @@ declare module binaryen {
     size: ExpressionRef;
   }
 
-  interface MemoryDropInfo extends ExpressionInfo {
+  interface DataDropInfo extends ExpressionInfo {
     segment: number;
   }
 
@@ -1762,8 +1775,60 @@ declare module binaryen {
   interface RefNullInfo extends ExpressionInfo {
   }
 
-  interface RefIsNullInfo extends ExpressionInfo {
+  interface RefIsInfo extends ExpressionInfo {
+    op: Operations;
     value: ExpressionRef;
+  }
+
+  interface RefAsInfo extends ExpressionInfo {
+    op: Operations;
+    value: ExpressionRef;
+  }
+
+  interface RefFuncInfo extends ExpressionInfo {
+    func: string;
+  }
+
+  interface RefEqInfo extends ExpressionInfo {
+    left: ExpressionRef;
+    right: ExpressionRef;
+  }
+
+  interface TryInfo extends ExpressionInfo {
+    name: string;
+    body: ExpressionRef;
+    catchTags: string[];
+    catchBodies: ExpressionRef[];
+    hasCatchAll: boolean;
+    delegateTarget: string;
+    isDelegate: boolean;
+  }
+
+  interface ThrowInfo extends ExpressionInfo {
+    tag: string;
+    operands: ExpressionRef[];
+  }
+
+  interface RethrowInfo extends ExpressionInfo {
+    target: string;
+  }
+
+  interface TupleMakeInfo extends ExpressionInfo {
+    operands: ExpressionRef[];
+  }
+
+  interface TupleExtract extends ExpressionInfo {
+    tuple: ExpressionRef;
+    index: number;
+  }
+
+  interface I31NewInfo extends ExpressionInfo {
+    value: ExpressionRef;
+  }
+
+  interface I31GetInfo extends ExpressionInfo {
+    i31: ExpressionRef;
+    isSigned: boolean;
   }
 
   function getFunctionInfo(func: FunctionRef): FunctionInfo;
