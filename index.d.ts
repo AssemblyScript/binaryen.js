@@ -13,6 +13,7 @@ declare module binaryen {
   const anyref: Type;
   const eqref: Type;
   const i31ref: Type;
+  const dataref: Type;
   const unreachable: Type;
   const auto: Type;
 
@@ -1436,12 +1437,22 @@ declare module binaryen {
     eqref: {
       pop(): ExpressionRef;
     };
+    dataref: {
+      pop(): ExpressionRef;
+    };
     i31ref: {
       pop(): ExpressionRef;
     };
     ref: {
       null(type: Type): ExpressionRef;
       is_null(value: ExpressionRef): ExpressionRef;
+      is_func(value: ExpressionRef): ExpressionRef;
+      is_data(value: ExpressionRef): ExpressionRef;
+      is_i31(value: ExpressionRef): ExpressionRef;
+      as_non_null(value: ExpressionRef): ExpressionRef;
+      as_func(value: ExpressionRef): ExpressionRef;
+      as_data(value: ExpressionRef): ExpressionRef;
+      as_i31(value: ExpressionRef): ExpressionRef;
       func(name: string, type: Type): ExpressionRef;
       eq(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
     };
