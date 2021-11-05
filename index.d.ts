@@ -959,6 +959,12 @@ declare module binaryen {
   const RefAsData: Operations;
   const RefAsI31: Operations;
 
+  const enum RunnerFlags {
+    Default,
+    PreserveSideeffects,
+    TraverseCalls
+  }
+
   type ElementSegmentRef = number;
   type ExpressionRef = number;
   type FunctionRef = number;
@@ -2057,6 +2063,13 @@ declare module binaryen {
     addBlockWithSwitch(code: ExpressionRef, condition: ExpressionRef): RelooperBlockRef;
     addBranchForSwitch(from: RelooperBlockRef, to: RelooperBlockRef, indexes: number[], code: ExpressionRef): void;
     renderAndDispose(entry: RelooperBlockRef, labelHelper: number): ExpressionRef;
+  }
+
+  class ExpressionRunner {
+    constructor(module: Module, flags: RunnerFlags, maxDepth: number, maxLoopIterations: number);
+    setLocalValue(index: number, valueExpr: ExpressionRef): boolean;
+    setGlobalValue(name: string, valueExpr: ExpressionRef): boolean;
+    runAndDispose(expr: ExpressionRef): ExpressionRef;
   }
 }
 
