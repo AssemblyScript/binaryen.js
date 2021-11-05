@@ -10,7 +10,6 @@ declare module binaryen {
   const v128: Type;
   const funcref: Type;
   const externref: Type;
-  const exnref: Type;
   const anyref: Type;
   const eqref: Type;
   const i31ref: Type;
@@ -67,7 +66,6 @@ declare module binaryen {
     Try,
     Throw,
     Rethrow,
-    BrOnExn,
     TupleMake,
     TupleExtract,
     Pop,
@@ -134,7 +132,6 @@ declare module binaryen {
   const TryId: ExpressionIds;
   const ThrowId: ExpressionIds;
   const RethrowId: ExpressionIds;
-  const BrOnExnId: ExpressionIds;
   const TupleMakeId: ExpressionIds;
   const TupleExtractId: ExpressionIds;
   const PopId: ExpressionIds;
@@ -159,14 +156,14 @@ declare module binaryen {
     Table,
     Memory,
     Global,
-    Event
+    Tag
   }
 
   const ExternalFunction: ExternalKinds;
   const ExternalTable: ExternalKinds;
   const ExternalMemory: ExternalKinds;
   const ExternalGlobal: ExternalKinds;
-  const ExternalEvent: ExternalKinds;
+  const ExternalTag: ExternalKinds;
 
   enum Features {
     MVP,
@@ -182,6 +179,8 @@ declare module binaryen {
     Multivalue,
     GC,
     Memory64,
+    TypedFunctionReferences,
+    RelaxedSIMD,
     All
   }
 
@@ -378,6 +377,12 @@ declare module binaryen {
     LeUVecI32x4,
     GeSVecI32x4,
     GeUVecI32x4,
+    EqVecI64x2,
+    NeVecI64x2,
+    LtSVecI64x2,
+    GtSVecI64x2,
+    LeSVecI64x2,
+    GeSVecI64x2,
     EqVecF32x4,
     NeVecF32x4,
     LtVecF32x4,
@@ -396,9 +401,12 @@ declare module binaryen {
     XorVec128,
     AndNotVec128,
     BitselectVec128,
+    AnyTrueVec128,
+    PopcntVecI8x16,
+    AbsVecI8x16,
     NegVecI8x16,
-    AnyTrueVecI8x16,
     AllTrueVecI8x16,
+    BitmaskVecI8x16,
     ShlVecI8x16,
     ShrSVecI8x16,
     ShrUVecI8x16,
@@ -408,14 +416,15 @@ declare module binaryen {
     SubVecI8x16,
     SubSatSVecI8x16,
     SubSatUVecI8x16,
-    MulVecI8x16,
     MinSVecI8x16,
     MinUVecI8x16,
     MaxSVecI8x16,
     MaxUVecI8x16,
+    AvgrUVecI8x16,
+    AbsVecI16x8,
     NegVecI16x8,
-    AnyTrueVecI16x8,
     AllTrueVecI16x8,
+    BitmaskVecI16x8,
     ShlVecI16x8,
     ShrSVecI16x8,
     ShrUVecI16x8,
@@ -430,10 +439,21 @@ declare module binaryen {
     MinUVecI16x8,
     MaxSVecI16x8,
     MaxUVecI16x8,
+    AvgrUVecI16x8,
+    Q15MulrSatSVecI16x8,
+    ExtMulLowSVecI16x8,
+    ExtMulHighSVecI16x8,
+    ExtMulLowUVecI16x8,
+    ExtMulHighUVecI16x8,
     DotSVecI16x8ToVecI32x4,
+    ExtMulLowSVecI32x4,
+    ExtMulHighSVecI32x4,
+    ExtMulLowUVecI32x4,
+    ExtMulHighUVecI32x4,
+    AbsVecI32x4,
     NegVecI32x4,
-    AnyTrueVecI32x4,
     AllTrueVecI32x4,
+    BitmaskVecI32x4,
     ShlVecI32x4,
     ShrSVecI32x4,
     ShrUVecI32x4,
@@ -444,67 +464,109 @@ declare module binaryen {
     MinUVecI32x4,
     MaxSVecI32x4,
     MaxUVecI32x4,
+    AbsVecI64x2,
     NegVecI64x2,
-    AnyTrueVecI64x2,
     AllTrueVecI64x2,
+    BitmaskVecI64x2,
     ShlVecI64x2,
     ShrSVecI64x2,
     ShrUVecI64x2,
     AddVecI64x2,
     SubVecI64x2,
+    MulVecI64x2,
+    ExtMulLowSVecI64x2,
+    ExtMulHighSVecI64x2,
+    ExtMulLowUVecI64x2,
+    ExtMulHighUVecI64x2,
     AbsVecF32x4,
     NegVecF32x4,
     SqrtVecF32x4,
-    QFMAVecF32x4,
-    QFMSVecF32x4,
     AddVecF32x4,
     SubVecF32x4,
     MulVecF32x4,
     DivVecF32x4,
     MinVecF32x4,
     MaxVecF32x4,
+    PMinVecF32x4,
+    PMaxVecF32x4,
+    CeilVecF32x4,
+    FloorVecF32x4,
+    TruncVecF32x4,
+    NearestVecF32x4,
     AbsVecF64x2,
     NegVecF64x2,
     SqrtVecF64x2,
-    QFMAVecF64x2,
-    QFMSVecF64x2,
     AddVecF64x2,
     SubVecF64x2,
     MulVecF64x2,
     DivVecF64x2,
     MinVecF64x2,
     MaxVecF64x2,
+    PMinVecF64x2,
+    PMaxVecF64x2,
+    CeilVecF64x2,
+    FloorVecF64x2,
+    TruncVecF64x2,
+    NearestVecF64x2,
+    ExtAddPairwiseSVecI8x16ToI16x8,
+    ExtAddPairwiseUVecI8x16ToI16x8,
+    ExtAddPairwiseSVecI16x8ToI32x4,
+    ExtAddPairwiseUVecI16x8ToI32x4,
     TruncSatSVecF32x4ToVecI32x4,
     TruncSatUVecF32x4ToVecI32x4,
-    TruncSatSVecF64x2ToVecI64x2,
-    TruncSatUVecF64x2ToVecI64x2,
     ConvertSVecI32x4ToVecF32x4,
     ConvertUVecI32x4ToVecF32x4,
-    ConvertSVecI64x2ToVecF64x2,
-    ConvertUVecI64x2ToVecF64x2,
-    LoadSplatVec8x16,
-    LoadSplatVec16x8,
-    LoadSplatVec32x4,
-    LoadSplatVec64x2,
-    LoadExtSVec8x8ToVecI16x8,
-    LoadExtUVec8x8ToVecI16x8,
-    LoadExtSVec16x4ToVecI32x4,
-    LoadExtUVec16x4ToVecI32x4,
-    LoadExtSVec32x2ToVecI64x2,
-    LoadExtUVec32x2ToVecI64x2,
+    Load8SplatVec128,
+    Load16SplatVec128,
+    Load32SplatVec128,
+    Load64SplatVec128,
+    Load8x8SVec128,
+    Load8x8UVec128,
+    Load16x4SVec128,
+    Load16x4UVec128,
+    Load32x2SVec128,
+    Load32x2UVec128,
+    Load32ZeroVec128,
+    Load64ZeroVec128,
+    Load8LaneVec128,
+    Load16LaneVec128,
+    Load32LaneVec128,
+    Load64LaneVec128,
+    Store8LaneVec128,
+    Store16LaneVec128,
+    Store32LaneVec128,
+    Store64LaneVec128,
     NarrowSVecI16x8ToVecI8x16,
     NarrowUVecI16x8ToVecI8x16,
     NarrowSVecI32x4ToVecI16x8,
     NarrowUVecI32x4ToVecI16x8,
-    WidenLowSVecI8x16ToVecI16x8,
-    WidenHighSVecI8x16ToVecI16x8,
-    WidenLowUVecI8x16ToVecI16x8,
-    WidenHighUVecI8x16ToVecI16x8,
-    WidenLowSVecI16x8ToVecI32x4,
-    WidenHighSVecI16x8ToVecI32x4,
-    WidenLowUVecI16x8ToVecI32x4,
-    WidenHighUVecI16x8ToVecI32x4,
-    SwizzleVec8x16
+    ExtendLowSVecI8x16ToVecI16x8,
+    ExtendHighSVecI8x16ToVecI16x8,
+    ExtendLowUVecI8x16ToVecI16x8,
+    ExtendHighUVecI8x16ToVecI16x8,
+    ExtendLowSVecI16x8ToVecI32x4,
+    ExtendHighSVecI16x8ToVecI32x4,
+    ExtendLowUVecI16x8ToVecI32x4,
+    ExtendHighUVecI16x8ToVecI32x4,
+    ExtendLowSVecI32x4ToVecI64x2,
+    ExtendHighSVecI32x4ToVecI64x2,
+    ExtendLowUVecI32x4ToVecI64x2,
+    ExtendHighUVecI32x4ToVecI64x2,
+    ConvertLowSVecI32x4ToVecF64x2,
+    ConvertLowUVecI32x4ToVecF64x2,
+    TruncSatZeroSVecF64x2ToVecI32x4,
+    TruncSatZeroUVecF64x2ToVecI32x4,
+    DemoteZeroVecF64x2ToVecF32x4,
+    PromoteLowVecF32x4ToVecF64x2,
+    SwizzleVec8x16,
+    RefIsNull,
+    RefIsFunc,
+    RefIsData,
+    RefIsI31,
+    RefAsNonNull,
+    RefAsFunc,
+    RefAsData,
+    RefAsI31
   }
 
   const ClzInt32: Operations;
@@ -827,11 +889,13 @@ declare module binaryen {
   const WidenHighUVecI16x8ToVecI32x4: Operations;
   const SwizzleVec8x16: Operations;
 
+  type ElementSegmentRef = number;
   type ExpressionRef = number;
   type FunctionRef = number;
   type GlobalRef = number;
   type ExportRef = number;
-  type EventRef = number;
+  type TableRef = number;
+  type TagRef = number;
 
   class Module {
     constructor();
@@ -866,6 +930,13 @@ declare module binaryen {
         wait32(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
         wait64(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       }
+    };
+    table: {
+      get(name: string, index: ExpressionRef, type: Type): ExpressionRef;
+      set(name: string, index: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      size(name: string): ExpressionRef;
+      grow(name: string, value: ExpressionRef, delta: ExpressionRef): ExpressionRef;
+      // TODO: init, fill, copy
     };
     data: {
       drop(segment: number): ExpressionRef;
@@ -1359,9 +1430,6 @@ declare module binaryen {
     externref: {
       pop(): ExpressionRef;
     };
-    exnref: {
-      pop(): ExpressionRef;
-    };
     anyref: {
       pop(): ExpressionRef;
     };
@@ -1389,10 +1457,9 @@ declare module binaryen {
       make(elements: ExportRef[]): ExpressionRef;
       extract(tuple: ExpressionRef, index: number): ExpressionRef;
     };
-    try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget: string): ExpressionRef;
-    throw(event: string, operands: ExpressionRef[]): ExpressionRef;
-    rethrow(exnref: ExpressionRef): ExpressionRef;
-    br_on_exn(label: string, event: string, exnref: ExpressionRef): ExpressionRef;
+    try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
+    throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
+    rethrow(target: string): ExpressionRef;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef, type?: Type): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
@@ -1406,19 +1473,21 @@ declare module binaryen {
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
     getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
-    addEvent(name: string, attribute: number, params: Type, results: Type): EventRef;
-    getEvent(name: string): EventRef;
-    removeEvent(name: string): void;
+    addTag(name: string, params: Type, results: Type): TagRef;
+    getTag(name: string): TagRef;
+    removeTag(name: string): void;
     addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): void;
     addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
     addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
     addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): void;
-    addEventImport(internalName: string, externalModuleName: string, externalBaseName: string, attribute: number, params: Type, results: Type): void;
+    addTagImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): void;
     addFunctionExport(internalName: string, externalName: string): ExportRef;
     addTableExport(internalName: string, externalName: string): ExportRef;
     addMemoryExport(internalName: string, externalName: string): ExportRef;
     addGlobalExport(internalName: string, externalName: string): ExportRef;
+    addTagExport(internalName: string, externalName: string): ExportRef;
     removeExport(externalName: string): void;
+    getExport(externalName: string): ExportRef;
     getNumExports(): number;
     getExportByIndex(index: number): ExportRef;
     setFunctionTable(initial: number, maximum: number, funcNames: number[], offset?: ExpressionRef): void;
@@ -1697,38 +1766,6 @@ declare module binaryen {
     value: ExpressionRef;
   }
 
-  interface RefFuncInfo extends ExpressionInfo {
-    func: string;
-  }
-
-  interface TryInfo extends ExpressionInfo {
-    body: ExpressionRef;
-    catchBody: ExpressionRef;
-  }
-
-  interface ThrowInfo extends ExpressionInfo {
-    event: string;
-    operands: ExpressionRef[];
-  }
-
-  interface RethrowInfo extends ExpressionInfo {
-    exnref: ExpressionRef;
-  }
-
-  interface BrOnExnInfo extends ExpressionInfo {
-    name: string;
-    event: string;
-    exnref: ExpressionRef;
-  }
-
-  interface PopInfo extends ExpressionInfo {
-  }
-
-  interface PushInfo extends ExpressionInfo {
-    type: never; // ?
-    value: ExpressionRef;
-  }
-
   function getFunctionInfo(func: FunctionRef): FunctionInfo;
 
   interface FunctionInfo {
@@ -1752,23 +1789,41 @@ declare module binaryen {
     init: ExpressionRef;
   }
 
+  function getTableInfo(table: TableRef): TableInfo;
+
+  interface TableInfo {
+    name: string;
+    module: string | null;
+    base: string | null;
+    initial: number;
+    max?: number;
+  }
+
+  function getElementSegmentInfo(segment: ElementSegmentRef): ElementSegmentInfo;
+
+  interface ElementSegmentInfo {
+    name: string,
+    table: string,
+    offset: number,
+    data: string[]
+  }
+
+  function getTagInfo(tag: TagRef): TagInfo;
+
+  interface TagInfo {
+    name: string;
+    module: string | null;
+    base: string | null;
+    params: Type;
+    results: Type;
+  }
+
   function getExportInfo(export_: ExportRef): ExportInfo;
 
   interface ExportInfo {
     kind: ExternalKinds;
     name: string;
     value: string;
-  }
-
-  function getEventInfo(event: EventRef): EventInfo;
-
-  interface EventInfo {
-    name: string;
-    module: string | null;
-    base: string | null;
-    attribute: number;
-    params: Type;
-    results: Type;
   }
 
   function getSideEffects(expr: ExpressionRef, features: Features): SideEffects;
@@ -1783,10 +1838,13 @@ declare module binaryen {
     WritesGlobal,
     ReadsMemory,
     WritesMemory,
+    ReadsTable,
+    WritesTable,
     ImplicitTrap,
     IsAtomic,
     Throws,
     DanglingPop,
+    TrapsNeverHappen,
     Any
   }
 
