@@ -1535,8 +1535,6 @@ declare module binaryen {
       abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       sqrt(value: ExpressionRef): ExpressionRef;
-      qfma(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
-      qfms(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
