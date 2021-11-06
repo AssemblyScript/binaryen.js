@@ -995,6 +995,13 @@ declare module binaryen {
       get(name: string, type: Type): ExpressionRef;
       set(name: string, value: ExpressionRef): ExpressionRef;
     };
+    table: {
+      get(name: string, index: ExpressionRef, type: Type): ExpressionRef;
+      set(name: string, index: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      size(name: string): ExpressionRef;
+      grow(name: string, value: ExpressionRef, delta: ExpressionRef): ExpressionRef;
+      // TODO: init, fill, copy
+    };
     memory: {
       size(): ExpressionRef;
       grow(value: ExpressionRef): ExpressionRef;
@@ -1006,13 +1013,6 @@ declare module binaryen {
         wait32(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
         wait64(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
       }
-    };
-    table: {
-      get(name: string, index: ExpressionRef, type: Type): ExpressionRef;
-      set(name: string, index: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      size(name: string): ExpressionRef;
-      grow(name: string, value: ExpressionRef, delta: ExpressionRef): ExpressionRef;
-      // TODO: init, fill, copy
     };
     data: {
       drop(segment: number): ExpressionRef;
@@ -1301,9 +1301,30 @@ declare module binaryen {
     };
     v128: {
       load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load8_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load16_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load32_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load64_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load8x8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load8x8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load16x4_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load16x4_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load32x2_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load32x2_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load32_zero(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load64_zero(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      load8_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      load16_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      load32_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      load64_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      store8_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      store16_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      store32_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
+      store64_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
       store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      const(value: number): ExpressionRef;
+      const(value: ArrayLike<number>): ExpressionRef;
       not(value: ExpressionRef): ExpressionRef;
+      any_true(value: ExpressionRef): ExpressionRef;
       and(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       or(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       xor(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
@@ -1312,6 +1333,8 @@ declare module binaryen {
       pop(): ExpressionRef;
     };
     i8x16: {
+      shuffle(left: ExpressionRef, right: ExpressionRef, mask: ArrayLike<number>): ExpressionRef;
+      swizzle(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       splat(value: ExpressionRef): ExpressionRef;
       extract_lane_s(vec: ExpressionRef, index: ExpressionRef): ExpressionRef;
       extract_lane_u(vec: ExpressionRef, index: ExpressionRef): ExpressionRef;
@@ -1326,9 +1349,11 @@ declare module binaryen {
       le_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
-      any_true(value: ExpressionRef): ExpressionRef;
       all_true(value: ExpressionRef): ExpressionRef;
+      bitmask(value: ExpressionRef): ExpressionRef;
+      popcnt(value: ExpressionRef): ExpressionRef;
       shl(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_s(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_u(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
@@ -1362,9 +1387,10 @@ declare module binaryen {
       le_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
-      any_true(value: ExpressionRef): ExpressionRef;
       all_true(value: ExpressionRef): ExpressionRef;
+      bitmask(value: ExpressionRef): ExpressionRef;
       shl(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_s(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_u(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
@@ -1380,14 +1406,19 @@ declare module binaryen {
       max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       avgr_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      q15mulr_sat_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_low_i8x16_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_high_i8x16_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_low_i8x16_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_high_i8x16_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extadd_pairwise_i8x16_s(value: ExpressionRef): ExpressionRef;
+      extadd_pairwise_i8x16_u(value: ExpressionRef): ExpressionRef;
       narrow_i32x4_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       narrow_i32x4_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      widen_low_i8x16_s(value: ExpressionRef): ExpressionRef;
-      widen_high_i8x16_s(value: ExpressionRef): ExpressionRef;
-      widen_low_i8x16_u(value: ExpressionRef): ExpressionRef;
-      widen_high_i8x16_u(value: ExpressionRef): ExpressionRef;
-      load8x8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8x8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      extend_low_i8x16_s(value: ExpressionRef): ExpressionRef;
+      extend_high_i8x16_s(value: ExpressionRef): ExpressionRef;
+      extend_low_i8x16_u(value: ExpressionRef): ExpressionRef;
+      extend_high_i8x16_u(value: ExpressionRef): ExpressionRef;
     };
     i32x4: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -1403,40 +1434,64 @@ declare module binaryen {
       le_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
-      any_true(value: ExpressionRef): ExpressionRef;
       all_true(value: ExpressionRef): ExpressionRef;
+      bitmask(value: ExpressionRef): ExpressionRef;
       shl(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_s(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_u(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      min_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      max_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      dot_i16x8_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_low_i16x8_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_high_i16x8_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_low_i16x8_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_high_i16x8_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extadd_pairwise_i16x8_s(value: ExpressionRef): ExpressionRef;
+      extadd_pairwise_i16x8_u(value: ExpressionRef): ExpressionRef;
       trunc_sat_f32x4_s(value: ExpressionRef): ExpressionRef;
       trunc_sat_f32x4_u(value: ExpressionRef): ExpressionRef;
-      widen_low_i16x8_s(value: ExpressionRef): ExpressionRef;
-      widen_high_i16x8_s(value: ExpressionRef): ExpressionRef;
-      widen_low_i16x8_u(value: ExpressionRef): ExpressionRef;
-      widen_high_i16x8_u(value: ExpressionRef): ExpressionRef;
-      load16x4_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16x4_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      extend_low_i16x8_s(value: ExpressionRef): ExpressionRef;
+      extend_high_i16x8_s(value: ExpressionRef): ExpressionRef;
+      extend_low_i16x8_u(value: ExpressionRef): ExpressionRef;
+      extend_high_i16x8_u(value: ExpressionRef): ExpressionRef;
+      trunc_sat_f64x2_s_zero(value: ExpressionRef): ExpressionRef;
+      trunc_sat_f64x2_u_zero(value: ExpressionRef): ExpressionRef;
     };
     i64x2: {
       splat(value: ExpressionRef): ExpressionRef;
       extract_lane(vec: ExpressionRef, index: ExpressionRef): ExpressionRef;
       replace_lane(vec: ExpressionRef, index: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      eq(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      ne(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      lt_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      gt_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      le_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
-      any_true(value: ExpressionRef): ExpressionRef;
       all_true(value: ExpressionRef): ExpressionRef;
+      bitmask(value: ExpressionRef): ExpressionRef;
       shl(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_s(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       shr_u(vec: ExpressionRef, shift: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      trunc_sat_f64x2_s(value: ExpressionRef): ExpressionRef;
-      trunc_sat_f64x2_u(value: ExpressionRef): ExpressionRef;
-      load32x2_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32x2_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_low_i32x4_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_high_i32x4_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_low_i32x4_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extmul_high_i32x4_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      extend_low_i32x4_s(value: ExpressionRef): ExpressionRef;
+      extend_high_i32x4_s(value: ExpressionRef): ExpressionRef;
+      extend_low_i32x4_u(value: ExpressionRef): ExpressionRef;
+      extend_high_i32x4_u(value: ExpressionRef): ExpressionRef;
     };
     f32x4: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -1451,16 +1506,21 @@ declare module binaryen {
       abs(value: ExpressionRef): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       sqrt(value: ExpressionRef): ExpressionRef;
-      qfma(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
-      qfms(a: ExpressionRef, b: ExpressionRef, c: ExpressionRef): ExpressionRef;
       add(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       sub(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       mul(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       div(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       min(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      pmin(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      pmax(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      ceil(value: ExpressionRef): ExpressionRef;
+      floor(value: ExpressionRef): ExpressionRef;
+      trunc(value: ExpressionRef): ExpressionRef;
+      nearest(value: ExpressionRef): ExpressionRef;
       convert_i32x4_s(value: ExpressionRef): ExpressionRef;
       convert_i32x4_u(value: ExpressionRef): ExpressionRef;
+      demote_f64x2_zero(value: ExpressionRef): ExpressionRef;
     };
     f64x2: {
       splat(value: ExpressionRef): ExpressionRef;
@@ -1483,22 +1543,15 @@ declare module binaryen {
       div(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       min(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       max(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      convert_i64x2_s(value: ExpressionRef): ExpressionRef;
-      convert_i64x2_u(value: ExpressionRef): ExpressionRef;
-    };
-    v8x16: {
-      shuffle(left: ExpressionRef, right: ExpressionRef, mask: number[]): ExpressionRef;
-      swizzle(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
-      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-    };
-    v16x8: {
-      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-    };
-    v32x4: {
-      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-    };
-    v64x2: {
-      load_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
+      pmin(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      pmax(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      ceil(value: ExpressionRef): ExpressionRef;
+      floor(value: ExpressionRef): ExpressionRef;
+      trunc(value: ExpressionRef): ExpressionRef;
+      nearest(value: ExpressionRef): ExpressionRef;
+      convert_low_i32x4_s(value: ExpressionRef): ExpressionRef;
+      convert_low_i32x4_u(value: ExpressionRef): ExpressionRef;
+      promote_low_f32x4(value: ExpressionRef): ExpressionRef;
     };
     funcref: {
       pop(): ExpressionRef;
@@ -1512,10 +1565,10 @@ declare module binaryen {
     eqref: {
       pop(): ExpressionRef;
     };
-    dataref: {
+    i31ref: {
       pop(): ExpressionRef;
     };
-    i31ref: {
+    dataref: {
       pop(): ExpressionRef;
     };
     ref: {
@@ -1559,6 +1612,9 @@ declare module binaryen {
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
     getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
+    addTable(name: string, initial: number, maximum: number, type: Type): TableRef;
+    getTable(name: string): TableRef;
+    removeTable(name: string): void;
     addTag(name: string, params: Type, results: Type): TagRef;
     getTag(name: string): TagRef;
     removeTag(name: string): void;
