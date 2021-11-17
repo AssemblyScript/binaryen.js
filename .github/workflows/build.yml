@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: '17'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
@@ -30,7 +30,7 @@ jobs:
     - name: "Set up CMake"
       run: |
         mkdir $HOME/cmake
-        wget -qO- https://github.com/Kitware/CMake/releases/download/v3.16.0/cmake-3.16.0-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
+        wget -qO- https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
         echo "$HOME/cmake/bin" >> $GITHUB_PATH
     - name: "Check out repository"
       uses: actions/checkout@v1
