@@ -3,11 +3,7 @@ import assert from "assert";
 // Basic tests to make sure that we do not push something obviously broken
 
 console.log("importing binaryen");
-const Binaryen = await import("../index.js");
-assert(Binaryen);
-
-console.log("instantiating binaryen");
-const binaryen = await Binaryen.default();
+const binaryen = (await import("../index.js")).default;
 assert(binaryen);
 
 console.log("constructing a module");

@@ -1,4 +1,4 @@
-declare module binaryen {
+declare module Binaryen {
 
   type Type = number;
 
@@ -2127,6 +2127,6 @@ declare module binaryen {
   }
 }
 
-declare function Binaryen(): Promise<typeof binaryen>;
+declare const binaryen: typeof Binaryen;
 
-export default Binaryen;
+export default binaryen;

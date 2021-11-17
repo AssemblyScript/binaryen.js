@@ -15,8 +15,7 @@ $> npm install binaryen
 ```
 
 ```js
-import Binaryen from "binaryen";
-const binaryen = await Binaryen();
+import binaryen from "binaryen";
 
 // Create a module with a single function
 var myModule = new binaryen.Module();
