@@ -79,8 +79,8 @@ jobs:
         emcc --version
         emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
         emmake make -j2 binaryen_wasm
-        cp ./bin/binaryen_wasm.js ../../index.js
         cd ../..
+        npm run bundle
     - name: "Test binaryen.js"
       run: |
         node ./tests/sanity
