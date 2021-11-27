@@ -1,5 +1,3 @@
---- CMakeLists.txt	2021-11-26 23:27:52.000000000 +0200
-+++ CMakeLists.txt	2021-11-27 18:00:38.000000000 +0200
 @@ -258,12 +258,7 @@
    endif()
    add_debug_compile_flag("-O0")
