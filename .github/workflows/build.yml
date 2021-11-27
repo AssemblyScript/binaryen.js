@@ -50,6 +50,8 @@ jobs:
         fi
         git submodule update --init --remote --merge
         cd ./binaryen
+        echo "Apply CMakeFile patch..."
+        patch --dry-run -ruN -d CMakeList.txt < ../scripts/CMakeList.patch
         git log -n1
         cd ..
     - name: "Determine version"

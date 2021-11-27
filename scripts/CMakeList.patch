@@ -1,0 +1,24 @@
+--- CMakeLists.txt	2021-11-26 23:27:52.000000000 +0200
++++ CMakeLists-new.txt	2021-11-27 18:00:38.000000000 +0200
+@@ -258,12 +258,7 @@
+   endif()
+   add_debug_compile_flag("-O0")
+   add_debug_compile_flag("-g3")
+-  if(EMSCRIPTEN)
+-    # really focus on minimizing output size when compiling sources
+-    add_nondebug_compile_flag("-Oz")
+-  else()
+-    add_nondebug_compile_flag("-O2")
+-  endif()
++  add_nondebug_compile_flag("-O2")
+   if(BYN_ENABLE_ASSERTIONS)
+     # On non-Debug builds cmake automatically defines NDEBUG, so we
+     # explicitly undefine it:
+@@ -375,6 +370,7 @@
+   target_link_libraries(binaryen_wasm optimized "--closure 1")
+   target_link_libraries(binaryen_wasm optimized "--closure-args \"--language_in=ECMASCRIPT6 --language_out=ECMASCRIPT6\"")
+   target_link_libraries(binaryen_wasm optimized "-flto")
++  target_link_libraries(binaryen_wasm optimized "-msign-ext") # enable sign-extending proposal
+   target_link_libraries(binaryen_wasm debug "--profiling")
+   set_property(TARGET binaryen_wasm PROPERTY CXX_STANDARD ${CXX_STANDARD})
+   set_property(TARGET binaryen_wasm PROPERTY CXX_STANDARD_REQUIRED ON)
