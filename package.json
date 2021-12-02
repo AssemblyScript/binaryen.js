@@ -1,7 +1,7 @@
 {
   "name": "binaryen",
   "description": "Browser & Node.js builds of Binaryen, a compiler infrastructure and toolchain library for WebAssembly.",
-  "version": "102.0.0",
+  "version": "103.0.0",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
