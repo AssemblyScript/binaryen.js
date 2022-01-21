@@ -48,7 +48,7 @@ jobs:
           # If not a PR, undo detached head
           git checkout "${GITHUB_REF:11}"
         fi
-        git submodule update --init --remote --merge
+        git submodule update --init --remote --merge --recursive
         cd ./binaryen
         git log -n1
         cd ..
