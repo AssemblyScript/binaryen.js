@@ -1632,7 +1632,7 @@ declare module Binaryen {
     getExportByIndex(index: number): ExportRef;
     setFunctionTable(initial: number, maximum: number, funcNames: number[], offset?: ExpressionRef): void;
     getFunctionTable(): { imported: boolean, segments: TableElement[] };
-    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, flags?: number[] | null, shared?: boolean): void;
+    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean): void;
     getMemorySegmentInfoByIndex(index: number): MemorySegmentInfo;
     setStart(start: FunctionRef): void;
     getFeatures(): Features;
