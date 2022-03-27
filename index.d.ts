@@ -1,4 +1,4 @@
-declare module Binaryen {
+declare module binaryen {
 
   type Type = number;
 
@@ -2126,7 +2126,5 @@ declare module Binaryen {
     runAndDispose(expr: ExpressionRef): ExpressionRef;
   }
 }
-
-declare const binaryen: typeof Binaryen;
 
 export default binaryen;
