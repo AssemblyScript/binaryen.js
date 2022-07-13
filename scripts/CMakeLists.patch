@@ -6,4 +6,3 @@
 +  target_link_libraries(binaryen_wasm optimized "-mbulk-memory") # enable bulk-memory proposal
    target_link_libraries(binaryen_wasm debug "--profiling")
    install(TARGETS binaryen_wasm DESTINATION ${CMAKE_INSTALL_BINDIR})
-
