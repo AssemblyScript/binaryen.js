@@ -240,7 +240,7 @@ API
   * TableElement#**offset**: `ExpressionRef`
   * TableElement#**names**: `string[]`
 
-* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`, flags?: `number[]`, shared?: `boolean`): `void`<br />
+* Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`, shared?: `boolean`): `void`<br />
   Sets the memory. There's just one memory for now, using name `"0"`. Providing `exportName` also creates a memory export.
 
   * MemorySegment#**offset**: `ExpressionRef`

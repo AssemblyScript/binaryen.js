@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Build
 on:
   schedule:
@@ -48,7 +49,7 @@ jobs:
           # If not a PR, undo detached head
           git checkout "${GITHUB_REF:11}"
         fi
-        git submodule update --init --remote --merge
+        git submodule update --init --remote --merge --recursive
         cd ./binaryen
         echo "Apply CMakeFile patch..."
         patch -ruN CMakeLists.txt < ../scripts/CMakeLists.patch
