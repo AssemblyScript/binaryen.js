@@ -18,6 +18,10 @@
     "wasm-opt": "bin/wasm-opt",
     "wasm2js": "bin/wasm2js"
   },
+  "engines": {
+    "node": ">=15.8"
+  },
+  "engineStrict": true,
   "scripts": {
     "readme": "doctoc README.md --github --title \"### Contents\"",
     "check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
