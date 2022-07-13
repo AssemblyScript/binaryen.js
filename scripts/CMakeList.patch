@@ -1,5 +1,3 @@
---- CMakeLists.txt	2022-07-13 21:13:58.000000000 +0300
-+++ CMakeLists.patched.txt	2022-07-13 21:15:55.000000000 +0300
 @@ -411,6 +411,8 @@
    target_link_libraries(binaryen_wasm optimized "--closure 1")
    target_link_libraries(binaryen_wasm optimized "--closure-args \"--language_in=ECMASCRIPT6 --language_out=ECMASCRIPT6\"")
@@ -8,4 +6,4 @@
 +  target_link_libraries(binaryen_wasm optimized "-mbulk-memory") # enable bulk-memory proposal
    target_link_libraries(binaryen_wasm debug "--profiling")
    install(TARGETS binaryen_wasm DESTINATION ${CMAKE_INSTALL_BINDIR})
- 
+
