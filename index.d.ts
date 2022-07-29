@@ -14,6 +14,10 @@ declare module binaryen {
   const eqref: Type;
   const i31ref: Type;
   const dataref: Type;
+  const stringref: Type;
+  const stringview_wtf8: Type;
+  const stringview_wtf16: Type;
+  const stringview_iter: Type;
   const unreachable: Type;
   const auto: Type;
 
@@ -188,6 +192,8 @@ declare module binaryen {
     Memory64,
     TypedFunctionReferences,
     RelaxedSIMD,
+    ExtendedConst,
+    Strings,
     All
   }
 
@@ -565,7 +571,7 @@ declare module binaryen {
     TruncSatZeroUVecF64x2ToVecI32x4,
     DemoteZeroVecF64x2ToVecF32x4,
     PromoteLowVecF32x4ToVecF64x2,
-    SwizzleVec8x16,
+    SwizzleVecI8x16,
     RefIsNull,
     RefIsFunc,
     RefIsData,
@@ -949,7 +955,7 @@ declare module binaryen {
   const TruncSatZeroUVecF64x2ToVecI32x4: Operations;
   const DemoteZeroVecF64x2ToVecF32x4: Operations;
   const PromoteLowVecF32x4ToVecF64x2: Operations;
-  const SwizzleVec8x16: Operations;
+  const SwizzleVecI8x16: Operations;
   const RefIsNull: Operations;
   const RefIsFunc: Operations;
   const RefIsData: Operations;
@@ -1569,6 +1575,18 @@ declare module binaryen {
     dataref: {
       pop(): ExpressionRef;
     };
+    stringref: {
+      pop(): ExpressionRef;
+    };
+    stringview_wtf8: {
+      pop(): ExpressionRef;
+    };
+    stringview_wtf16: {
+      pop(): ExpressionRef;
+    };
+    stringview_iter: {
+      pop(): ExpressionRef;
+    };
     ref: {
       null(type: Type): ExpressionRef;
       is_null(value: ExpressionRef): ExpressionRef;
@@ -1640,6 +1658,8 @@ declare module binaryen {
     addCustomSection(name: string, contents: Uint8Array): void;
     getNumGlobals(): number;
     getNumTables(): number;
+    hasMemory(): boolean;
+    getMemoryInfo(): MemoryInfo;
     getNumMemorySegments(): number;
     getNumElementSegments(): number;
     getGlobalByIndex(index: number): GlobalRef;
@@ -1685,6 +1705,14 @@ declare module binaryen {
     offset: ExpressionRef;
     data: Uint8Array;
     passive: boolean;
+  }
+
+  interface MemoryInfo {
+    module: string | null;
+    base: string | null;
+    shared: boolean;
+    initial: number;
+    max?: number;
   }
 
   interface ExpressionInfo {
