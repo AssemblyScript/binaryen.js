@@ -43,7 +43,7 @@ const mod = new Module();
 const { local, i32 } = mod;
 
 mod.addFunction("add", createType([ I32, I32 ]), I32, [ I32 ],
-  mod.block(null, [
+  mod.block(null, [ // entry block (usually not visible in wat/wast)
     local.set(2,
       i32.add(
         local.get(0, I32),
