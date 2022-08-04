@@ -1065,7 +1065,6 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * **SelectId**: `ExpressionId`
   * **DropId**: `ExpressionId`
   * **ReturnId**: `ExpressionId`
-  * **HostId**: `ExpressionId`
   * **NopId**: `ExpressionId`
   * **UnreachableId**: `ExpressionId`
   * **AtomicCmpxchgId**: `ExpressionId`
@@ -1089,7 +1088,6 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * **TryId**: `ExpressionId`
   * **ThrowId**: `ExpressionId`
   * **RethrowId**: `ExpressionId`
-  * **BrOnExnId**: `ExpressionId`
   * **PushId**: `ExpressionId`
   * **PopId**: `ExpressionId`
 
