@@ -165,7 +165,7 @@ API
   View of a string reference in [WTF-16](https://simonsapin.github.io/wtf-8/#wtf-16) encoding.  🦄
 
  * **stringview_iter**: `Type`<br />
-  String view iterator.  🦄
+  Iterator over the code points of a string reference.  🦄
 
  * **unreachable**: `Type`<br />
    Special type indicating unreachable code when obtaining information about an expression.
