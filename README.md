@@ -15,40 +15,63 @@ $> npm install binaryen
 ```
 
 ```js
-import binaryen from "binaryen";
+import {
+  Module,
+  createType,
+  i32 as I32,
+} from "binaryen";
+
+/*
+  (func (export "add") $add (param $0 i32) (param $1 i32) (result i32)
+  . (local $2 i32)
+  | (local.set $2
+  | . (i32.add
+  | |   (local.get $0)
+  | |   (local.get $1)
+  | ` )
+  | )
+  | (return
+  |   (local.get $2)
+  ` )
+  )
+
+ Let's build above wasm function using binaryen IR
+*/
 
 // Create a module with a single function
-var myModule = new binaryen.Module();
+const mod = new Module();
+const { local, i32 } = mod;
 
-myModule.addFunction("add", binaryen.createType([ binaryen.i32, binaryen.i32 ]), binaryen.i32, [ binaryen.i32 ],
-  myModule.block(null, [
-    myModule.local.set(2,
-      myModule.i32.add(
-        myModule.local.get(0, binaryen.i32),
-        myModule.local.get(1, binaryen.i32)
+mod.addFunction("add", createType([ I32, I32 ]), I32, [ I32 ],
+  mod.block(null, [
+    local.set(2,
+      i32.add(
+        local.get(0, I32),
+        local.get(1, I32)
       )
     ),
-    myModule.return(
-      myModule.local.get(2, binaryen.i32)
+    mod.return(
+      local.get(2, I32)
     )
   ])
 );
-myModule.addFunctionExport("add", "add");
+mod.addFunctionExport("add", "add");
 
 // Optimize the module using default passes and levels
-myModule.optimize();
+mod.optimize();
 
 // Validate the module
-if (!myModule.validate())
+if (!mod.validate())
   throw new Error("validation error");
 
 // Generate text format and binary
-var textData = myModule.emitText();
-var wasmData = myModule.emitBinary();
+var textData = mod.emitText();
+var wasmData = mod.emitBinary();
 
 // Example usage with the WebAssembly API
 var compiled = new WebAssembly.Module(wasmData);
 var instance = new WebAssembly.Instance(compiled, {});
+
 console.log(instance.exports.add(41, 1));
 ```
 
