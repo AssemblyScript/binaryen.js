@@ -159,7 +159,7 @@ API
   String reference.  🦄
 
  * **stringview_wtf8**: `Type`<br />
-  String view reference for WTF8.  🦄
+  View of a string reference in [WTF-8](https://simonsapin.github.io/wtf-8/) encoding.  🦄
 
  * **stringview_wtf16**: `Type`<br />
   String view reference for WTF16.  🦄
