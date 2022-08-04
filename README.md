@@ -140,14 +140,32 @@ API
  * **funcref**: `Type`<br />
    A function reference. 🦄
 
+ * **externref**: `Type`<br />
+   An external (host) reference. 🦄
+
  * **anyref**: `Type`<br />
-   Any host reference. 🦄
+  Any (top type) reference. 🦄
 
- * **nullref**: `Type`<br />
-   A null reference. 🦄
+ * **eqref**: `Type`<br />
+  Equal reference.  🦄
 
- * **exnref**: `Type`<br />
-   An exception reference. 🦄
+ * **i31ref**: `Type`<br />
+  i31 reference.  🦄
+
+ * **dataref**: `Type`<br />
+  Data reference.  🦄
+
+ * **stringref**: `Type`<br />
+  String reference.  🦄
+
+ * **stringview_wtf8**: `Type`<br />
+  View of a string reference in [WTF-8](https://simonsapin.github.io/wtf-8/) encoding.  🦄
+
+ * **stringview_wtf16**: `Type`<br />
+  View of a string reference in [WTF-16](https://simonsapin.github.io/wtf-8/#wtf-16) encoding.  🦄
+
+ * **stringview_iter**: `Type`<br />
+  Iterator over the code points of a string reference.  🦄
 
  * **unreachable**: `Type`<br />
    Special type indicating unreachable code when obtaining information about an expression.
@@ -308,6 +326,15 @@ API
   * GlobalInfo#**mutable**: `boolean`
   * GlobalInfo#**init**: `ExpressionRef`
 
+* **getTableInfo**(table: `TableRef`): `TableInfo`<br />
+  Obtains information about a table.
+
+  * TableInfo#**name**: `string`
+  * TableInfo#**module**: `string | null` (if imported)
+  * TableInfo#**base**: `string | null` (if imported)
+  * TableInfo#**initial**: `number`;
+  * TableInfo#**max**?: `number`;
+
 * **getExportInfo**(export_: `ExportRef`): `ExportInfo`<br />
   Obtains information about an export.
 
@@ -321,17 +348,16 @@ API
   * **ExternalTable**: `ExternalKind`
   * **ExternalMemory**: `ExternalKind`
   * **ExternalGlobal**: `ExternalKind`
-  * **ExternalEvent**: `ExternalKind`
+  * **ExternalTag**: `ExternalKind`
 
-* **getEventInfo**(event: `EventRef`): `EventInfo`<br />
-  Obtains information about an event.
+* **getTagInfo**(tag: `TagRef`): `TagInfo`<br />
+  Obtains information about a tag.
 
-  * EventInfo#**name**: `string`
-  * EventInfo#**module**: `string | null` (if imported)
-  * EventInfo#**base**: `string | null` (if imported)
-  * EventInfo#**attribute**: `number`
-  * EventInfo#**params**: `Type`
-  * EventInfo#**results**: `Type`
+  * TagInfo#**name**: `string`
+  * TagInfo#**module**: `string | null` (if imported)
+  * TagInfo#**base**: `string | null` (if imported)
+  * TagInfo#**params**: `Type`
+  * TagInfo#**results**: `Type`
 
 * **getSideEffects**(expr: `ExpressionRef`, features: `FeatureFlags`): `SideEffects`<br />
   Gets the side effects of the specified expression.
@@ -345,9 +371,13 @@ API
   * SideEffects.**WritesGlobal**: `SideEffects`
   * SideEffects.**ReadsMemory**: `SideEffects`
   * SideEffects.**WritesMemory**: `SideEffects`
+  * SideEffects.**ReadsTable**: `SideEffects`
+  * SideEffects.**WritesTable**: `SideEffects`
   * SideEffects.**ImplicitTrap**: `SideEffects`
   * SideEffects.**IsAtomic**: `SideEffects`
   * SideEffects.**Throws**: `SideEffects`
+  * SideEffects.**DanglingPop**: `SideEffects`
+  * SideEffects.**TrapsNeverHappen**: `SideEffects`
   * SideEffects.**Any**: `SideEffects`
 
 ### Module validation
@@ -433,6 +463,9 @@ API
 
 * Module#**emitText**(): `string`<br />
   Returns the module in Binaryen's s-expression text format (not official stack-style text format).
+
+* Module#**emitStackIR**(optimize?: `boolean`): `string`<br />
+  Returns the module in official stack-style text format.
 
 * Module#**emitAsmjs**(): `string`<br />
   Returns the [asm.js](http://asmjs.org/) representation of the module.
@@ -979,23 +1012,21 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 * Module#v128.**pop**(): `ExpressionRef`
 * Module#funcref.**pop**(): `ExpressionRef`
 * Module#anyref.**pop**(): `ExpressionRef`
-* Module#nullref.**pop**(): `ExpressionRef`
-* Module#exnref.**pop**(): `ExpressionRef`
+* Module#externref.**pop**(): `ExpressionRef`
 * Module#tuple.**make**(elements: `ExpressionRef[]`): `ExpressionRef`
 * Module#tuple.**extract**(tuple: `ExpressionRef`, index: `number`): `ExpressionRef`
 
 #### [Exception handling operations](https://github.com/WebAssembly/exception-handling/blob/master/proposals/Exceptions.md) 🦄
 
-* Module#**try**(name: `string`, body: `ExpressionRef`, catchTags: `string[]`, catchBodies: `ExpressionRef[]`, delegateTarget: `string`): `ExpressionRef`
-* Module#**throw**(event: `string`, operands: `ExpressionRef[]`): `ExpressionRef`
-* Module#**rethrow**(exnref: `ExpressionRef`): `ExpressionRef`
-* Module#**br_on_exn**(label: `string`, event: `string`, exnref: `ExpressionRef`): `ExpressionRef`
+* Module#**try**(name: `string`, body: `ExpressionRef`, catchTags: `string[]`, catchBodies: `ExpressionRef[]`, delegateTarget?: `string`): `ExpressionRef`
+* Module#**throw**(tag: `string`, operands: `ExpressionRef[]`): `ExpressionRef`
+* Module#**rethrow**(target: `string`): `ExpressionRef`
 >
-* Module#**addEvent**(name: `string`, attribute: `number`, params: `Type`, results: `Type`): `Event`
-* Module#**getEvent**(name: `string`): `Event`
-* Module#**removeEvent**(name: `stirng`): `void`
-* Module#**addEventImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, attribute: `number`, params: `Type`, results: `Type`): `void`
-* Module#**addEventExport**(internalName: `string`, externalName: `string`): `ExportRef`
+* Module#**addTag**(name: `string`, params: `Type`, results: `Type`): `TagRef`
+* Module#**getTag**(name: `string`): `TagRef`
+* Module#**removeTag**(name: `stirng`): `void`
+* Module#**addTagImport**(internalName: `string`, externalModuleName: `string`, externalBaseName: `string`, params: `Type`, results: `Type`): `void`
+* Module#**addTagExport**(internalName: `string`, externalName: `string`): `ExportRef`
 
 #### [Reference types operations](https://github.com/WebAssembly/reference-types/blob/master/proposals/reference-types/Overview.md) 🦄
 
@@ -1034,7 +1065,6 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * **SelectId**: `ExpressionId`
   * **DropId**: `ExpressionId`
   * **ReturnId**: `ExpressionId`
-  * **HostId**: `ExpressionId`
   * **NopId**: `ExpressionId`
   * **UnreachableId**: `ExpressionId`
   * **AtomicCmpxchgId**: `ExpressionId`
@@ -1058,7 +1088,6 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * **TryId**: `ExpressionId`
   * **ThrowId**: `ExpressionId`
   * **RethrowId**: `ExpressionId`
-  * **BrOnExnId**: `ExpressionId`
   * **PushId**: `ExpressionId`
   * **PopId**: `ExpressionId`
 
@@ -1147,9 +1176,11 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   >
   * UnreachableInfo
   >
-  * HostInfo#**op**: `number`
-  * HostInfo#**nameOperand**: `string | null`
-  * HostInfo#**operands**: `ExpressionRef[]`
+  * PopInfo
+  >
+  * MemorySizeInfo
+  >
+  * MemoryGrowInfo#**delta**: `ExpressionRef`
   >
   * AtomicRMWInfo#**op**: `number`
   * AtomicRMWInfo#**bytes**: `number`
@@ -1215,25 +1246,41 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * MemoryFillInfo#**value**: `ExpressionRef`
   * MemoryFillInfo#**size**: `ExpressionRef`
   >
-  * TryInfo#**body**: `ExpressionRef`
-  * TryInfo#**catchBody**: `ExpressionRef`
-  >
   * RefNullInfo
   >
-  * RefIsNullInfo#**value**: `ExpressionRef`
+  * RefIsInfo#**op**: `Operations`
+  * RefIsInfo#**value**: `ExpressionRef`
+  >
+  * RefAsInfo#**op**: `Operations`
+  * RefAsInfo#**value**: `ExpressionRef`
   >
   * RefFuncInfo#**func**: `string`
   >
-  * ThrowInfo#**event**: `string`
+  * RefEqInfo#**left**: `ExpressionRef`
+  * RefEqInfo#**right**: `ExpressionRef`
+  >
+  * TryInfo#**name**: `string`
+  * TryInfo#**body**: `ExpressionRef`
+  * TryInfo#**catchBodies**: `ExpressionRef[]`
+  * TryInfo#**ccatchBodies**: `ExpressionRef[]`;
+  * TryInfo#**chasCatchAll**: `boolean`;
+  * TryInfo#**cdelegateTarget**: `string`;
+  * TryInfo#**cisDelegate**: `boolean`;
+  >
+  * ThrowInfo#**tag**: `string`
   * ThrowInfo#**operands**: `ExpressionRef[]`
   >
-  * RethrowInfo#**exnref**: `ExpressionRef`
+  * RethrowInfo#**target**: `string`
   >
-  * BrOnExnInfo#**name**: `string`
-  * BrOnExnInfo#**event**: `string`
-  * BrOnExnInfo#**exnref**: `ExpressionRef`
+  * TupleMakeInfo#**operands**: `ExpressionRef[]`
   >
-  * PopInfo
+  * TupleExtract#**tuple**: `ExpressionRef`
+  * TupleExtract#**index**: `number`
+  >
+  * I31NewInfo#**value**: `ExpressionRef`
+  >
+  * I31GetInfo#**i31**: `ExpressionRef`
+  * I31GetInfo#**isSigned**: `boolean`
   >
   * PushInfo#**value**: `ExpressionRef`
 
