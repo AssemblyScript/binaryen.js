@@ -23,16 +23,16 @@ import {
 
 /*
   (func (export "add") $add (param $0 i32) (param $1 i32) (result i32)
-  . (local $2 i32)
-  | (local.set $2
-  | . (i32.add
-  | |   (local.get $0)
-  | |   (local.get $1)
-  | ` )
-  | )
-  | (return
-  |   (local.get $2)
-  ` )
+  ⋮ (local $2 i32)
+  ⋮ (local.set $2
+  ⋮ ⋮ (i32.add
+  ⋮ ⋮ ⋮ (local.get $0)
+  ⋮ ⋮ ⋮ (local.get $1)
+  ⋮ ⋮ )
+  ⋮ )
+  ⋮ (return
+  ⋮ ⋮ (local.get $2)
+  ⋮ )
   )
 
  Let's build above wasm function using binaryen IR
