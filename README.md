@@ -68,7 +68,7 @@ if (!mod.validate())
 var textData = mod.emitText();
 var wasmData = mod.emitBinary();
 
-// Free resurces
+// Free resources
 mod.dispose();
 
 // Example usage with the WebAssembly API
