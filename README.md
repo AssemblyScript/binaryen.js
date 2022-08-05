@@ -68,6 +68,9 @@ if (!mod.validate())
 var textData = mod.emitText();
 var wasmData = mod.emitBinary();
 
+// Free resurces
+mod.dispose();
+
 // Example usage with the WebAssembly API
 var compiled = new WebAssembly.Module(wasmData);
 var instance = new WebAssembly.Instance(compiled, {});
