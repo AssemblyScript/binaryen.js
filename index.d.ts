@@ -190,7 +190,6 @@ declare module binaryen {
     Multivalue,
     GC,
     Memory64,
-    TypedFunctionReferences,
     RelaxedSIMD,
     ExtendedConst,
     Strings,
@@ -1009,29 +1008,29 @@ declare module binaryen {
       // TODO: init, fill, copy
     };
     memory: {
-      size(): ExpressionRef;
-      grow(value: ExpressionRef): ExpressionRef;
-      init(segment: number, dest: ExpressionRef, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
-      copy(dest: ExpressionRef, source: ExpressionRef, size: ExpressionRef): ExpressionRef;
-      fill(dest: ExpressionRef, value: ExpressionRef, size: ExpressionRef): ExpressionRef;
+      size(name?: string, memory64?: boolean): ExpressionRef;
+      grow(value: ExpressionRef, name?: string, memory64?: boolean): ExpressionRef;
+      init(segment: number, dest: ExpressionRef, offset: ExpressionRef, size: ExpressionRef, name?: string): ExpressionRef;
+      copy(dest: ExpressionRef, source: ExpressionRef, size: ExpressionRef, destName?: string, sourceName?: string): ExpressionRef;
+      fill(dest: ExpressionRef, value: ExpressionRef, size: ExpressionRef, name?: string): ExpressionRef;
       atomic: {
-        notify(ptr: ExpressionRef, notifyCount: ExpressionRef): ExpressionRef;
-        wait32(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
-        wait64(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef): ExpressionRef;
+        notify(ptr: ExpressionRef, notifyCount: ExpressionRef, name?: string): ExpressionRef;
+        wait32(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef, name?: string): ExpressionRef;
+        wait64(ptr: ExpressionRef, expected: ExpressionRef, timeout: ExpressionRef, name?: string): ExpressionRef;
       }
     };
     data: {
       drop(segment: number): ExpressionRef;
     };
     i32: {
-      load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      store8(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      store16(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      load(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+      store8(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+      store16(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       const(value: number): ExpressionRef;
       clz(value: ExpressionRef): ExpressionRef;
       ctz(value: ExpressionRef): ExpressionRef;
@@ -1083,54 +1082,54 @@ declare module binaryen {
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       atomic: {
-        load(offset: number, ptr: ExpressionRef): ExpressionRef;
-        load8_u(offset: number, ptr: ExpressionRef): ExpressionRef;
-        load16_u(offset: number, ptr: ExpressionRef): ExpressionRef;
-        store(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+        load(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        load8_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        load16_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
         rmw: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
         rmw8_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
         rmw16_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
       },
       pop(): ExpressionRef;
     };
     i64: {
-      load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      store8(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      store16(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-      store32(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      load(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load32_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load32_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+      store8(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+      store16(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+      store32(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       const(low: number, high: number): ExpressionRef;
       clz(value: ExpressionRef): ExpressionRef;
       ctz(value: ExpressionRef): ExpressionRef;
@@ -1184,56 +1183,56 @@ declare module binaryen {
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       atomic: {
-        load(offset: number, ptr: ExpressionRef): ExpressionRef;
-        load8_u(offset: number, ptr: ExpressionRef): ExpressionRef;
-        load16_u(offset: number, ptr: ExpressionRef): ExpressionRef;
-        load32_u(offset: number, ptr: ExpressionRef): ExpressionRef;
-        store(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-        store32(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+        load(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        load8_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        load16_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        load32_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+        store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        store32(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
         rmw: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
         rmw8_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
         rmw16_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
         rmw32_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
         },
       },
       pop(): ExpressionRef;
     };
     f32: {
-      load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      load(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       const(value: number): ExpressionRef;
       const_bits(value: number): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
@@ -1269,8 +1268,8 @@ declare module binaryen {
       pop(): ExpressionRef;
     };
     f64: {
-      load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      load(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       const(value: number): ExpressionRef;
       const_bits(low: number, high: number): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
@@ -1306,28 +1305,28 @@ declare module binaryen {
       pop(): ExpressionRef;
     };
     v128: {
-      load(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load64_splat(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8x8_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8x8_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16x4_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load16x4_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32x2_s(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32x2_u(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load32_zero(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load64_zero(offset: number, align: number, ptr: ExpressionRef): ExpressionRef;
-      load8_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      load16_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      load32_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      load64_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      store8_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      store16_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      store32_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      store64_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef): ExpressionRef;
-      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      load(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8_splat(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16_splat(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load32_splat(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load64_splat(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8x8_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8x8_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16x4_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load16x4_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load32x2_s(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load32x2_u(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load32_zero(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load64_zero(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
+      load8_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      load16_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      load32_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      load64_lane(offset: number, align: number, index: number, ptr: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      store8_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      store16_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      store32_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      store64_lane(offset: number, align: number, index: number, pt: ExpressionRef, vec: ExpressionRef, name?: string): ExpressionRef;
+      store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       const(value: ArrayLike<number>): ExpressionRef;
       not(value: ExpressionRef): ExpressionRef;
       any_true(value: ExpressionRef): ExpressionRef;
@@ -1650,7 +1649,7 @@ declare module binaryen {
     getExportByIndex(index: number): ExportRef;
     setFunctionTable(initial: number, maximum: number, funcNames: number[], offset?: ExpressionRef): void;
     getFunctionTable(): { imported: boolean, segments: TableElement[] };
-    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean): void;
+    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
     getMemorySegmentInfoByIndex(index: number): MemorySegmentInfo;
     setStart(start: FunctionRef): void;
     getFeatures(): Features;
@@ -1659,7 +1658,7 @@ declare module binaryen {
     getNumGlobals(): number;
     getNumTables(): number;
     hasMemory(): boolean;
-    getMemoryInfo(): MemoryInfo;
+    getMemoryInfo(name?: string): MemoryInfo;
     getNumMemorySegments(): number;
     getNumElementSegments(): number;
     getGlobalByIndex(index: number): GlobalRef;
@@ -1711,6 +1710,7 @@ declare module binaryen {
     module: string | null;
     base: string | null;
     shared: boolean;
+    is64: boolean;
     initial: number;
     max?: number;
   }
