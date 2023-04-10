@@ -78,7 +78,7 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-sSTACK_SIZE=5242880"
+        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-sSTACK_SIZE=2097152"
         emmake make -j2 binaryen_wasm
         cd ../..
         npm run bundle
