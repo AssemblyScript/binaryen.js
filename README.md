@@ -249,15 +249,6 @@ API
 * Module#**removeGlobal**(name: `string`): `void`<br />
   Removes a global, by name.
 
-* Module#**setFunctionTable**(initial: `number`, maximum: `number`, funcs: `string[]`, offset?: `ExpressionRef`): `void`<br />
-  Sets the contents of the function table. There's just one table for now, using name `"0"`.
-
-* Module#**getFunctionTable**(): `{ imported: boolean, segments: TableElement[] }`<br />
-  Gets the contents of the function table.
-
-  * TableElement#**offset**: `ExpressionRef`
-  * TableElement#**names**: `string[]`
-
 * Module#**setMemory**(initial: `number`, maximum: `number`, exportName: `string | null`, segments: `MemorySegment[]`, shared?: `boolean`): `void`<br />
   Sets the memory. There's just one memory for now, using name `"0"`. Providing `exportName` also creates a memory export.
 
