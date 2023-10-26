@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/setup-node@v2
       with:
-        node-version: '17'
+        node-version: '20'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
