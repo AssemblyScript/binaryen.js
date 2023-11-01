@@ -1635,8 +1635,8 @@ declare module binaryen {
     removeTag(name: string): void;
     addFunctionImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): void;
     addTableImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
-    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string): void;
-    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type): void;
+    addMemoryImport(internalName: string, externalModuleName: string, externalBaseName: string, shared?: boolean): void;
+    addGlobalImport(internalName: string, externalModuleName: string, externalBaseName: string, globalType: Type, mutable?: boolean): void;
     addTagImport(internalName: string, externalModuleName: string, externalBaseName: string, params: Type, results: Type): void;
     addFunctionExport(internalName: string, externalName: string): ExportRef;
     addTableExport(internalName: string, externalName: string): ExportRef;
