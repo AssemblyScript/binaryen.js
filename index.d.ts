@@ -989,8 +989,8 @@ declare module binaryen {
     switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
     return_call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
-    call_indirect(target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
-    return_call_indirect(target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    call_indirect(table: string, target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    return_call_indirect(table: string, target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
     local: {
       get(index: number, type: Type): ExpressionRef;
       set(index: number, value: ExpressionRef): ExpressionRef;
