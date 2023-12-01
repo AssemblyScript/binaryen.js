@@ -1613,20 +1613,19 @@ declare module binaryen {
     };
     Function: {
       getName(func: FunctionRef): string;  
-      getParams(func: FunctionRef): TypeRef;
-      getResults(func: FunctionRef): TypeRef;
+      getParams(func: FunctionRef): Type;
+      getResults(func: FunctionRef): Type;
       getNumVars(func: FunctionRef): number;
-      getVar(func: FunctionRef, index: number): TypeRef;
+      getVar(func: FunctionRef, index: number): Type;
       getNumLocals(func: FunctionRef): number;
       hasLocalName(func: FunctionRef, index: number): boolean;
       getLocalName(func: FunctionRef, index: number): string;
       setLocalName(func: ExpressionRef, index: number, name: string): void;
       getBody(func: FunctionRef): ExpressionRef;
       setBody(func: FunctionRef, bodyExpr: ExpressionRef): void;
-      optimize(func: FunctionRef, module: ModuleRef): void;
-      runPasses(func: FunctionRef, module: ModuleRef, passes: string[], numPasses: number): void;
+      optimize(func: FunctionRef, module: Module): void;
+      runPasses(func: FunctionRef, module: Module, passes: string[], numPasses: number): void;
       setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
-
     };
     try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
     throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
