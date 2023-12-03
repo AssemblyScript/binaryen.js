@@ -1611,6 +1611,19 @@ declare module binaryen {
       make(elements: ExportRef[]): ExpressionRef;
       extract(tuple: ExpressionRef, index: number): ExpressionRef;
     };
+    Function: {
+      getName(func: FunctionRef): string;  
+      getParams(func: FunctionRef): Type;
+      getResults(func: FunctionRef): Type;
+      getNumVars(func: FunctionRef): number;
+      getVar(func: FunctionRef, index: number): Type;
+      getNumLocals(func: FunctionRef): number;
+      hasLocalName(func: FunctionRef, index: number): boolean;
+      getLocalName(func: FunctionRef, index: number): string;
+      setLocalName(func: ExpressionRef, index: number, name: string): void;
+      getBody(func: FunctionRef): ExpressionRef;
+      setBody(func: FunctionRef, bodyExpr: ExpressionRef): void;
+    };
     try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
     throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
     rethrow(target: string): ExpressionRef;
