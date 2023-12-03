@@ -1623,9 +1623,6 @@ declare module binaryen {
       setLocalName(func: ExpressionRef, index: number, name: string): void;
       getBody(func: FunctionRef): ExpressionRef;
       setBody(func: FunctionRef, bodyExpr: ExpressionRef): void;
-      optimize(func: FunctionRef, module: Module): void;
-      runPasses(func: FunctionRef, module: Module, passes: string[], numPasses: number): void;
-      setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
     };
     try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
     throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
