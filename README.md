@@ -152,8 +152,8 @@ API
  * **i31ref**: `Type`<br />
   i31 reference.  🦄
 
- * **dataref**: `Type`<br />
-  Data reference.  🦄
+ * **structref**: `Type`<br />
+  Structure reference.  🦄
 
  * **stringref**: `Type`<br />
   String reference.  🦄
@@ -1027,9 +1027,10 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 
 #### [Bulk memory operations](https://github.com/WebAssembly/bulk-memory-operations/blob/master/proposals/bulk-memory-operations/Overview.md) 🦄
 
-* Module#memory.**init**(segment: `number`, dest: `ExpressionRef`, offset: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`
+* Module#memory.**init**(segment: `string`, dest: `ExpressionRef`, offset: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`
 * Module#memory.**copy**(dest: `ExpressionRef`, source: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`
 * Module#memory.**fill**(dest: `ExpressionRef`, value: `ExpressionRef`, size: `ExpressionRef`): `ExpressionRef`
+* Module#data.**drop**(segment: `string`): `ExpressionRef`
 
 ### Expression manipulation
 
@@ -1268,7 +1269,7 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * TupleExtract#**tuple**: `ExpressionRef`
   * TupleExtract#**index**: `number`
   >
-  * I31NewInfo#**value**: `ExpressionRef`
+  * RefI31Info#**value**: `ExpressionRef`
   >
   * I31GetInfo#**i31**: `ExpressionRef`
   * I31GetInfo#**isSigned**: `boolean`
