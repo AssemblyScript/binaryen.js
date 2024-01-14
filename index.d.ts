@@ -1643,6 +1643,11 @@ declare module binaryen {
     addTable(name: string, initial: number, maximum: number, type: Type): TableRef;
     getTable(name: string): TableRef;
     removeTable(name: string): void;
+    addActiveElementSegment(table: string, name: string, funcNames: string[], offset: ExpressionRef): ElementSegmentRef;
+    addPassiveElementSegment(name: string, funcNames: string[]): ElementSegmentRef;
+    getElementSegment(name: string): ElementSegmentRef;
+    getTableSegments(table: string): string[];
+    removeElementSegment(name: string): void;
     addTag(name: string, params: Type, results: Type): TagRef;
     getTag(name: string): TagRef;
     removeTag(name: string): void;
