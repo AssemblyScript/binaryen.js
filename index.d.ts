@@ -1640,7 +1640,7 @@ declare module binaryen {
     addGlobal(name: string, type: Type, mutable: boolean, init: ExpressionRef): GlobalRef;
     getGlobal(name: string): GlobalRef;
     removeGlobal(name: string): void;
-    addTable(name: string, initial: number, maximum: number, type: Type): TableRef;
+    addTable(name: string, initial: number, maximum: number): TableRef;
     getTable(name: string): TableRef;
     removeTable(name: string): void;
     addActiveElementSegment(table: string, name: string, funcNames: string[], offset: ExpressionRef): ElementSegmentRef;
