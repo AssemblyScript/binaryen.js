@@ -12,6 +12,9 @@ jobs:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
+    env:
+      MAKE_FLAGS: "-j2"
+      CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
       matrix:
         emsdk: [ "tot", "latest" ]
@@ -78,8 +81,8 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="-sMAXIMUM_MEMORY=4294967296"
-        emmake make -j2 binaryen_wasm
+        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" -DENABLE_WERROR=OFF
+        emmake make $MAKE_FLAGS binaryen_wasm
         cd ../..
         npm run bundle
     - name: "Test binaryen.js"
@@ -90,7 +93,7 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emmake make -j2 wasm-opt
+        emmake make $MAKE_FLAGS wasm-opt
         echo '#!/usr/bin/env node' | cat - ./bin/wasm-opt.js > ../../bin/wasm-opt
         cd ../..
     - name: "Test wasm-opt"
@@ -101,7 +104,7 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emmake make -j2 wasm2js
+        emmake make $MAKE_FLAGS wasm2js
         echo '#!/usr/bin/env node' | cat - ./bin/wasm2js.js > ../../bin/wasm2js
         cd ../..
     - name: "Test wasm2js"
