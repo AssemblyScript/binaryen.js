@@ -15,8 +15,15 @@
   "main": "index.js",
   "typings": "index.d.ts",
   "bin": {
+    "wasm-shell": "bin/wasm-shell",
     "wasm-opt": "bin/wasm-opt",
-    "wasm2js": "bin/wasm2js"
+    "wasm-metadce": "bin/wasm-metadce",
+    "wasm2js": "bin/wasm2js",
+    "wasm-as": "bin/wasm-as",
+    "wasm-dis": "bin/wasm-dis",
+    "wasm-ctor-eval": "bin/wasm-ctor-eval",
+    "wasm-reduce": "bin/wasm-reduce",
+    "wasm-merge": "bin/wasm-merge"
   },
   "scripts": {
     "readme": "doctoc README.md --github --title \"### Contents\"",
@@ -31,8 +38,15 @@
     "package-lock.json",
     "README.md",
     "bin/package.json",
+    "bin/wasm-shell",
     "bin/wasm-opt",
-    "bin/wasm2js"
+    "bin/wasm-metadce",
+    "bin/wasm2js",
+    "bin/wasm-as",
+    "bin/wasm-dis",
+    "bin/wasm-ctor-eval",
+    "bin/wasm-reduce",
+    "bin/wasm-merge"
   ],
   "devDependencies": {
     "dateformat": "^5.0.2",

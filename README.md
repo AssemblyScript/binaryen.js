@@ -73,7 +73,7 @@ or you can use one of the [previous versions](https://github.com/AssemblyScript/
 
 ### Command line
 
-The package includes Node.js builds of [wasm-opt](https://github.com/WebAssembly/binaryen#wasm-opt) and [wasm2js](https://github.com/WebAssembly/binaryen#wasm2js).
+The package includes Node.js builds of [Binaryen's command line tools](https://github.com/WebAssembly/binaryen#tools): `wasm-shell`, `wasm-opt`, `wasm-metadce`, `wasm2js`, `wasm-as`, `wasm-dis`, `wasm-ctor-eval`, `wasm-reduce` and `wasm-merge`.
 
 API
 ---
