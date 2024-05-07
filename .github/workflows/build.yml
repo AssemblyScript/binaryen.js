@@ -7,6 +7,8 @@ on:
     branches:
     - main
   pull_request:
+env:
+  BINARYEN_TOOLS: wasm-shell wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce wasm-merge
 jobs:
   build:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
@@ -88,105 +90,24 @@ jobs:
     - name: "Test binaryen.js"
       run: |
         node ./tests/sanity
-    - name: "Build wasm-shell"
+    - name: "Build tools"
       run: |
+        mkdir -p ./bin
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emmake make $MAKE_FLAGS wasm-shell
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-shell.js > ../../bin/wasm-shell
+        for tool in ${{ env.BINARYEN_TOOLS }}; do
+          emmake make $MAKE_FLAGS "$tool"
+          echo '#!/usr/bin/env node' > "../../bin/$tool"
+          cat "./$tool.js" >> "../../bin/$tool"
+        done
         cd ../..
-    - name: "Test wasm-shell"
+        chmod +x ./bin/*
+    - name: "Test tools"
       run: |
-        node ./bin/wasm-shell --help
-    - name: "Build wasm-opt"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-opt
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-opt.js > ../../bin/wasm-opt
-        cd ../..
-    - name: "Test wasm-opt"
-      run: |
-        node ./bin/wasm-opt --help
-    - name: "Build wasm-metadce"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-metadce
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-metadce.js > ../../bin/wasm-metadce
-        cd ../..
-    - name: "Test wasm-metadce"
-      run: |
-        node ./bin/wasm-metadce --help
-    - name: "Build wasm2js"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm2js
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm2js.js > ../../bin/wasm2js
-        cd ../..
-    - name: "Test wasm2js"
-      run: |
-        node ./bin/wasm2js --help
-    - name: "Build wasm-as"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-as
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-as.js > ../../bin/wasm-as
-        cd ../..
-    - name: "Test wasm-as"
-      run: |
-        node ./bin/wasm-as --help
-    - name: "Build wasm-dis"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-dis
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-dis.js > ../../bin/wasm-dis
-        cd ../..
-    - name: "Test wasm-dis"
-      run: |
-        node ./bin/wasm-dis --help
-    - name: "Build wasm-ctor-eval"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-ctor-eval
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-ctor-eval.js > ../../bin/wasm-ctor-eval
-        cd ../..
-    - name: "Test wasm-ctor-eval"
-      run: |
-        node ./bin/wasm-ctor-eval --help
-    - name: "Build wasm-reduce"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-reduce
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-reduce.js > ../../bin/wasm-reduce
-        cd ../..
-    - name: "Test wasm-reduce"
-      run: |
-        node ./bin/wasm-reduce --help
-    - name: "Build wasm-merge"
-      run: |
-        cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
-        emmake make $MAKE_FLAGS wasm-merge
-        echo '#!/usr/bin/env node' | cat - ./bin/wasm-merge.js > ../../bin/wasm-merge
-        cd ../..
-    - name: "Test wasm-merge"
-      run: |
-        node ./bin/wasm-merge --help
+        for tool in ${{ env.BINARYEN_TOOLS }}; do
+          "./bin/$tool" --help
+        done
     - name: "Push changes to GitHub"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
