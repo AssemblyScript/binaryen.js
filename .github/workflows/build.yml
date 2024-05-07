@@ -190,7 +190,7 @@ jobs:
     - name: "Push changes to GitHub"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
-        git add ./binaryen ./index.js ./bin/wasm-opt ./bin/wasm2js
+        git add ./binaryen ./index.js ./bin/*
         npm version $VERSION --no-git-tag-version --force
         if [ $RELEASE ]; then
           echo "Committing release ("$VERSION") ..."
