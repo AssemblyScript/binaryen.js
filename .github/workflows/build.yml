@@ -99,7 +99,7 @@ jobs:
         for tool in ${{ env.BINARYEN_TOOLS }}; do
           emmake make $MAKE_FLAGS "$tool"
           echo '#!/usr/bin/env node' > "../../bin/$tool"
-          cat "./$tool.js" >> "../../bin/$tool"
+          cat "./bin/$tool.js" >> "../../bin/$tool"
         done
         cd ../..
         chmod +x ./bin/*
