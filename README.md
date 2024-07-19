@@ -1021,9 +1021,15 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 
 #### [Reference types operations](https://github.com/WebAssembly/reference-types/blob/master/proposals/reference-types/Overview.md) 🦄
 
-* Module#ref.**null**(): `ExpressionRef`
+* Module#ref.**null**(type: `Type`): `ExpressionRef`
 * Module#ref.**is_null**(value: `ExpressionRef`): `ExpressionRef`
-* Module#ref.**func**(name: `string`): `ExpressionRef`
+* Module#ref.**is_func**(value: `ExpressionRef`): `ExpressionRef`
+* Module#ref.**is_data**(value: `ExpressionRef`): `ExpressionRef`
+* Module#ref.**is_i31**(value: `ExpressionRef`): `ExpressionRef`
+* Module#ref.**as_non_null**(value: `ExpressionRef`): `ExpressionRef`
+* Module#ref.**func**(name: `string`, type: `Type`): `ExpressionRef`
+* Module#ref.**i31**(value: `ExpressionRef`): `ExpressionRef`
+* Module#ref.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 
 #### [Bulk memory operations](https://github.com/WebAssembly/bulk-memory-operations/blob/master/proposals/bulk-memory-operations/Overview.md) 🦄
 
