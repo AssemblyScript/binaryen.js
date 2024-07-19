@@ -1023,9 +1023,6 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
 
 * Module#ref.**null**(type: `Type`): `ExpressionRef`
 * Module#ref.**is_null**(value: `ExpressionRef`): `ExpressionRef`
-* Module#ref.**is_func**(value: `ExpressionRef`): `ExpressionRef`
-* Module#ref.**is_data**(value: `ExpressionRef`): `ExpressionRef`
-* Module#ref.**is_i31**(value: `ExpressionRef`): `ExpressionRef`
 * Module#ref.**as_non_null**(value: `ExpressionRef`): `ExpressionRef`
 * Module#ref.**func**(name: `string`, type: `Type`): `ExpressionRef`
 * Module#ref.**i31**(value: `ExpressionRef`): `ExpressionRef`
