@@ -1742,9 +1742,6 @@ declare module binaryen {
     ref: {
       null(type: Type): ExpressionRef;
       is_null(value: ExpressionRef): ExpressionRef;
-      is_func(value: ExpressionRef): ExpressionRef;
-      is_data(value: ExpressionRef): ExpressionRef;
-      is_i31(value: ExpressionRef): ExpressionRef;
       as_non_null(value: ExpressionRef): ExpressionRef;
       func(name: string, type: Type): ExpressionRef;
       i31(value: ExpressionRef): ExpressionRef;
