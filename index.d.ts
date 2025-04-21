@@ -2200,6 +2200,7 @@ declare module binaryen {
     name: string;
     module: string | null;
     base: string | null;
+    type: Type;
     params: Type;
     results: Type;
     vars: Type[];

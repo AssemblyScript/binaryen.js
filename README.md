@@ -307,6 +307,7 @@ API
   * FunctionInfo#**name**: `string`
   * FunctionInfo#**module**: `string | null` (if imported)
   * FunctionInfo#**base**: `string | null` (if imported)
+  * FunctionInfo#**type**: `Type`
   * FunctionInfo#**params**: `Type`
   * FunctionInfo#**results**: `Type`
   * FunctionInfo#**vars**: `Type`
