@@ -652,6 +652,8 @@ declare module binaryen {
     RefAsNonNull,
     RefAsExternInternalize,
     RefAsExternExternalize,
+    RefAsAnyConvertExtern,
+    RefAsExternConvertAny,
     BrOnNull,
     BrOnNonNull,
     BrOnCast,
