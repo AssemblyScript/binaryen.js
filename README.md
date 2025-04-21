@@ -285,6 +285,11 @@ API
   * Features.**TailCall**: `Features`
   * Features.**ReferenceTypes**: `Features`
   * Features.**Multivalue**: `Features`
+  * Features.**StackSwitching**: `Features`
+  * Features.**SharedEverything**: `Features`
+  * Features.**FP16**: `Features`
+  * Features.**BulkMemoryOpt**: `Features`
+  * Features.**CallIndirectOverlong**: `Features`
   * Features.**All**: `Features`
 
 * Module#**setFeatures**(features: `Features`): `void`<br />

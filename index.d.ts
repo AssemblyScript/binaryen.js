@@ -246,6 +246,11 @@ declare module binaryen {
     ExtendedConst,
     Strings,
     MultiMemory,
+    StackSwitching,
+    SharedEverything,
+    FP16,
+    BulkMemoryOpt,
+    CallIndirectOverlong,
     All
   }
 
