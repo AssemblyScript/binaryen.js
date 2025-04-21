@@ -905,10 +905,10 @@ declare module binaryen {
   const XorVec128: Operations;
   const AndNotVec128: Operations;
   const BitselectVec128: Operations;
-  const RelaxedFmaVecF32x4: Operations;
-  const RelaxedFmsVecF32x4: Operations;
-  const RelaxedFmaVecF64x2: Operations;
-  const RelaxedFmsVecF64x2: Operations;
+  const RelaxedMaddVecF32x4: Operations;
+  const RelaxedNmaddVecF32x4: Operations;
+  const RelaxedMaddVecF64x2: Operations;
+  const RelaxedNmaddVecF64x2: Operations;
   const LaneselectI8x16: Operations;
   const LaneselectI16x8: Operations;
   const LaneselectI32x4: Operations;
