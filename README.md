@@ -411,11 +411,47 @@ API
 * **setDebugInfo**(on: `boolean`): `void`<br />
   Enables or disables debug information in emitted binaries.
 
+* **getTrapsNeverHappen**(): `boolean`<br />
+  Gets whether no traps can be considered reached at runtime when optimizing.
+
+* **setTrapsNeverHappen**(on: `boolean`): `void`<br />
+  Enables or disables whether no traps can be considered reached at runtime when optimizing.
+
+* **getClosedWorld**(): `boolean`<br />
+  Gets whether considering that the code outside of the module does not inspect or interact with GC and function references.
+
+* **setClosedWorld**(on: `boolean`): `void`<br />
+  Enables or disables whether considering that the code outside of the module does not inspect or interact with GC and function references.
+
 * **getLowMemoryUnused**(): `boolean`<br />
   Gets whether the low 1K of memory can be considered unused when optimizing.
 
 * **setLowMemoryUnused**(on: `boolean`): `void`<br />
   Enables or disables whether the low 1K of memory can be considered unused when optimizing.
+
+* **getZeroFilledMemory**(): `boolean`<br />
+  Gets whether an imported memory is considered zero-initialized.
+
+* **setZeroFilledMemory**(on: `boolean`): `void`<br />
+  Enables or disables whether an imported memory is considered zero-initialized.
+
+* **getFastMath**(): `boolean`<br />
+  Gets whether fast math optimizations are enabled, ignoring for example corner cases of floating-point math like NaN changes.
+
+* **setFastMath**(on: `boolean`): `void`<br />
+  Enables or disables fast math optimizations, ignoring for example corner cases of floating-point math like NaN changes.
+
+* **getGenerateStackIR**(): `boolean`<br />
+  Gets whether to generate StackIR during binary writing.
+
+* **setGenerateStackIR**(on: `boolean`): `void`<br />
+  Enable or disable StackIR generation during binary writing.
+
+* **getOptimizeStackIR**(): `boolean`<br />
+  Gets whether to optimize StackIR during binary writing.
+
+* **setOptimizeStackIR**(on: `boolean`): `void`<br />
+  Enable or disable StackIR optimisation during binary writing.
 
 * **getPassArgument**(key: `string`): `string | null`<br />
   Gets the value of the specified arbitrary pass argument.
@@ -425,6 +461,15 @@ API
 
 * **clearPassArguments**(): `void`<br />
   Clears all arbitrary pass arguments.
+
+* **hasPassToSkip**(pass: `string`): `boolean`<br />
+  Gets whether a pass is in the set of passes to skip.
+
+* **addPassToSkip**(pass: `string`): `void`<br />
+  Add a pass to the set of passes to skip.
+
+* **clearPassesToSkip**(): `void`<br />
+  Clears the set of passes to skip.
 
 * **getAlwaysInlineMaxSize**(): `number`<br />
   Gets the function size at which we always inline.
