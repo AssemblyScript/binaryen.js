@@ -1779,7 +1779,7 @@ declare module binaryen {
     try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
     throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
     rethrow(target: string): ExpressionRef;
-    select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef, type?: Type): ExpressionRef;
+    select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
     nop(): ExpressionRef;

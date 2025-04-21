@@ -498,7 +498,7 @@ API
 * Module#**drop**(value: `ExpressionRef`): `ExpressionRef`<br />
   Creates a [drop](http://webassembly.org/docs/semantics/#type-parametric-operators) of a value.
 
-* Module#**select**(condition: `ExpressionRef`, ifTrue: `ExpressionRef`, ifFalse: `ExpressionRef`, type?: `Type`): `ExpressionRef`<br />
+* Module#**select**(condition: `ExpressionRef`, ifTrue: `ExpressionRef`, ifFalse: `ExpressionRef`): `ExpressionRef`<br />
   Creates a [select](http://webassembly.org/docs/semantics/#type-parametric-operators) of one of two values.
 
 #### [Variable accesses](http://webassembly.org/docs/semantics/#local-variables)
