@@ -1840,7 +1840,6 @@ declare module binaryen {
     optimizeFunction(func: string | FunctionRef): void;
     runPasses(passes: string[]): void;
     runPassesOnFunction(func: string | FunctionRef, passes: string[]): void;
-    autoDrop(): void;
     dispose(): void;
     emitBinary(): Uint8Array;
     emitBinary(sourceMapUrl: string | null): { binary: Uint8Array; sourceMap: string | null; };

@@ -298,9 +298,6 @@ API
 * Module#**addCustomSection**(name: `string`, contents: `Uint8Array`): `void`<br />
   Adds a custom section to the binary.
 
-* Module#**autoDrop**(): `void`<br />
-  Enables automatic insertion of `drop` operations where needed. Lets you not worry about dropping when creating your code.
-
 * **getFunctionInfo**(ftype: `FunctionRef`: `FunctionInfo`<br />
   Obtains information about a function.
 
