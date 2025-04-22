@@ -1069,8 +1069,7 @@ declare module binaryen {
 
   const enum ExpressionRunnerFlags {
     Default,
-    PreserveSideeffects,
-    TraverseCalls
+    PreserveSideeffects
   }
 
   type ElementSegmentRef = number;
