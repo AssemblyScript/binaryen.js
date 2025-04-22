@@ -250,7 +250,7 @@ API
 * Module#**getNumMemorySegments**(): `number`<br />
   Gets the number of memory segments within the module.
 
-* Module#**getMemorySegmentInfoByIndex**(index: `number`): `MemorySegmentInfo`<br />
+* Module#**getMemorySegmentInfo**(name: `string`): `MemorySegmentInfo`<br />
   Gets information about the memory segment at the specified index.
 
   * MemorySegmentInfo#**offset**: `number`

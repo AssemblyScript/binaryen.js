@@ -1753,7 +1753,7 @@ declare module binaryen {
     getNumExports(): number;
     getExportByIndex(index: number): ExportRef;
     setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
-    getMemorySegmentInfoByIndex(index: number): MemorySegmentInfo;
+    getMemorySegmentInfo(name: string): MemorySegmentInfo;
     setStart(start: FunctionRef): void;
     getFeatures(): Features;
     setFeatures(features: Features): void;
