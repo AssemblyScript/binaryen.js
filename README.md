@@ -494,7 +494,7 @@ API
 * Module#**emitText**(): `string`<br />
   Returns the module in Binaryen's s-expression text format (not official stack-style text format).
 
-* Module#**emitStackIR**(optimize?: `boolean`): `string`<br />
+* Module#**emitStackIR**(): `string`<br />
   Returns the module in official stack-style text format.
 
 * Module#**emitAsmjs**(): `string`<br />

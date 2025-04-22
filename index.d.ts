@@ -1769,7 +1769,7 @@ declare module binaryen {
     getTableByIndex(index: number): TableRef;
     getElementSegmentByIndex(index: number): ElementSegmentRef;
     emitText(): string;
-    emitStackIR(optimize?: boolean): string;
+    emitStackIR(): string;
     emitAsmjs(): string;
     validate(): number;
     optimize(): void;
