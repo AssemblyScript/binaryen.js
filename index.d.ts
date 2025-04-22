@@ -15,9 +15,6 @@ declare module binaryen {
   const i31ref: Type;
   const structref: Type;
   const stringref: Type;
-  const stringview_wtf8: Type;
-  const stringview_wtf16: Type;
-  const stringview_iter: Type;
   const unreachable: Type;
   const auto: Type;
 
@@ -110,13 +107,8 @@ declare module binaryen {
     StringEncode,
     StringConcat,
     StringEq,
-    StringAs,
-    StringWTF8Advance,
     StringWTF16Get,
-    StringIterNext,
-    StringIterMove,
     StringSliceWTF,
-    StringSliceIter,
     Resume
   }
 
@@ -205,13 +197,8 @@ declare module binaryen {
   const StringEncodeId: ExpressionIds;
   const StringConcatId: ExpressionIds;
   const StringEqId: ExpressionIds;
-  const StringAsId: ExpressionIds;
-  const StringWTF8AdvanceId: ExpressionIds;
   const StringWTF16GetId: ExpressionIds;
-  const StringIterNextId: ExpressionIds;
-  const StringIterMoveId: ExpressionIds;
   const StringSliceWTFId: ExpressionIds;
-  const StringSliceIterId: ExpressionIds;
   const ResumeId: ExpressionIds;
 
   const enum ExternalKinds {
@@ -658,35 +645,13 @@ declare module binaryen {
     BrOnNonNull,
     BrOnCast,
     BrOnCastFail,
-    StringNewUTF8,
-    StringNewWTF8,
-    StringNewLossyUTF8,
-    StringNewWTF16,
-    StringNewUTF8Array,
-    StringNewWTF8Array,
     StringNewLossyUTF8Array,
     StringNewWTF16Array,
     StringNewFromCodePoint,
     StringMeasureUTF8,
-    StringMeasureWTF8,
     StringMeasureWTF16,
-    StringMeasureIsUSV,
-    StringMeasureWTF16View,
-    StringEncodeUTF8,
-    StringEncodeLossyUTF8,
-    StringEncodeWTF8,
-    StringEncodeWTF16,
-    StringEncodeUTF8Array,
     StringEncodeLossyUTF8Array,
-    StringEncodeWTF8Array,
     StringEncodeWTF16Array,
-    StringAsWTF8,
-    StringAsWTF16,
-    StringAsIter,
-    StringIterMoveAdvance,
-    StringIterMoveRewind,
-    StringSliceWTF8,
-    StringSliceWTF16,
     StringEqEqual,
     StringEqCompare
   }
@@ -1092,35 +1057,13 @@ declare module binaryen {
   const BrOnNonNull: Operations;
   const BrOnCast: Operations;
   const BrOnCastFail: Operations;
-  const StringNewUTF8: Operations;
-  const StringNewWTF8: Operations;
-  const StringNewLossyUTF8: Operations;
-  const StringNewWTF16: Operations;
-  const StringNewUTF8Array: Operations;
-  const StringNewWTF8Array: Operations;
   const StringNewLossyUTF8Array: Operations;
   const StringNewWTF16Array: Operations;
   const StringNewFromCodePoint: Operations;
   const StringMeasureUTF8: Operations;
-  const StringMeasureWTF8: Operations;
   const StringMeasureWTF16: Operations;
-  const StringMeasureIsUSV: Operations;
-  const StringMeasureWTF16View: Operations;
-  const StringEncodeUTF8: Operations;
-  const StringEncodeLossyUTF8: Operations;
-  const StringEncodeWTF8: Operations;
-  const StringEncodeWTF16: Operations;
-  const StringEncodeUTF8Array: Operations;
   const StringEncodeLossyUTF8Array: Operations;
-  const StringEncodeWTF8Array: Operations;
   const StringEncodeWTF16Array: Operations;
-  const StringAsWTF8: Operations;
-  const StringAsWTF16: Operations;
-  const StringAsIter: Operations;
-  const StringIterMoveAdvance: Operations;
-  const StringIterMoveRewind: Operations;
-  const StringSliceWTF8: Operations;
-  const StringSliceWTF16: Operations;
   const StringEqEqual: Operations;
   const StringEqCompare: Operations;
 
@@ -1735,15 +1678,6 @@ declare module binaryen {
       pop(): ExpressionRef;
     };
     stringref: {
-      pop(): ExpressionRef;
-    };
-    stringview_wtf8: {
-      pop(): ExpressionRef;
-    };
-    stringview_wtf16: {
-      pop(): ExpressionRef;
-    };
-    stringview_iter: {
       pop(): ExpressionRef;
     };
     ref: {
