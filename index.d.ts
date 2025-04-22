@@ -2047,14 +2047,14 @@ declare module binaryen {
   }
 
   interface MemoryInitInfo extends ExpressionInfo {
-    segment: number;
+    segment: string;
     dest: ExpressionRef;
     offset: ExpressionRef;
     size: ExpressionRef;
   }
 
   interface DataDropInfo extends ExpressionInfo {
-    segment: number;
+    segment: string;
   }
 
   interface MemoryCopyInfo extends ExpressionInfo {

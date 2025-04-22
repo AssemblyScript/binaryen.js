@@ -1265,12 +1265,12 @@ Note that these are pseudo instructions enabling Binaryen to reason about multip
   * SIMDLoadInfo#**align**: `number`
   * SIMDLoadInfo#**ptr**: `ExpressionRef`
   >
-  * MemoryInitInfo#**segment**: `number`
+  * MemoryInitInfo#**segment**: `string`
   * MemoryInitInfo#**dest**: `ExpressionRef`
   * MemoryInitInfo#**offset**: `ExpressionRef`
   * MemoryInitInfo#**size**: `ExpressionRef`
   >
-  * MemoryDropInfo#**segment**: `number`
+  * MemoryDropInfo#**segment**: `string`
   >
   * MemoryCopyInfo#**dest**: `ExpressionRef`
   * MemoryCopyInfo#**source**: `ExpressionRef`
