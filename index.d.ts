@@ -1754,6 +1754,7 @@ declare module binaryen {
     getExportByIndex(index: number): ExportRef;
     setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
     getMemorySegmentInfo(name: string): MemorySegmentInfo;
+    getStart(): FunctionRef;
     setStart(start: FunctionRef): void;
     getFeatures(): Features;
     setFeatures(features: Features): void;

@@ -257,6 +257,9 @@ API
   * MemorySegmentInfo#**data**: `Uint8Array`
   * MemorySegmentInfo#**passive**: `boolean`
 
+* Module#**getStart**(): `FunctionRef`<br />
+  Gets the start function, if any.
+
 * Module#**setStart**(start: `FunctionRef`): `void`<br />
   Sets the start function.
 
