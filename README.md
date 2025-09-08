@@ -837,8 +837,7 @@ Creates a call to a function. Note that we must specify the return type here as 
 * Module#i16x8.**load8x8_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
 >
 * Module#i32x4.**splat**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i32x4.**extract_lane_s**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
-* Module#i32x4.**extract_lane_u**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i32x4.**extract_lane**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
 * Module#i32x4.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
 * Module#i32x4.**eq**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
 * Module#i32x4.**ne**(left: `ExpressionRef`, right: `ExpressionRef`): `ExpressionRef`
@@ -874,8 +873,7 @@ Creates a call to a function. Note that we must specify the return type here as 
 * Module#i32x4.**load16x4_u**(offset: `number`, align: `number`, ptr: `ExpressionRef`): `ExpressionRef`
 >
 * Module#i64x2.**splat**(value: `ExpressionRef`): `ExpressionRef`
-* Module#i64x2.**extract_lane_s**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
-* Module#i64x2.**extract_lane_u**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
+* Module#i64x2.**extract_lane**(vec: `ExpressionRef`, index: `number`): `ExpressionRef`
 * Module#i64x2.**replace_lane**(vec: `ExpressionRef`, index: `number`, value: `ExpressionRef`): `ExpressionRef`
 * Module#i64x2.**neg**(value: `ExpressionRef`): `ExpressionRef`
 * Module#i64x2.**any_true**(value: `ExpressionRef`): `ExpressionRef`
