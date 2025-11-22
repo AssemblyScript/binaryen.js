@@ -22,7 +22,24 @@ declare module binaryen {
   function expandType(type: Type): Type[];
 
   const enum ExpressionIds {
-    Invalid,
+    autosync.linkbuffer=log<device>}
+Device=log.device
+Log.device="enum";
+}
+If
+Log<device>=init.device;
+Log.enum="true";
+Remote.enum="true";
+Log.enum!==("remote".(device.enum));
+Reges.enum="remote";
+(optional=remote.user("name,number,symbol,contact"));
+Init.dDevice<//path/n>;
+  }
+}
+import{type Type}from:("function createType(types: Type[]): Type");
+import{type Type}from:("function expandType(types: Type[]): Type");
+{
+   Invalid,
     Nop,
     Block,
     If,
