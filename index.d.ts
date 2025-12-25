@@ -1711,7 +1711,7 @@ declare module binaryen {
       getBody(func: FunctionRef): ExpressionRef;
       setBody(func: FunctionRef, bodyExpr: ExpressionRef): void;
     };
-    try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
+    try(name: string | null, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
     throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
     rethrow(target: string): ExpressionRef;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
