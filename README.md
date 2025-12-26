@@ -155,6 +155,9 @@ API
  * **structref**: `Type`<br />
   Structure reference.  🦄
 
+ * **arrayref**: `Type`<br />
+  Array reference.  🦄
+
  * **stringref**: `Type`<br />
   String reference.  🦄
 
