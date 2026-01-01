@@ -14,6 +14,7 @@ declare module binaryen {
   const eqref: Type;
   const i31ref: Type;
   const structref: Type;
+  const arrayref: Type;
   const stringref: Type;
   const unreachable: Type;
   const auto: Type;
@@ -1674,6 +1675,9 @@ declare module binaryen {
       pop(): ExpressionRef;
     };
     structref: {
+      pop(): ExpressionRef;
+    };
+    arrayref: {
       pop(): ExpressionRef;
     };
     stringref: {
