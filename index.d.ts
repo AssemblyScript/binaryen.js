@@ -1677,6 +1677,9 @@ declare module binaryen {
     structref: {
       pop(): ExpressionRef;
     };
+    arrayref: {
+      pop(): ExpressionRef;
+    };
     stringref: {
       pop(): ExpressionRef;
     };
