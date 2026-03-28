@@ -8,7 +8,7 @@ on:
     - main
   pull_request:
 env:
-  BINARYEN_TOOLS: wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce wasm-merge
+  BINARYEN_TOOLS: wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce
 jobs:
   build:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
