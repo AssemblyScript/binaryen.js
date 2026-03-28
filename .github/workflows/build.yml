@@ -85,6 +85,7 @@ jobs:
         emcmake cmake .. -G Ninja \
            -DCMAKE_BUILD_TYPE=Release \
            -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" \
+           -DEXPORTED_RUNTIME_METHODS=stringToUTF8OnStack,stringToAscii,getExceptionMessage \
            -DENABLE_WERROR=OFF \
            -DBUILD_EMSCRIPTEN_TOOLS_ONLY=ON \
            -DBUILD_TOOLS=ON \
