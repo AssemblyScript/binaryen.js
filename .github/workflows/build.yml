@@ -91,7 +91,8 @@ jobs:
            -DBUILD_TOOLS=ON \
            -DBUILD_STATIC_LIB=OFF \
            -DBUILD_TESTS=OFF \
-           -DBUILD_FUZZTEST=OFF
+           -DBUILD_FUZZTEST=OFF \
+           -DThreads_FOUND=TRUE
         emmake ninja
         cd ../..
         npm run bundle
