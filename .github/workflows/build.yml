@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
     env:
-      CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE -sEXPORTED_RUNTIME_METHODS=stringToUTF8OnStack,stringToAscii,getExceptionMessage"
+      CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
       matrix:
         emsdk: [ "tot", "latest" ]
