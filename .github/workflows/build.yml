@@ -88,6 +88,7 @@ jobs:
            -DENABLE_WERROR=OFF \
            -DBUILD_EMSCRIPTEN_TOOLS_ONLY=ON \
            -DBUILD_TOOLS=ON \
+           -DBUILD_STATIC_LIB=OFF \
            -DBUILD_TESTS=OFF \
            -DBUILD_FUZZTEST=OFF
         emmake ninja
