@@ -15,16 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
     env:
-      MAKE_FLAGS: "-j2"
       CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
       matrix:
         emsdk: [ "tot", "latest" ]
       fail-fast: false
     steps:
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v6
       with:
-        node-version: '20'
+        node-version: '22'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
@@ -34,12 +33,12 @@ jobs:
         $HOME/emsdk/emsdk activate ${{ matrix.emsdk }}
         echo "$HOME/emsdk" >> $GITHUB_PATH
     - name: "Set up CMake"
-      run: |
-        mkdir $HOME/cmake
-        wget -qO- https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
-        echo "$HOME/cmake/bin" >> $GITHUB_PATH
+      uses: lukka/get-cmake@v3.31.0
+      with:
+        cmakeVersion: 3.30.5
+        ninjaVersion: latest
     - name: "Check out repository"
-      uses: actions/checkout@v1
+      uses: actions/checkout@v4
       with:
         submodules: false
     - name: "Set up repository"
@@ -79,12 +78,12 @@ jobs:
         fi
     - name: "Build binaryen.js"
       run: |
-        mkdir ./binaryen/build
+        mkdir -p ./binaryen/build
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" -DENABLE_WERROR=OFF
-        emmake make $MAKE_FLAGS binaryen_wasm
+        emcmake cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" -DENABLE_WERROR=OFF
+        emmake ninja
         cd ../..
         npm run bundle
     - name: "Test binaryen.js"
@@ -95,9 +94,11 @@ jobs:
         mkdir -p ./bin
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
-        emcc --version
         for tool in ${{ env.BINARYEN_TOOLS }}; do
-          emmake make $MAKE_FLAGS "$tool"
+          if [ ! -f "./bin/$tool.js" ]; then
+            echo "Missing tool: $tool"
+            exit 1
+          fi
           echo '#!/usr/bin/env node' > "../../bin/$tool"
           cat "./bin/$tool.js" >> "../../bin/$tool"
         done
