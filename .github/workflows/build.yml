@@ -82,7 +82,13 @@ jobs:
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emcmake cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" -DENABLE_WERROR=OFF
+        emcmake cmake .. -G Ninja \
+           -DCMAKE_BUILD_TYPE=Release \
+           -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" \
+           -DENABLE_WERROR=OFF \
+           -DBUILD_TOOLS=ON \
+           -DBUILD_STATIC_LIB=OFF \
+           -DBUILD_TESTS=OFF
         emmake ninja
         cd ../..
         npm run bundle
