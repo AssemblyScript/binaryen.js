@@ -88,7 +88,8 @@ jobs:
            -DENABLE_WERROR=OFF \
            -DBUILD_TOOLS=ON \
            -DBUILD_STATIC_LIB=OFF \
-           -DBUILD_TESTS=OFF
+           -DBUILD_TESTS=OFF \
+           -DBUILD_FUZZING=OFF
         emmake ninja
         cd ../..
         npm run bundle
