@@ -35,7 +35,7 @@ jobs:
     - name: "Set up CMake"
       uses: lukka/get-cmake@latest
       with:
-        cmakeVersion: 3.30.5
+        cmakeVersion: 3.27.9
         ninjaVersion: latest
     - name: "Check out repository"
       uses: actions/checkout@v4
