@@ -71,7 +71,6 @@ jobs:
           echo "Resetting to $TAG ..."
           cd ./binaryen
           git reset --hard "$TAG"
-          git clean -f
           git log -n1
           cd ..
           echo "RELEASE=1" >> $GITHUB_ENV
@@ -83,7 +82,6 @@ jobs:
       run: |
         mkdir -p ./binaryen/build
         cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
         emcc --version
         emcmake cmake .. -G Ninja \
            -DCMAKE_BUILD_TYPE=Release \
@@ -104,7 +102,6 @@ jobs:
       run: |
         mkdir -p ./bin
         cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
         for tool in ${{ env.BINARYEN_TOOLS }}; do
           if [ ! -f "./bin/$tool.js" ]; then
             echo "Missing tool: $tool"
@@ -112,9 +109,9 @@ jobs:
           fi
           echo '#!/usr/bin/env node' > "../../bin/$tool"
           cat "./bin/$tool.js" >> "../../bin/$tool"
+          chmod +x "../../bin/$tool"
         done
         cd ../..
-        chmod +x ./bin/*
     - name: "Test tools"
       run: |
         for tool in ${{ env.BINARYEN_TOOLS }}; do
