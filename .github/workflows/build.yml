@@ -8,7 +8,7 @@ on:
     - main
   pull_request:
 env:
-  BINARYEN_TOOLS: wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce
+  BINARYEN_TOOLS: wasm-shell wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce wasm-merge
 jobs:
   build:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
@@ -43,7 +43,7 @@ jobs:
     - name: "Check out repository"
       uses: actions/checkout@v4
       with:
-        submodules: false
+        submodules: true
     - name: "Set up repository"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -88,9 +88,7 @@ jobs:
         emcmake cmake .. -G Ninja \
            -DCMAKE_BUILD_TYPE=Release \
            -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" \
-           -DEXPORTED_RUNTIME_METHODS=stringToUTF8OnStack,stringToAscii,getExceptionMessage \
            -DENABLE_WERROR=OFF \
-           -DBUILD_EMSCRIPTEN_TOOLS_ONLY=ON \
            -DBUILD_TOOLS=ON \
            -DBUILD_STATIC_LIB=OFF \
            -DBUILD_TESTS=OFF \
