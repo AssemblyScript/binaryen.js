@@ -95,8 +95,7 @@ jobs:
            -DBUILD_FUZZTEST=OFF
         emmake ninja
         cd ../..
-        cp ./binaryen/build/bin/binaryen_js.js ./binaryen/build/bin/binaryen_wasm.js
-        cp ./binaryen/build/bin/binaryen_js.wasm ./binaryen/build/bin/binaryen_wasm.wasm
+        mv ./binaryen/build/bin/binaryen_js.js ./binaryen/build/bin/binaryen_wasm.js
         npm run bundle
     - name: "Test binaryen.js"
       run: |
