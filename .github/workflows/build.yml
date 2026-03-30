@@ -9,6 +9,9 @@ on:
   pull_request:
 env:
   BINARYEN_TOOLS: wasm-shell wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce wasm-merge
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}	
+  cancel-in-progress: true
 jobs:
   build:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
@@ -56,7 +59,7 @@ jobs:
           # If not a PR, undo detached head
           git checkout "${GITHUB_REF:11}"
         fi
-        git submodule update --init --remote --recursive
+        git submodule update --init --remote --recursive --depth 1
         cd ./binaryen
         git log -n1
         cd ..
