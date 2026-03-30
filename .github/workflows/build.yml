@@ -9,22 +9,27 @@ on:
   pull_request:
 env:
   BINARYEN_TOOLS: wasm-shell wasm-opt wasm-metadce wasm2js wasm-as wasm-dis wasm-ctor-eval wasm-reduce wasm-merge
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}	
+  cancel-in-progress: true
 jobs:
   build:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
+    permissions:
+      id-token: write
+      contents: write
     env:
-      MAKE_FLAGS: "-j2"
       CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
       matrix:
         emsdk: [ "tot", "latest" ]
       fail-fast: false
     steps:
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v6
       with:
-        node-version: '20'
+        node-version: '22'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
@@ -34,14 +39,14 @@ jobs:
         $HOME/emsdk/emsdk activate ${{ matrix.emsdk }}
         echo "$HOME/emsdk" >> $GITHUB_PATH
     - name: "Set up CMake"
-      run: |
-        mkdir $HOME/cmake
-        wget -qO- https://github.com/Kitware/CMake/releases/download/v3.21.4/cmake-3.21.4-Linux-x86_64.tar.gz | tar -xzC $HOME/cmake --strip-components 1
-        echo "$HOME/cmake/bin" >> $GITHUB_PATH
-    - name: "Check out repository"
-      uses: actions/checkout@v1
+      uses: lukka/get-cmake@latest
       with:
-        submodules: false
+        cmakeVersion: 3.31.11
+        ninjaVersion: latest
+    - name: "Check out repository"
+      uses: actions/checkout@v4
+      with:
+        submodules: true
     - name: "Set up repository"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,7 +59,7 @@ jobs:
           # If not a PR, undo detached head
           git checkout "${GITHUB_REF:11}"
         fi
-        git submodule update --init --remote --merge --recursive
+        git submodule update --init --remote --recursive --depth 1
         cd ./binaryen
         git log -n1
         cd ..
@@ -69,7 +74,6 @@ jobs:
           echo "Resetting to $TAG ..."
           cd ./binaryen
           git reset --hard "$TAG"
-          git clean -f
           git log -n1
           cd ..
           echo "RELEASE=1" >> $GITHUB_ENV
@@ -79,12 +83,19 @@ jobs:
         fi
     - name: "Build binaryen.js"
       run: |
-        mkdir ./binaryen/build
+        mkdir -p ./binaryen/build
         cd ./binaryen/build
         source $HOME/emsdk/emsdk_env.sh
         emcc --version
-        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" -DENABLE_WERROR=OFF
-        emmake make $MAKE_FLAGS binaryen_wasm
+        emcmake cmake .. -G Ninja \
+           -DCMAKE_BUILD_TYPE=Release \
+           -DCMAKE_EXE_LINKER_FLAGS="$CMAKE_EXE_LINKER_FLAGS" \
+           -DENABLE_WERROR=OFF \
+           -DBUILD_TOOLS=ON \
+           -DBUILD_STATIC_LIB=OFF \
+           -DBUILD_TESTS=OFF \
+           -DBUILD_FUZZTEST=OFF
+        emmake ninja
         cd ../..
         npm run bundle
     - name: "Test binaryen.js"
@@ -94,15 +105,16 @@ jobs:
       run: |
         mkdir -p ./bin
         cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
-        emcc --version
         for tool in ${{ env.BINARYEN_TOOLS }}; do
-          emmake make $MAKE_FLAGS "$tool"
+          if [ ! -f "./bin/$tool.js" ]; then
+            echo "Missing tool: $tool"
+            exit 1
+          fi
           echo '#!/usr/bin/env node' > "../../bin/$tool"
           cat "./bin/$tool.js" >> "../../bin/$tool"
+          chmod +x "../../bin/$tool"
         done
         cd ../..
-        chmod +x ./bin/*
     - name: "Test tools"
       run: |
         for tool in ${{ env.BINARYEN_TOOLS }}; do
@@ -127,11 +139,7 @@ jobs:
         git push -u origin "v$VERSION"
     - name: "Publish to npm"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
-      env:
-        NPM_REGISTRY: "registry.npmjs.org"
-        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
-        npm config set "//${NPM_REGISTRY}/:_authToken=${NPM_AUTH_TOKEN}"
         if [ $RELEASE ]; then
           echo "Publishing release ..."
           npm publish
