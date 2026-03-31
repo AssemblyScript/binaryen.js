@@ -17,9 +17,6 @@ jobs:
     name: "Build with Emsdk:${{ matrix.emsdk }}"
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || !contains(github.event.head_commit.message, '[ci skip]')
-    permissions:
-      id-token: write
-      contents: write
     env:
       CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
@@ -30,6 +27,7 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: '22'
+        registry-url: 'https://registry.npmjs.org'
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
@@ -139,7 +137,11 @@ jobs:
         git push -u origin "v$VERSION"
     - name: "Publish to npm"
       if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
+      env:
+        NPM_REGISTRY: "registry.npmjs.org"
+        NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
+        npm config set "//${NPM_REGISTRY}/:_authToken=${NPM_AUTH_TOKEN}"
         if [ $RELEASE ]; then
           echo "Publishing release ..."
           npm publish
