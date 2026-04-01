@@ -12,7 +12,7 @@ var src = {
   filter: tag => {
     var match = /^version_(\d+)$/.exec(tag); // see: https://github.com/WebAssembly/binaryen/issues/1156
     return match ? {
-      tag: tag,
+      tag,
       version: match[1] + ".0.0",
     } : null;
   }
@@ -23,41 +23,47 @@ var dst = {
   filter: tag => {
     var match = /^v(\d+\.\d+\.\d+)(?:\-|$)/.exec(tag);
     return match ? {
-      tag: tag,
+      tag,
       version: match[1]
     } : null;
   }
 };
 
-function latest(repo) {
-  return new Promise((resolve, reject) => {
-    repo.git.tags({ "--sort": "-committerdate" }, (err, tags) => {
-      if (err) return reject(err);
-      for (var i = 0; i < tags.all.length; ++i) {
-        var result = repo.filter(tags.all[i]);
-        if (result !== null) {
-          repo.tag = result.tag;
-          repo.version = result.version;
-          return resolve();
-        };
+async function latest(repo) {
+  try {
+    const tags = await repo.git.tags({ "--sort": "-committerdate" });
+    for (let i = 0; i < tags.all.length; i++) {
+      const tag = tags.all[i];
+      const res = repo.filter(tag);
+      if (res !== null) {
+        return res;
       }
-      return reject(Error("no matching tags: " + tags.all.join(", ")));
-    });
-  }).catch(err => {
+    }
+    return { version: null, tag: null };
+  } catch (err) {
     console.error(err.stack);
     process.exit(1);
-  });
+  }
 }
 
-if (process.argv[2] === "tag") {
-  latest(src).then(() => console.log(src.tag));
-} else {
-  latest(src).then(() => {
-    latest(dst).then(() => {
-      if (semver.gt(src.version, dst.version))
-        console.log(src.version);
-      else
-        console.log(src.version + "-nightly." + dateFormat(Date.UTC(), "yyyymmdd"));
-    });
-  });
+async function main() {
+  if (process.argv[2] === "tag") {
+    const { tag } = await latest(src);
+    console.log(tag);
+    return;
+  }
+
+  let { version: srcVer } = await latest(src);
+  let { version: dstVer } = await latest(dst);
+
+  srcVer = semver.clean(srcVer);
+  dstVer = semver.coerce(dstVer);
+
+  if (!dstVer || semver.gt(srcVer, dstVer)) {
+    console.log(srcVer);
+  } else {
+    console.log(`${srcVer}-nightly.${dateFormat(Date.UTC(), "yyyymmdd")}`);
+  }
 }
+
+main();
