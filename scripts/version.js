@@ -4,30 +4,23 @@ import dateFormat from "dateformat";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const resolve = (...args) => path.resolve(__dirname, ...args);
 
-var src = {
-  git: simpleGit(__dirname + "/../binaryen"),
+const createRepo = (path, regex, mapVersion) => ({
+  git: simpleGit(path),
   filter: tag => {
-    var match = /^version_(\d+)$/.exec(tag); // see: https://github.com/WebAssembly/binaryen/issues/1156
+    const match = regex.exec(tag);
     return match ? {
       tag,
-      version: match[1] + ".0.0",
+      version: mapVersion(match),
     } : null;
   }
-};
+});
 
-var dst = {
-  git: simpleGit(__dirname + "/.."),
-  filter: tag => {
-    var match = /^v(\d+\.\d+\.\d+)(?:\-|$)/.exec(tag);
-    return match ? {
-      tag,
-      version: match[1]
-    } : null;
-  }
-};
+// see: https://github.com/WebAssembly/binaryen/issues/1156
+const src = createRepo(resolve('../binaryen'), /^version_(\d+)$/,  ([, maj]) => `${maj}.0.0`);
+const dst = createRepo(resolve('..'), /^v(\d+\.\d+\.\d+)(?:\-|$)/, ([, maj]) => maj);
 
 async function latest(repo) {
   try {
