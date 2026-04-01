@@ -44,7 +44,7 @@ jobs:
         cmakeVersion: 3.31.11
         ninjaVersion: latest
     - name: "Check out repository"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         submodules: true
     - name: "Set up repository"
