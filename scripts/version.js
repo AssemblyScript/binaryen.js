@@ -20,7 +20,7 @@ const createRepo = (path, regex, mapVersion) => ({
 
 // see: https://github.com/WebAssembly/binaryen/issues/1156
 const src = createRepo(resolve('../binaryen'), /^version_(\d+)$/,  ([, maj]) => `${maj}.0.0`);
-const dst = createRepo(resolve('..'), /^v(\d+\.\d+\.\d+)(?:\-|$)/, ([, maj]) => maj);
+const dst = createRepo(resolve('..'), /^v(\d+\.\d+\.\d+)(?:\-|$)/, ([, ver]) => ver);
 
 async function latest(repo) {
   try {
