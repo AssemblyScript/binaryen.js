@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = (...args) => path.resolve(__dirname, ...args);
 
+const MAX_TAGS_LIMIT = 64;
+
 const createRepo = (path, regex, mapVersion) => ({
   git: simpleGit(path),
   filter: tag => {
@@ -19,14 +21,15 @@ const createRepo = (path, regex, mapVersion) => ({
 });
 
 // see: https://github.com/WebAssembly/binaryen/issues/1156
-const src = createRepo(resolve('../binaryen'), /^version_(\d+)$/,  ([, maj]) => `${maj}.0.0`);
+const src = createRepo(resolve('../binaryen'), /^version_(\d+)(?:_.*)?$/, ([, maj]) => `${maj}.0.0`);
 const dst = createRepo(resolve('..'), /^v(\d+\.\d+\.\d+)(?:\-|$)/, ([, ver]) => ver);
 
 async function latest(repo) {
   try {
-    const tags = await repo.git.tags({ "--sort": "-committerdate" });
-    for (let i = 0; i < tags.all.length; i++) {
-      const tag = tags.all[i];
+    const tagsRaw = await repo.git.raw(['tag', '--sort=-v:refname']);
+    const allTags = tagsRaw.split('\n').filter(Boolean).slice(0, MAX_TAGS_LIMIT);
+
+    for (let tag of allTags) {
       const res = repo.filter(tag);
       if (res !== null) {
         return res;
