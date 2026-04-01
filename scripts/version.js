@@ -15,7 +15,7 @@ const createRepo = (path, regex, mapVersion) => ({
     const match = regex.exec(tag);
     return match ? {
       tag,
-      version: semver.clean(mapVersion(match)),
+      version: mapVersion(match),
     } : null;
   }
 });
