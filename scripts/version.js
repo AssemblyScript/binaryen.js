@@ -13,7 +13,7 @@ const createRepo = (path, regex, mapVersion) => ({
     const match = regex.exec(tag);
     return match ? {
       tag,
-      version: mapVersion(match),
+      version: semver.clean(mapVersion(match)),
     } : null;
   }
 });
@@ -48,9 +48,6 @@ async function main() {
 
   let { version: srcVer } = await latest(src);
   let { version: dstVer } = await latest(dst);
-
-  srcVer = semver.clean(srcVer);
-  dstVer = semver.coerce(dstVer);
 
   if (!dstVer || semver.gt(srcVer, dstVer)) {
     console.log(srcVer);
