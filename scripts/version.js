@@ -9,6 +9,13 @@ const resolve = (...args) => path.resolve(__dirname, ...args);
 
 const MAX_TAGS_LIMIT = 64;
 
+function isGreater(a, b) {
+  const cmp = semver.compare(semver.coerce(a), semver.coerce(b));
+  return cmp === 0
+    ? a.includes("nightly") && !b.includes("nightly")
+    : cmp > 0;
+}
+
 const createRepo = (path, regex, mapVersion) => ({
   git: simpleGit(path),
   filter: tag => {
@@ -52,7 +59,7 @@ async function main() {
   let { version: srcVer } = await latest(src);
   let { version: dstVer } = await latest(dst);
 
-  if (!dstVer || semver.gt(srcVer, dstVer)) {
+  if (!dstVer || isGreater(srcVer, dstVer)) {
     console.log(srcVer);
   } else {
     console.log(`${srcVer}-nightly.${dateFormat(Date.UTC(), "yyyymmdd")}`);
