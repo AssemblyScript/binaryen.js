@@ -44,9 +44,9 @@ jobs:
         cmakeVersion: 3.31.11
         ninjaVersion: latest
     - name: "Check out repository"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
-        submodules: true
+        submodules: false
     - name: "Set up repository"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,7 +59,7 @@ jobs:
           # If not a PR, undo detached head
           git checkout "${GITHUB_REF:11}"
         fi
-        git submodule update --init --remote --recursive --depth 1
+        git submodule update --init --remote --merge --recursive
         cd ./binaryen
         git log -n1
         cd ..
