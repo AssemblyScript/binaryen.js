@@ -43,6 +43,8 @@ declare module binaryen {
 
   function createType(types: Type[]): Type;
   function expandType(type: Type): Type[];
+  function getTypeFromHeapType(heapType: HeapType, nullable: boolean): Type;
+  function getHeapType(type: Type): HeapType;
 
   const enum ExpressionIds {
     Invalid,
@@ -1847,6 +1849,29 @@ declare module binaryen {
     copyExpression(expr: ExpressionRef): ExpressionRef;
   }
 
+  interface TypeBuilderField {
+    type: Type;
+    packedType: Type;
+    mutable: boolean;
+  }
+
+  class TypeBuilder {
+    constructor(size: number);
+    ptr: number;
+    grow(count: number): void;
+    getSize(): number;
+    setSignatureType(index: number, paramTypes: Type, resultTypes: Type): void;
+    setStructType(index: number, fields?: TypeBuilderField[]): void;
+    setArrayType(index: number, elementType: Type, elementPackedType: Type, elementMutable: boolean): void;
+    getTempHeapType(index: number): HeapType;
+    getTempTupleType(types: Type[]): Type;
+    getTempRefType(heapType: HeapType, nullable: boolean): Type;
+    setSubType(index: number, superType: HeapType): void;
+    setOpen(index: number): void;
+    createRecGroup(index: number, length: number): void;
+    buildAndDispose(): HeapType[];
+  }
+
   interface MemorySegment {
     offset: ExpressionRef;
     data: Uint8Array;
@@ -2311,6 +2336,8 @@ declare module binaryen {
   function getAllowInliningFunctionsWithLoops(): boolean;
   function setAllowInliningFunctionsWithLoops(on: boolean): void;
   function exit(status: number): void;
+
+  
 
   type RelooperBlockRef = number;
 
