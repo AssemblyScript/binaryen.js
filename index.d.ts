@@ -1,25 +1,50 @@
 declare module binaryen {
 
   type Type = number;
+  type HeapType = number;
 
   const none: Type;
+  
   const i32: Type;
   const i64: Type;
   const f32: Type;
   const f64: Type;
   const v128: Type;
+  
   const funcref: Type;
   const externref: Type;
   const anyref: Type;
   const eqref: Type;
   const i31ref: Type;
   const structref: Type;
+  const arrayref: Type;
   const stringref: Type;
+  
+  const nullref: Type;
+  const nullexternref: Type;
+  const nullfuncref: Type;
+  
   const unreachable: Type;
   const auto: Type;
 
+  namespace HeapTypes {
+    const ext: HeapType;
+    const func: HeapType;
+    const any: HeapType;
+    const eq: HeapType;
+    const i31: HeapType;
+    const struct: HeapType;
+    const array: HeapType;
+    const string: HeapType;
+    const none: HeapType;
+    const noext: HeapType;
+    const nofunc: HeapType;
+  }
+
   function createType(types: Type[]): Type;
   function expandType(type: Type): Type[];
+  function getTypeFromHeapType(heapType: HeapType, nullable: boolean): Type;
+  function getHeapType(type: Type): HeapType;
 
   const enum ExpressionIds {
     Invalid,
@@ -215,14 +240,22 @@ declare module binaryen {
   const ExternalGlobal: ExternalKinds;
   const ExternalTag: ExternalKinds;
 
+  type MemoryOrder = number;
+
+  declare const MemoryOrder: {
+    readonly unordered: MemoryOrder;
+    readonly seqcst: MemoryOrder;
+    readonly acqrel: MemoryOrder;
+  };
+
   enum Features {
     MVP,
     Atomics,
-    BulkMemory,
     MutableGlobals,
     NontrappingFPToInt,
-    SignExt,
     SIMD128,
+    BulkMemory,
+    SignExt,
     ExceptionHandling,
     TailCall,
     ReferenceTypes,
@@ -238,6 +271,8 @@ declare module binaryen {
     FP16,
     BulkMemoryOpt,
     CallIndirectOverlong,
+    RelaxedAtomics,
+    CustomPageSizes,
     All
   }
 
@@ -1073,6 +1108,8 @@ declare module binaryen {
   }
 
   type ElementSegmentRef = number;
+  type RelooperBlockRef = number;
+  type DataSegmentRef = number;
   type ExpressionRef = number;
   type FunctionRef = number;
   type GlobalRef = number;
@@ -1088,6 +1125,10 @@ declare module binaryen {
     loop(label: string | null, body: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
+    br_on_null(label: string, value: ExpressionRef): ExpressionRef;
+    br_on_non_null(label: string, value: ExpressionRef): ExpressionRef;
+    br_on_cast(label: string, value: ExpressionRef, castType: Type): ExpressionRef;
+    br_on_cast_fail(label: string, value: ExpressionRef, castType: Type): ExpressionRef;
     switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
     return_call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
@@ -1184,38 +1225,38 @@ declare module binaryen {
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       atomic: {
-        load(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        load8_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        load16_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        load(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        load8_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        load16_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         rmw: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
         rmw8_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
         rmw16_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
       },
       pop(): ExpressionRef;
@@ -1232,7 +1273,7 @@ declare module binaryen {
       store8(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       store16(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       store32(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-      const(low: number, high: number): ExpressionRef;
+      const(lowOrBigInt: number | bigint, high?: number): ExpressionRef;
       clz(value: ExpressionRef): ExpressionRef;
       ctz(value: ExpressionRef): ExpressionRef;
       popcnt(value: ExpressionRef): ExpressionRef;
@@ -1285,49 +1326,49 @@ declare module binaryen {
       ge_s(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       atomic: {
-        load(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        load8_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        load16_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        load32_u(offset: number, ptr: ExpressionRef, name?: string): ExpressionRef;
-        store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-        store32(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
+        load(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        load8_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder: ExpressionRef;
+        load16_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        load32_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store8(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store16(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+        store32(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         rmw: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
         rmw8_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
         rmw16_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
         rmw32_u: {
-          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
-          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string): ExpressionRef;
+          add(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          sub(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          and(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          or(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xor(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          xchg(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
+          cmpxchg(offset: number, ptr: ExpressionRef, expected: ExpressionRef, replacement: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         },
       },
       pop(): ExpressionRef;
@@ -1373,7 +1414,7 @@ declare module binaryen {
       load(offset: number, align: number, ptr: ExpressionRef, name?: string): ExpressionRef;
       store(offset: number, align: number, ptr: ExpressionRef, value: ExpressionRef, name?: string): ExpressionRef;
       const(value: number): ExpressionRef;
-      const_bits(low: number, high: number): ExpressionRef;
+      const_bits(lowOrBigInt: number | bigint, high?: number): ExpressionRef;
       neg(value: ExpressionRef): ExpressionRef;
       abs(value: ExpressionRef): ExpressionRef;
       ceil(value: ExpressionRef): ExpressionRef;
@@ -1676,6 +1717,9 @@ declare module binaryen {
     structref: {
       pop(): ExpressionRef;
     };
+    arrayref: {
+      pop(): ExpressionRef;
+    };
     stringref: {
       pop(): ExpressionRef;
     };
@@ -1686,6 +1730,8 @@ declare module binaryen {
       func(name: string, type: Type): ExpressionRef;
       i31(value: ExpressionRef): ExpressionRef;
       eq(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
+      test(value: ExpressionRef, castType: Type): ExpressionRef;
+      cast(value: ExpressionRef, castType: Type): ExpressionRef;
     };
     i31: {
       get_s(i31: ExpressionRef): ExpressionRef;
@@ -1697,6 +1743,26 @@ declare module binaryen {
     tuple: {
       make(elements: ExportRef[]): ExpressionRef;
       extract(tuple: ExpressionRef, index: number): ExpressionRef;
+    };
+    struct: {
+      new(operands: Type[], type: Type): ExpressionRef;
+      new_default(type: Type): ExpressionRef;
+      get(index: number, ref: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
+      set(index: number, ref: ExpressionRef, value: ExpressionRef): ExpressionRef;
+    };
+    array: {
+      new(type: Type, size: ExpressionRef, init: ExpressionRef): ExpressionRef;
+      new_default(type: Type, size: ExpressionRef): ExpressionRef;
+      new_fixed(type: Type, values: ExpressionRef[]): ExpressionRef;
+      new_data(type: Type, name: string, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
+      new_elem(type: Type, name: string, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
+      get(ref: ExpressionRef, index: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
+      set(ref: ExpressionRef, index: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      len(ref: ExpressionRef): ExpressionRef;
+      fill(ref: ExpressionRef, index: ExpressionRef, value: ExpressionRef, size: ExpressionRef): ExpressionRef;
+      copy(destRef: ExpressionRef, destIndex: ExpressionRef, srcRef: ExpressionRef, srcIndex: ExpressionRef, length: ExpressionRef): ExpressionRef;
+      init_data(name: string, ref: ExpressionRef, index: ExpressionRef, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
+      init_elem(name: string, ref: ExpressionRef, index: ExpressionRef, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
     };
     Function: {
       getName(func: FunctionRef): string;  
@@ -1711,6 +1777,8 @@ declare module binaryen {
       getBody(func: FunctionRef): ExpressionRef;
       setBody(func: FunctionRef, bodyExpr: ExpressionRef): void;
     };
+    call_ref(target: ExpressionRef, operands: ExpressionRef[], type: Type): ExpressionRef;
+    return_call_ref(target: ExpressionRef, operands: ExpressionRef[], type: Type): ExpressionRef;
     try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
     throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
     rethrow(target: string): ExpressionRef;
@@ -1758,6 +1826,8 @@ declare module binaryen {
     setStart(start: FunctionRef): void;
     getFeatures(): Features;
     setFeatures(features: Features): void;
+    setTypeName(heapType: HeapType, name: string): void;
+    setFieldName(heapType: HeapType, index: number, name: string): void;
     addCustomSection(name: string, contents: Uint8Array): void;
     getNumGlobals(): number;
     getNumTables(): number;
@@ -1768,6 +1838,8 @@ declare module binaryen {
     getGlobalByIndex(index: number): GlobalRef;
     getTableByIndex(index: number): TableRef;
     getElementSegmentByIndex(index: number): ElementSegmentRef;
+    getDataSegment(name: string): DataSegmentRef;
+    getDataSegmentByIndex(index: number): DataSegmentRef;
     emitText(): string;
     emitStackIR(): string;
     emitAsmjs(): string;
@@ -1784,6 +1856,29 @@ declare module binaryen {
     getDebugInfoFileName(index: number): string | null;
     setDebugLocation(func: FunctionRef, expr: ExpressionRef, fileIndex: number, lineNumber: number, columnNumber: number): void;
     copyExpression(expr: ExpressionRef): ExpressionRef;
+  }
+
+  interface TypeBuilderField {
+    type: Type;
+    packedType: Type;
+    mutable: boolean;
+  }
+
+  class TypeBuilder {
+    constructor(size: number);
+    ptr: number;
+    grow(count: number): void;
+    getSize(): number;
+    setSignatureType(index: number, paramTypes: Type, resultTypes: Type): void;
+    setStructType(index: number, fields?: TypeBuilderField[]): void;
+    setArrayType(index: number, elementType: Type, elementPackedType: Type, elementMutable: boolean): void;
+    getTempHeapType(index: number): HeapType;
+    getTempTupleType(types: Type[]): Type;
+    getTempRefType(heapType: HeapType, nullable: boolean): Type;
+    setSubType(index: number, superType: HeapType): void;
+    setOpen(index: number): void;
+    createRecGroup(index: number, length: number): void;
+    buildAndDispose(): HeapType[];
   }
 
   interface MemorySegment {
@@ -2250,8 +2345,6 @@ declare module binaryen {
   function getAllowInliningFunctionsWithLoops(): boolean;
   function setAllowInliningFunctionsWithLoops(on: boolean): void;
   function exit(status: number): void;
-
-  type RelooperBlockRef = number;
 
   class Relooper {
     constructor(module: Module);
