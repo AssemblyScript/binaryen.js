@@ -1100,6 +1100,7 @@ declare module binaryen {
   }
 
   type ElementSegmentRef = number;
+  type RelooperBlockRef = number;
   type DataSegmentRef = number;
   type ExpressionRef = number;
   type FunctionRef = number;
@@ -2336,10 +2337,6 @@ declare module binaryen {
   function getAllowInliningFunctionsWithLoops(): boolean;
   function setAllowInliningFunctionsWithLoops(on: boolean): void;
   function exit(status: number): void;
-
-  
-
-  type RelooperBlockRef = number;
 
   class Relooper {
     constructor(module: Module);
