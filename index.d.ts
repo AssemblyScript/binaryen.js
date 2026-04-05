@@ -1739,8 +1739,8 @@ declare module binaryen {
     struct: {
       new(operands: Type[], type: Type): ExpressionRef;
       new_default(type: Type): ExpressionRef;
-      get(index: ExpressionRef, ref: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
-      set(index: ExpressionRef, ref: ExpressionRef, value: ExpressionRef): ExpressionRef;
+      get(index: number, ref: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
+      set(index: number, ref: ExpressionRef, value: ExpressionRef): ExpressionRef;
     };
     array: {
       new(type: Type, size: ExpressionRef, init: ExpressionRef): ExpressionRef;
