@@ -1117,10 +1117,10 @@ declare module binaryen {
     loop(label: string | null, body: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     br_if(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
-    br_on_null(label: string, value?: ExpressionRef): ExpressionRef;
-    br_on_non_null(label: string, value?: ExpressionRef): ExpressionRef;
-    br_on_cast(label: string, value?: ExpressionRef, castType?: Type): ExpressionRef;
-    br_on_cast_fail(label: string, value?: ExpressionRef, castType?: Type): ExpressionRef;
+    br_on_null(label: string, value: ExpressionRef): ExpressionRef;
+    br_on_non_null(label: string, value: ExpressionRef): ExpressionRef;
+    br_on_cast(label: string, value: ExpressionRef, castType: HeapType): ExpressionRef;
+    br_on_cast_fail(label: string, value: ExpressionRef, castType: HeapType): ExpressionRef;
     switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
     call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
     return_call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
