@@ -272,6 +272,7 @@ declare module binaryen {
     BulkMemoryOpt,
     CallIndirectOverlong,
     RelaxedAtomics,
+    Multibyte,
     CustomPageSizes,
     All
   }
