@@ -240,11 +240,13 @@ declare module binaryen {
   const ExternalGlobal: ExternalKinds;
   const ExternalTag: ExternalKinds;
 
-  const enum MemoryOrder {
-    Unordered,
-    SeqCst,
-    AcqRel
-  }
+  type MemoryOrder = number;
+
+  declare const MemoryOrder: {
+    readonly unordered: MemoryOrder;
+    readonly seqcst: MemoryOrder;
+    readonly acqrel: MemoryOrder;
+  };
 
   enum Features {
     MVP,
