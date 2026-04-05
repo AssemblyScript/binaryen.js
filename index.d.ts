@@ -1,6 +1,7 @@
 declare module binaryen {
 
   type Type = number;
+  type PackedType = number;
   type HeapType = number;
 
   const none: Type;
@@ -27,19 +28,21 @@ declare module binaryen {
   const unreachable: Type;
   const auto: Type;
 
-  namespace HeapTypes {
-    const ext: HeapType;
-    const func: HeapType;
-    const any: HeapType;
-    const eq: HeapType;
-    const i31: HeapType;
-    const struct: HeapType;
-    const array: HeapType;
-    const string: HeapType;
-    const none: HeapType;
-    const noext: HeapType;
-    const nofunc: HeapType;
-  }
+  const notPacked: PackedType;
+  const i8: PackedType;
+  const i16: PackedType;
+
+  const ext: HeapType;
+  const func: HeapType;
+  const any: HeapType;
+  const eq: HeapType;
+  const i31: HeapType;
+  const struct: HeapType;
+  const array: HeapType;
+  const string: HeapType;
+  const none: HeapType;
+  const noext: HeapType;
+  const nofunc: HeapType;
 
   function createType(types: Type[]): Type;
   function expandType(type: Type): Type[];
@@ -1861,7 +1864,7 @@ declare module binaryen {
 
   interface TypeBuilderField {
     type: Type;
-    packedType: Type;
+    packedType: PackedType;
     mutable: boolean;
   }
 
