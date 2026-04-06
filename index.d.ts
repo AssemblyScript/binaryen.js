@@ -2313,6 +2313,7 @@ declare module binaryen {
 
   function emitText(expression: ExpressionRef | Module): string;
   function readBinary(data: Uint8Array): Module;
+  function readBinaryWithFeatures(data: Uint8Array, features: Features): Module;
   function parseText(text: string): Module;
   function getOptimizeLevel(): number;
   function setOptimizeLevel(level: number): number;
