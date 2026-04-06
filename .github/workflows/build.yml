@@ -30,10 +30,16 @@ jobs:
     - uses: actions/setup-node@v6
       with:
         node-version: '24'
+    - uses: actions/cache@v5
+      with:
+        path: ~/emsdk
+        key: emsdk-${{ matrix.emsdk }}
     - name: "Set up Emsdk"
       run: |
         mkdir $HOME/emsdk
-        git clone --depth 1 https://github.com/emscripten-core/emsdk.git $HOME/emsdk
+        if [ ! -d "$HOME/emsdk" ]; then
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git $HOME/emsdk
+        fi
         $HOME/emsdk/emsdk update-tags
         $HOME/emsdk/emsdk install ${{ matrix.emsdk }}
         $HOME/emsdk/emsdk activate ${{ matrix.emsdk }}
