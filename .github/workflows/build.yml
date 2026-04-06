@@ -35,7 +35,7 @@ jobs:
       with:
         version: ${{ matrix.emsdk }}
         actions-cache-folder: emsdk-cache
-    - name: Verify emsdk
+    - name: Check Emsdk
       run: emcc -v
     - name: "Set up CMake"
       uses: lukka/get-cmake@latest
