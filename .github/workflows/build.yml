@@ -84,7 +84,7 @@ jobs:
       run: |
         mkdir -p ./binaryen/build
         cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
+        which emcc
         emcc --version
         emcmake cmake .. -G Ninja \
            -DCMAKE_BUILD_TYPE=Release \
