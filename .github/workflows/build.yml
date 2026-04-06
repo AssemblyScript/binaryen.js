@@ -24,7 +24,7 @@ jobs:
       CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
       matrix:
-        emsdk: [ "tot", "latest" ]
+        emsdk: [ "latest-upstream", "latest" ]
       fail-fast: false
     steps:
     - uses: actions/setup-node@v6
