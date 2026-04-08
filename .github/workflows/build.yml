@@ -121,7 +121,7 @@ jobs:
           "./bin/$tool" --help
         done
     - name: "Push changes to GitHub"
-      if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
+      if: github.event_name == 'schedule' && matrix.emsdk == 'latest-upstream'
       run: |
         git add ./binaryen ./index.js ./bin/*
         npm version $VERSION --no-git-tag-version --force
@@ -138,7 +138,7 @@ jobs:
         git tag "v$VERSION"
         git push -u origin "v$VERSION"
     - name: "Publish to npm"
-      if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
+      if: github.event_name == 'schedule' && matrix.emsdk == 'latest-upstream'
       run: |
         if [ $RELEASE ]; then
           echo "Publishing release ..."
