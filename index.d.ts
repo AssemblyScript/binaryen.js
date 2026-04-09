@@ -1824,8 +1824,8 @@ declare module binaryen {
     getExport(externalName: string): ExportRef;
     getNumExports(): number;
     getExportByIndex(index: number): ExportRef;
-    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
-    getMemorySegmentInfo(name: string): MemorySegmentInfo;
+    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: DataSegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
+    getDataSegmentInfo(name: string): DataSegmentInfo;
     getStart(): FunctionRef;
     setStart(start: FunctionRef): void;
     getFeatures(): Features;
@@ -1837,7 +1837,7 @@ declare module binaryen {
     getNumTables(): number;
     hasMemory(): boolean;
     getMemoryInfo(name?: string): MemoryInfo;
-    getNumMemorySegments(): number;
+    getNumDataSegments(): number;
     getNumElementSegments(): number;
     getGlobalByIndex(index: number): GlobalRef;
     getTableByIndex(index: number): TableRef;
@@ -1885,7 +1885,7 @@ declare module binaryen {
     buildAndDispose(): HeapType[];
   }
 
-  interface MemorySegment {
+  interface DataSegment {
     offset: ExpressionRef;
     data: Uint8Array;
     passive?: boolean;
@@ -1902,7 +1902,7 @@ declare module binaryen {
   function getExpressionType(expression: ExpressionRef): Type;
   function getExpressionInfo(expression: ExpressionRef): ExpressionInfo;
 
-  interface MemorySegmentInfo {
+  interface DataSegmentInfo {
     offset: ExpressionRef;
     data: Uint8Array;
     passive: boolean;
