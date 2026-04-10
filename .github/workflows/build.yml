@@ -24,20 +24,16 @@ jobs:
       CMAKE_EXE_LINKER_FLAGS: "-sMAXIMUM_MEMORY=4294967296 -sSINGLE_FILE"
     strategy:
       matrix:
-        emsdk: [ "latest-upstream", "latest" ]
+        emsdk: [ "tot", "latest" ]
       fail-fast: false
     steps:
     - uses: actions/setup-node@v6
       with:
         node-version: '24'
     - name: "Set up Emsdk"
-      run: |
-        mkdir $HOME/emsdk
-        git clone --depth 1 https://github.com/emscripten-core/emsdk.git $HOME/emsdk
-        $HOME/emsdk/emsdk update-tags
-        $HOME/emsdk/emsdk install ${{ matrix.emsdk }}
-        $HOME/emsdk/emsdk activate ${{ matrix.emsdk }}
-        echo "$HOME/emsdk" >> $GITHUB_PATH
+      uses: emscripten-core/setup-emsdk@v15
+      with:
+        version: ${{ matrix.emsdk }}
     - name: "Set up CMake"
       uses: lukka/get-cmake@latest
       with:
@@ -85,7 +81,7 @@ jobs:
       run: |
         mkdir -p ./binaryen/build
         cd ./binaryen/build
-        source $HOME/emsdk/emsdk_env.sh
+        source $EMSDK/emsdk_env.sh
         emcc --version
         emcmake cmake .. -G Ninja \
            -DCMAKE_BUILD_TYPE=Release \
@@ -121,7 +117,7 @@ jobs:
           "./bin/$tool" --help
         done
     - name: "Push changes to GitHub"
-      if: github.event_name == 'schedule' && matrix.emsdk == 'latest-upstream'
+      if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
         git add ./binaryen ./index.js ./bin/*
         npm version $VERSION --no-git-tag-version --force
@@ -138,7 +134,7 @@ jobs:
         git tag "v$VERSION"
         git push -u origin "v$VERSION"
     - name: "Publish to npm"
-      if: github.event_name == 'schedule' && matrix.emsdk == 'latest-upstream'
+      if: github.event_name == 'schedule' && matrix.emsdk == 'tot'
       run: |
         if [ $RELEASE ]; then
           echo "Publishing release ..."
