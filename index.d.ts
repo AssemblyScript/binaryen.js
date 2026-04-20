@@ -1331,7 +1331,7 @@ declare module binaryen {
       ge_u(left: ExpressionRef, right: ExpressionRef): ExpressionRef;
       atomic: {
         load(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
-        load8_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder: ExpressionRef;
+        load8_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         load16_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         load32_u(offset: number, ptr: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
         store(offset: number, ptr: ExpressionRef, value: ExpressionRef, name?: string, order?: MemoryOrder): ExpressionRef;
