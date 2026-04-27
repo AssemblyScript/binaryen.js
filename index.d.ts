@@ -5,13 +5,13 @@ declare module binaryen {
   type HeapType = number;
 
   const none: Type;
-  
+
   const i32: Type;
   const i64: Type;
   const f32: Type;
   const f64: Type;
   const v128: Type;
-  
+
   const funcref: Type;
   const externref: Type;
   const anyref: Type;
@@ -20,11 +20,11 @@ declare module binaryen {
   const structref: Type;
   const arrayref: Type;
   const stringref: Type;
-  
+
   const nullref: Type;
   const nullexternref: Type;
   const nullfuncref: Type;
-  
+
   const unreachable: Type;
   const auto: Type;
 
