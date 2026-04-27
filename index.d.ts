@@ -44,7 +44,7 @@ declare module binaryen {
   const noext: HeapType;
   const nofunc: HeapType;
 
-  function createType(types: Type[]): Type;
+  function createType(types: readonly Type[]): Type;
   function expandType(type: Type): Type[];
   function getTypeFromHeapType(heapType: HeapType, nullable: boolean): Type;
   function getHeapType(type: Type): HeapType;
@@ -1124,7 +1124,7 @@ declare module binaryen {
   class Module {
     constructor();
     readonly ptr: number;
-    block(label: string | null, children: ExpressionRef[], resultType?: Type): ExpressionRef;
+    block(label: string | null, children: readonly ExpressionRef[], resultType?: Type): ExpressionRef;
     if(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse?: ExpressionRef): ExpressionRef;
     loop(label: string | null, body: ExpressionRef): ExpressionRef;
     br(label: string, condition?: ExpressionRef, value?: ExpressionRef): ExpressionRef;
@@ -1133,11 +1133,11 @@ declare module binaryen {
     br_on_non_null(label: string, value: ExpressionRef): ExpressionRef;
     br_on_cast(label: string, value: ExpressionRef, castType: Type): ExpressionRef;
     br_on_cast_fail(label: string, value: ExpressionRef, castType: Type): ExpressionRef;
-    switch(labels: string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
-    call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
-    return_call(name: string, operands: ExpressionRef[], returnType: Type): ExpressionRef;
-    call_indirect(table: string, target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
-    return_call_indirect(table: string, target: ExpressionRef, operands: ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    switch(labels: readonly string[], defaultLabel: string, condition: ExpressionRef, value?: ExpressionRef): ExpressionRef;
+    call(name: string, operands: readonly ExpressionRef[], returnType: Type): ExpressionRef;
+    return_call(name: string, operands: readonly ExpressionRef[], returnType: Type): ExpressionRef;
+    call_indirect(table: string, target: ExpressionRef, operands: readonly ExpressionRef[], params: Type, results: Type): ExpressionRef;
+    return_call_indirect(table: string, target: ExpressionRef, operands: readonly ExpressionRef[], params: Type, results: Type): ExpressionRef;
     local: {
       get(index: number, type: Type): ExpressionRef;
       set(index: number, value: ExpressionRef): ExpressionRef;
@@ -1745,11 +1745,11 @@ declare module binaryen {
       fence(): ExpressionRef;
     };
     tuple: {
-      make(elements: ExportRef[]): ExpressionRef;
+      make(elements: readonly ExportRef[]): ExpressionRef;
       extract(tuple: ExpressionRef, index: number): ExpressionRef;
     };
     struct: {
-      new: (operands: ExpressionRef[], type: Type) => ExpressionRef;
+      new: (operands: readonly ExpressionRef[], type: Type) => ExpressionRef;
       new_default(type: Type): ExpressionRef;
       get(index: number, ref: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
       set(index: number, ref: ExpressionRef, value: ExpressionRef): ExpressionRef;
@@ -1757,7 +1757,7 @@ declare module binaryen {
     array: {
       new: (type: Type, size: ExpressionRef, init: ExpressionRef) => ExpressionRef;
       new_default(type: Type, size: ExpressionRef): ExpressionRef;
-      new_fixed(type: Type, values: ExpressionRef[]): ExpressionRef;
+      new_fixed(type: Type, values: readonly ExpressionRef[]): ExpressionRef;
       new_data(type: Type, name: string, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
       new_elem(type: Type, name: string, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
       get(ref: ExpressionRef, index: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
@@ -1769,7 +1769,7 @@ declare module binaryen {
       init_elem(name: string, ref: ExpressionRef, index: ExpressionRef, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
     };
     Function: {
-      getName(func: FunctionRef): string;  
+      getName(func: FunctionRef): string;
       getParams(func: FunctionRef): Type;
       getResults(func: FunctionRef): Type;
       getNumVars(func: FunctionRef): number;
@@ -1781,17 +1781,17 @@ declare module binaryen {
       getBody(func: FunctionRef): ExpressionRef;
       setBody(func: FunctionRef, bodyExpr: ExpressionRef): void;
     };
-    call_ref(target: ExpressionRef, operands: ExpressionRef[], type: Type): ExpressionRef;
-    return_call_ref(target: ExpressionRef, operands: ExpressionRef[], type: Type): ExpressionRef;
-    try(name: string, body: ExpressionRef, catchTags: string[], catchBodies: ExpressionRef[], delegateTarget?: string): ExpressionRef;
-    throw(tag: string, operands: ExpressionRef[]): ExpressionRef;
+    call_ref(target: ExpressionRef, operands: readonly ExpressionRef[], type: Type): ExpressionRef;
+    return_call_ref(target: ExpressionRef, operands: readonly ExpressionRef[], type: Type): ExpressionRef;
+    try(name: string, body: ExpressionRef, catchTags: readonly string[], catchBodies: readonly ExpressionRef[], delegateTarget?: string): ExpressionRef;
+    throw(tag: string, operands: readonly ExpressionRef[]): ExpressionRef;
     rethrow(target: string): ExpressionRef;
     select(condition: ExpressionRef, ifTrue: ExpressionRef, ifFalse: ExpressionRef): ExpressionRef;
     drop(value: ExpressionRef): ExpressionRef;
     return(value?: ExpressionRef): ExpressionRef;
     nop(): ExpressionRef;
     unreachable(): ExpressionRef;
-    addFunction(name: string, params: Type, results: Type, vars: Type[], body: ExpressionRef): FunctionRef;
+    addFunction(name: string, params: Type, results: Type, vars: readonly Type[], body: ExpressionRef): FunctionRef;
     getFunction(name: string): FunctionRef;
     removeFunction(name: string): void;
     getNumFunctions(): number;
@@ -1802,8 +1802,8 @@ declare module binaryen {
     addTable(name: string, initial: number, maximum: number): TableRef;
     getTable(name: string): TableRef;
     removeTable(name: string): void;
-    addActiveElementSegment(table: string, name: string, funcNames: string[], offset: ExpressionRef): ElementSegmentRef;
-    addPassiveElementSegment(name: string, funcNames: string[]): ElementSegmentRef;
+    addActiveElementSegment(table: string, name: string, funcNames: readonly string[], offset: ExpressionRef): ElementSegmentRef;
+    addPassiveElementSegment(name: string, funcNames: readonly string[]): ElementSegmentRef;
     getElementSegment(name: string): ElementSegmentRef;
     getTableSegments(table: string): string[];
     removeElementSegment(name: string): void;
@@ -1824,7 +1824,7 @@ declare module binaryen {
     getExport(externalName: string): ExportRef;
     getNumExports(): number;
     getExportByIndex(index: number): ExportRef;
-    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: MemorySegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
+    setMemory(initial: number, maximum: number, exportName?: string | null, segments?: readonly MemorySegment[] | null, shared?: boolean, memory64?: boolean, internalName?: string): void;
     getMemorySegmentInfo(name: string): MemorySegmentInfo;
     getStart(): FunctionRef;
     setStart(start: FunctionRef): void;
@@ -1850,8 +1850,8 @@ declare module binaryen {
     validate(): number;
     optimize(): void;
     optimizeFunction(func: string | FunctionRef): void;
-    runPasses(passes: string[]): void;
-    runPassesOnFunction(func: string | FunctionRef, passes: string[]): void;
+    runPasses(passes: readonly string[]): void;
+    runPassesOnFunction(func: string | FunctionRef, passes: readonly string[]): void;
     dispose(): void;
     emitBinary(): Uint8Array;
     emitBinary(sourceMapUrl: string | null): { binary: Uint8Array; sourceMap: string | null; };
@@ -1874,10 +1874,10 @@ declare module binaryen {
     grow(count: number): void;
     getSize(): number;
     setSignatureType(index: number, paramTypes: Type, resultTypes: Type): void;
-    setStructType(index: number, fields?: TypeBuilderField[]): void;
+    setStructType(index: number, fields?: readonly TypeBuilderField[]): void;
     setArrayType(index: number, elementType: Type, elementPackedType: Type, elementMutable: boolean): void;
     getTempHeapType(index: number): HeapType;
-    getTempTupleType(types: Type[]): Type;
+    getTempTupleType(types: readonly Type[]): Type;
     getTempRefType(heapType: HeapType, nullable: boolean): Type;
     setSubType(index: number, superType: HeapType): void;
     setOpen(index: number): void;
@@ -2356,7 +2356,7 @@ declare module binaryen {
     addBlock(expression: ExpressionRef): RelooperBlockRef;
     addBranch(from: RelooperBlockRef, to: RelooperBlockRef, condition: ExpressionRef, code: ExpressionRef): void;
     addBlockWithSwitch(code: ExpressionRef, condition: ExpressionRef): RelooperBlockRef;
-    addBranchForSwitch(from: RelooperBlockRef, to: RelooperBlockRef, indexes: number[], code: ExpressionRef): void;
+    addBranchForSwitch(from: RelooperBlockRef, to: RelooperBlockRef, indexes: readonly number[], code: ExpressionRef): void;
     renderAndDispose(entry: RelooperBlockRef, labelHelper: number): ExpressionRef;
   }
 
