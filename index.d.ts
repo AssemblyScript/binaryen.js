@@ -1749,13 +1749,13 @@ declare module binaryen {
       extract(tuple: ExpressionRef, index: number): ExpressionRef;
     };
     struct: {
-      new(operands: Type[], type: Type): ExpressionRef;
+      new: (operands: Type[], type: Type) => ExpressionRef;
       new_default(type: Type): ExpressionRef;
       get(index: number, ref: ExpressionRef, type: Type, signed: boolean): ExpressionRef;
       set(index: number, ref: ExpressionRef, value: ExpressionRef): ExpressionRef;
     };
     array: {
-      new(type: Type, size: ExpressionRef, init: ExpressionRef): ExpressionRef;
+      new: (type: Type, size: ExpressionRef, init: ExpressionRef) => ExpressionRef;
       new_default(type: Type, size: ExpressionRef): ExpressionRef;
       new_fixed(type: Type, values: ExpressionRef[]): ExpressionRef;
       new_data(type: Type, name: string, offset: ExpressionRef, size: ExpressionRef): ExpressionRef;
