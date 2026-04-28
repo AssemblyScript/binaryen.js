@@ -4,60 +4,66 @@ import dateFormat from "dateformat";
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const resolve = (...args) => path.resolve(__dirname, ...args);
 
-var src = {
-  git: simpleGit(__dirname + "/../binaryen"),
+const MAX_TAGS_LIMIT = 64;
+
+function isGreater(a, b) {
+  const cmp = semver.compare(semver.coerce(a), semver.coerce(b));
+  return cmp === 0
+    ? a.includes("nightly") && !b.includes("nightly")
+    : cmp > 0;
+}
+
+const createRepo = (path, regex, mapVersion) => ({
+  git: simpleGit(path),
   filter: tag => {
-    var match = /^version_(\d+)$/.exec(tag); // see: https://github.com/WebAssembly/binaryen/issues/1156
+    const match = regex.exec(tag);
     return match ? {
-      tag: tag,
-      version: match[1] + ".0.0",
+      tag,
+      version: mapVersion(match),
     } : null;
   }
-};
+});
 
-var dst = {
-  git: simpleGit(__dirname + "/.."),
-  filter: tag => {
-    var match = /^v(\d+\.\d+\.\d+)(?:\-|$)/.exec(tag);
-    return match ? {
-      tag: tag,
-      version: match[1]
-    } : null;
-  }
-};
+// see: https://github.com/WebAssembly/binaryen/issues/1156
+const src = createRepo(resolve('../binaryen'), /^version_(\d+)(?:_.*)?$/, ([, maj]) => `${maj}.0.0`);
+const dst = createRepo(resolve('..'), /^v(\d+\.\d+\.\d+)(?:\-|$)/, ([, ver]) => ver);
 
-function latest(repo) {
-  return new Promise((resolve, reject) => {
-    repo.git.tags({ "--sort": "-committerdate" }, (err, tags) => {
-      if (err) return reject(err);
-      for (var i = 0; i < tags.all.length; ++i) {
-        var result = repo.filter(tags.all[i]);
-        if (result !== null) {
-          repo.tag = result.tag;
-          repo.version = result.version;
-          return resolve();
-        };
+async function latest(repo) {
+  try {
+    const tagsRaw = await repo.git.raw(['tag', '--sort=-v:refname']);
+    const allTags = tagsRaw.split('\n').filter(Boolean).slice(0, MAX_TAGS_LIMIT);
+
+    for (let tag of allTags) {
+      const res = repo.filter(tag);
+      if (res !== null) {
+        return res;
       }
-      return reject(Error("no matching tags: " + tags.all.join(", ")));
-    });
-  }).catch(err => {
+    }
+    return { version: null, tag: null };
+  } catch (err) {
     console.error(err.stack);
     process.exit(1);
-  });
+  }
 }
 
-if (process.argv[2] === "tag") {
-  latest(src).then(() => console.log(src.tag));
-} else {
-  latest(src).then(() => {
-    latest(dst).then(() => {
-      if (semver.gt(src.version, dst.version))
-        console.log(src.version);
-      else
-        console.log(src.version + "-nightly." + dateFormat(Date.UTC(), "yyyymmdd"));
-    });
-  });
+async function main() {
+  if (process.argv[2] === "tag") {
+    const { tag } = await latest(src);
+    console.log(tag);
+    return;
+  }
+
+  let { version: srcVer } = await latest(src);
+  let { version: dstVer } = await latest(dst);
+
+  if (!dstVer || isGreater(srcVer, dstVer)) {
+    console.log(srcVer);
+  } else {
+    console.log(`${srcVer}-nightly.${dateFormat(Date.UTC(), "yyyymmdd")}`);
+  }
 }
+
+main();
