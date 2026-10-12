@@ -27,7 +27,7 @@
   },
   "scripts": {
     "readme": "doctoc README.md --github --title \"### Contents\"",
-    "check": "tsc index.d.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
+    "check": "tsc index.d.ts tests/table-segments.ts --noEmit --strict --noImplicitAny --strictNullChecks --listFiles --diagnostics",
     "test": "npm run check && node tests/sanity && node tests/example",
     "bundle": "node scripts/bundle.js"
   },
