@@ -1858,7 +1858,7 @@ declare namespace binaryen {
     addActiveElementSegment(table: string, name: string, funcNames: readonly string[], offset: ExpressionRef): ElementSegmentRef;
     addPassiveElementSegment(name: string, funcNames: readonly string[]): ElementSegmentRef;
     getElementSegment(name: string): ElementSegmentRef;
-    getTableSegments(table: string): string[];
+    getTableSegments(table: TableRef): ElementSegmentRef[];
     removeElementSegment(name: string): void;
     addTag(name: string, params: Type, results: Type): TagRef;
     getTag(name: string): TagRef;

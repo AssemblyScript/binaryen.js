@@ -66,3 +66,18 @@ assert(typeof js === "string" && js.length);
 console.log("wrapping an existing module");
 var wrapped = binaryen.wrapModule(mod.ptr);
 assert(wrapped.getFunction("main"));
+
+console.log("getting element references for a table");
+var tables = new binaryen.Module();
+tables.addFunction("answer", binaryen.none, binaryen.i32, [], tables.i32.const(42));
+var dispatch = tables.addTable("dispatch", 1, 1);
+tables.addTable("other", 1, 1);
+tables.addActiveElementSegment("dispatch", "matched", [ "answer" ], tables.i32.const(0));
+tables.addActiveElementSegment("other", "unrelated", [ "answer" ], tables.i32.const(0));
+var segments = tables.getTableSegments(dispatch);
+assert.deepStrictEqual(segments, [ tables.getElementSegment("matched") ]);
+var segmentInfo = binaryen.getElementSegmentInfo(segments[0]);
+assert.strictEqual(segmentInfo.name, "matched");
+assert.strictEqual(segmentInfo.table, "dispatch");
+assert.deepStrictEqual(segmentInfo.data, [ "answer" ]);
+tables.dispose();
